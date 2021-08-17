@@ -1,6 +1,6 @@
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import UserMixin
+from flask_security import UserMixin, RoleMixin
 from . import db, login
 
 
@@ -15,9 +15,12 @@ class CoffeeShop(db.Model):
     address = db.Column(db.String(120), index=True, unique=True)
     cash = db.Column(db.Integer)
     cashless = db.Column(db.Integer)
-    equipments = db.relationship('Equipments', backref='coffee_shop', lazy=True)
+    coffee_shop_equipments = db.relationship('CoffeeShopEquipment', backref='coffee_shop', lazy=True)
     warehouse = db.relationship('Warehouse', backref='coffee_shop', lazy=True)
-    daily_reports = db.relationship('DailyReports', backref='coffee_shop', lazy=True)
+    daily_reports = db.relationship('DailyReport', backref='coffee_shop', lazy=True)
+
+    def __repr__(self):
+        return f'<CoffeeShop: {self.place_name}>'
 
 
 class CoffeeShopEquipment(db.Model):
@@ -26,6 +29,9 @@ class CoffeeShopEquipment(db.Model):
     grinder_1 = db.Column(db.String(64), index=True, unique=True)
     grinder_2 = db.Column(db.String(64), index=True, unique=True)
     coffee_shop_id = db.Column(db.Integer, db.ForeignKey('coffee_shop.id'))
+
+    def __repr__(self):
+        return f'<CoffeeShopEquipment: {self.coffee_shop.place_name}>'
 
 
 class Warehouse(db.Model):
@@ -37,15 +43,27 @@ class Warehouse(db.Model):
     hot_dogs = db.Column(db.Integer)
     coffee_shop_id = db.Column(db.Integer, db.ForeignKey('coffee_shop.id'))
 
+    def __repr__(self):
+        return f'<Warehouse: {self.coffee_shop.place_name}>'
+
+
+permissions = db.Table('permissions',
+                       db.Column('barista_id', db.Integer(), db.ForeignKey('barista.id')),
+                       db.Column('role_id', db.Integer(), db.ForeignKey('role.id')))
+
 
 class Barista(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     phone_number = db.Column(db.String(120), unique=True)
     salary_rate = db.Column(db.Integer)
-    password_hash = db.Column(db.String(128))
-    # permissions
-    daily_reports = db.relationship('DailyReports', backref='barista', lazy=True)
+    daily_reports = db.relationship('DailyReport', backref='barista', lazy=True)
+    password_hash = db.Column(db.String(255))
+    email = db.Column(db.String(255), unique=True)
+    active = db.Column(db.Boolean())
+    confirmed_at = db.Column(db.DateTime())
+    permissions = db.relationship('Role', secondary=permissions,
+                                  backref=db.backref('users', lazy='dynamic'))
 
     def __repr__(self):
         return f'<Barista: {self.name}>'
@@ -55,6 +73,15 @@ class Barista(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+
+class Role(db.Model, RoleMixin):
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(80), unique=True)
+    description = db.Column(db.String(255))
+
+    def __repr__(self):
+        return f'<Role: {self.name}>'
 
 
 expenses = db.Table('expenses',
@@ -76,7 +103,7 @@ class DailyReport(db.Model):
                                backref=db.backref('daily_reports', lazy=True))
 
     def __repr__(self):
-        return f'<DailyReport: {self.timestamp}>'
+        return f'<DailyReport from {self.coffee_shop.place_name} on {self.barista.name} | {self.timestamp}>'
 
 
 class Expense(db.Model):
