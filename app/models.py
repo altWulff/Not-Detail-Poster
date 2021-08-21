@@ -103,7 +103,7 @@ class DailyReport(db.Model):
                                backref=db.backref('daily_reports', lazy=True))
 
     def __repr__(self):
-        return f'<DailyReport from {self.coffee_shop.place_name} on {self.barista.name} | {self.timestamp}>'
+        return f'<DailyReport {self.timestamp}>'
 
 
 class Expense(db.Model):
