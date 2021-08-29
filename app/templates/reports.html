@@ -12,7 +12,6 @@
             {{ day_report.coffee_shop.place_name }} / {{ day_report.coffee_shop.address }}
           </div>
           <div class="card-body">
-              <h6 class="card-subtitle mb-2 text-muted"> {{ day_report.timestamp }}</h6>
             <table class="table">
                 <tbody>
                   <tr>
@@ -34,15 +33,15 @@
                     <th scope="row"></th>
                     <td>Remainder of day</td>
                     <td>{{ day_report.remainder_of_day }}</td>
-                  </tr>
+                </tr>
                 <tr>
                     <th scope="row"></th>
                     <td>Expenses</td>
                     <td>{{ day_report.expenses }}</td>
-                  </tr>
+                </tr>
                 </tbody>
               </table>
-            <h6 class="card-subtitle mb-2 text-muted"> by {{ day_report.barista.name }}</h6>
+              <h6 class="card-subtitle mb-2 text-muted">Отчет отправлен {{ moment(day_report.timestamp).fromNow() }}. Отправил {{ day_report.barista.name }}</h6>
           </div>
         </div>
         </div>

@@ -1,10 +1,23 @@
 {% extends "base.html" %}
 {% block title %}Главная{% endblock %}
 {% block content %}
-Lorem ipsum dolor sit amet, consectetur adipisicing elit. Assumenda deleniti deserunt doloremque esse inventore itaque laudantium provident sapiente. Consequatur cupiditate hic id, iure quos repellat tempore! Autem corporis doloremque iure.
-Lorem ipsum dolor sit amet, consectetur adipisicing elit. Assumenda deleniti deserunt doloremque esse inventore itaque laudantium provident sapiente. Consequatur cupiditate hic id, iure quos repellat tempore! Autem corporis doloremque iure.
-Lorem ipsum dolor sit amet, consectetur adipisicing elit. Assumenda deleniti deserunt doloremque esse inventore itaque laudantium provident sapiente. Consequatur cupiditate hic id, iure quos repellat tempore! Autem corporis doloremque iure.
-Lorem ipsum dolor sit amet, consectetur adipisicing elit. Assumenda deleniti deserunt doloremque esse inventore itaque laudantium provident sapiente. Consequatur cupiditate hic id, iure quos repellat tempore! Autem corporis doloremque iure.
-Lorem ipsum dolor sit amet, consectetur adipisicing elit. Assumenda deleniti deserunt doloremque esse inventore itaque laudantium provident sapiente. Consequatur cupiditate hic id, iure quos repellat tempore! Autem corporis doloremque iure.Lorem ipsum dolor sit amet, consectetur adipisicing elit. Assumenda deleniti deserunt doloremque esse inventore itaque laudantium provident sapiente. Consequatur cupiditate hic id, iure quos repellat tempore! Autem corporis doloremque iure.
+<div class="row align-items-md-stretch">
+    {% for coffee_shop in coffee_shop_list %}
+        <div class="col-md-6">
+            <div class="h-100 p-5 bg-light border rounded-3">
+                <h2>{{coffee_shop.place_name}} / {{coffee_shop.address}}</h2>
+                <p>Cash: {{coffee_shop.cash}}</p>
+                <p>Cashless: {{coffee_shop.cashless}}</p>
+                <p>Arabika: {{coffee_shop.warehouse.coffee_arabika}}</p>
+                <p>Blend: {{coffee_shop.warehouse.coffee_blend}}</p>
+                <p>Milk: {{coffee_shop.warehouse.milk}}</p>
+                <p>Panini: {{coffee_shop.warehouse.panini}}</p>
+                <p>Hot-dogs: {{coffee_shop.warehouse.hot_dogs}}</p>
 
+                <a href="/reports/{{coffee_shop.address}}">Все отчеты</a>
+            </div>
+
+        </div>
+    {% endfor %}
+</div>
 {% endblock %}

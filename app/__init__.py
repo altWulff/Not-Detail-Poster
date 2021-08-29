@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_admin import Admin
+from flask_moment import Moment
 from flask_admin.contrib.sqla import ModelView
 from flask_security import Security, SQLAlchemyUserDatastore
 from flask_debugtoolbar import DebugToolbarExtension
@@ -16,6 +17,7 @@ migrate = Migrate(app, db)
 login = LoginManager(app)
 admin = Admin(app, name='Not Detail Poster', template_mode='bootstrap4')
 toolbar = DebugToolbarExtension(app)
+moment = Moment(app)
 
 from app import views, models, forms, admin
 

@@ -9,13 +9,19 @@ from app.models import Barista, CoffeeShop, DailyReport
 @app.route('/index')
 # @login_required
 def home():
-    return render_template('index.html')
+    coffee_shop_list = CoffeeShop.query.all()
+    return render_template('index.html', coffee_shop_list=coffee_shop_list)
 
 
 @app.route('/reports')
 def reports():
     daily_reports = CoffeeShop.query.first().daily_reports
     return render_template('reports.html', daily_reports=daily_reports)
+
+
+@app.route('/create_report')
+def create_report():
+    return render_template('create_report.html')
 
 
 @app.route('/reports/<coffee_shop_address>')
