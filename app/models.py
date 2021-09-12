@@ -68,6 +68,9 @@ class Barista(UserMixin, db.Model):
     def __repr__(self):
         return f'<Barista: {self.name}>'
 
+    def check_phone_number(self, phone_number):
+        return self.phone_number == phone_number
+
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
