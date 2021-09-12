@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     {% block head %}
     <title>{% block title %}{% endblock %} - Not Detail Poster</title>
     {% endblock %}
@@ -36,15 +37,14 @@
             <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle">
           </a>
           <ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1" style="">
-              <li><a class="dropdown-item" href="#">{{g.current_user}}</a></li>
-            <li><a class="dropdown-item" href="#">Профиль</a></li>
+            <li><a class="dropdown-item" href="#">Профиль {{current_user.name}}</a></li>
             <li><a class="dropdown-item" href="/create_report">Создание отчёта</a></li>
             <li><a class="dropdown-item" href="#">Приход</a></li>
             <li><a class="dropdown-item" href="#">Расход</a></li>
             <li><a class="dropdown-item" href="#">Продажа развеса</a></li>
             <li><a class="dropdown-item" href="#">Списание</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#">Выход</a></li>
+            <li><a class="dropdown-item" href="/logout">Выход</a></li>
           </ul>
         </div>
       </div>
@@ -61,6 +61,7 @@
   <div class="container py-3">
     <span class="text-muted">
         {% block footer %}
+        <p>Current User: {{ current_user }}</p>
         &copy; 2021
         {% endblock %}
     </span>
