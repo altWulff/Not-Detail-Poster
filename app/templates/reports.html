@@ -3,7 +3,7 @@
 {% block head %}
 {% endblock %}
 {% block content %}
-<p>Отчеты. Здесь пока что ничего нет ...</p>
+{% if daily_reports %}
 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 g-2">
     {% for day_report in daily_reports %}
         <div class="col">
@@ -41,10 +41,13 @@
                 </tr>
                 </tbody>
               </table>
-              <h6 class="card-subtitle mb-2 text-muted">Отчет отправлен {{ moment(day_report.timestamp).fromNow() }}. Отправил {{ day_report.barista.name }}</h6>
+              <h6 class="card-subtitle mb-2 text-muted">Отчет отправлен {{ moment(day_report.timestamp).fromNow() }}. Отправил <a href="{{ url_for('user_profile', user_name=day_report.barista.name) }}" class="link-secondary">{{ day_report.barista.name }}</a></h6>
           </div>
         </div>
         </div>
         {% endfor %}
-        </div>
+</div>
+{% else %}
+    <p>Отчеты. Здесь пока что ничего нет ...</p>
+{% endif %}
 {% endblock %}

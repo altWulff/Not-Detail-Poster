@@ -1,4 +1,18 @@
 {% extends "base.html" %}
-{% block title %}Создание отчета{% endblock %}
 {% block content %}
+<form action="" method="post" novalidate>
+    {{ form.csrf_token }}
+        <p>
+            {{ form.cashbox.label }}<br>
+            {{ form.cashbox}}<br>
+            {{form.cash_balance.label}}<br>
+            {{form.cash_balance}}<br>
+            {{form.cashless.label}}<br>
+            {{form.cashless}}<br>
+            {{form.remainder_of_day.label}}<br>
+            {{form.remainder_of_day}}<br>
+
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
 {% endblock %}
