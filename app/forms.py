@@ -13,17 +13,23 @@ class LoginForm(FlaskForm):
 
 
 class RegistrationForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
+    name = StringField('Name', validators=[DataRequired()])
+    phone_number = IntegerField('Phone Number', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     password2 = PasswordField(
         'Repeat Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Register')
 
-    def validate_username(self, username):
-        user = Barista.query.filter_by(username=username.data).first()
+    def validate_username(self, name):
+        user = Barista.query.filter_by(name=name.data).first()
         if user is not None:
-            raise ValidationError('Please use a different username.')
+            raise ValidationError('Please use a different name.')
+            
+    def validate_phone_number(self, phone_number):
+        user = Barista.query.filter_by(phone_number=phone_number.data).first()
+        if user is not None:
+            raise ValidationError('Please use a different phone number.')       
 
     def validate_email(self, email):
         user = Barista.query.filter_by(email=email.data).first()

@@ -1,0 +1,39 @@
+ <div class="col">
+ <div class="card">
+    <div class="card-header">
+            {{ day_report.coffee_shop.place_name }} / {{ day_report.coffee_shop.address }}
+    </div>
+    <div class="card-body">
+        <table class="table">
+            <tbody>
+            <tr>
+               <th scope="row"></th>
+                <td>Cashbox</td>
+                <td>{{ day_report.cashbox }}</td>
+            </tr>
+            <tr>
+                <th scope="row"></th>
+                <td>Cash balance</td>
+                <td>{{ day_report.cash_balance }}</td>
+            </tr>
+            <tr>
+                <th scope="row"></th>
+                <td>Cashless</td>
+                <td>{{ day_report.cashless }}</td>
+            </tr>
+            <tr>
+                <th scope="row"></th>
+                <td>Remainder of day</td>
+                <td>{{ day_report.remainder_of_day }}</td>
+            </tr>
+            <tr>
+                <th scope="row"></th>
+                <td>Expenses</td>
+                <td>{{ day_report.expenses }}</td>
+            </tr>
+            </tbody>
+        </table>
+        <h6 class="card-subtitle mb-2 text-muted">Отчет отправлен {{ moment(day_report.timestamp).fromNow() }}. Отправил <a href="{{ url_for('user_profile', user_name=day_report.barista.name) }}" class="link-secondary">{{ day_report.barista.name }}</a></h6>
+    </div>
+</div>
+</div>

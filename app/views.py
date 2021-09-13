@@ -1,7 +1,7 @@
 from flask import render_template, redirect, url_for, abort, request, flash, g
-from flask_login import login_required, login_user, logout_user, current_user
+from flask_security import login_required,  login_user, logout_user, current_user, roles_required
 from app import app, db
-from app.forms import LoginForm, ReportForm, EditProfileForm
+from app.forms import LoginForm, ReportForm, EditProfileForm, RegistrationForm
 from app.models import Barista, CoffeeShop, DailyReport
 
 
@@ -69,6 +69,7 @@ def reports_on_address(coffee_shop_address):
 
 
 @app.route('/statistics')
+@roles_required('admin')
 @login_required
 def statistics():
     return render_template('statistics.html')
@@ -80,13 +81,27 @@ def login():
     app.logger.info(form.validate_on_submit())
     if form.validate_on_submit():
         user = Barista.query.filter_by(name=form.name.data).first()
-        # if user is None or not user.check_phone_number(form.phone_number.data) or not user.check_password(form.password.data):
-        #     flash('Invalid name, phone number or password')
-        #     return redirect(url_for('login'))
+        if user is None:
+            flash('Invalid name, phone number or password')
+            return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
         return redirect('index')
     return render_template('login.html', title='Sign In', form=form)
 
+@app.route('/new_staff')
+def create_new_staff():
+    #if current_user.is_authenticated:
+        #return redirect(url_for('home'))
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        user = Barista(name=form.username.data,
+        phone_number=form.phone_number.data, email=form.email.data)
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        flash('Congratulations, you are now a registered user!')
+        return redirect(url_for('login'))
+    return render_template('new_staff.html', form=form)
 
 @app.route('/logout')
 def logout():

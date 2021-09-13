@@ -12,50 +12,38 @@
     <script src="{{ url_for('static', filename='moment-with-locales.js') }}">
         {{ moment.include_moment() }}
     </script>
-
+    <style type="text/css" media="all">
+    {% block style %}
+    {% endblock %}    
+    </style>
 </head>
 <header class="p-3 mb-3 border-bottom">
     <div class="container">
       <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-        <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none">
+        <a href="{{ url_for('home') }}" class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none">
           <svg class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap"><use xlink:href="#bootstrap"></use></svg>
         </a>
-
-        <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-            <span class="navbar-brand mb-0 h1"><a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none">Not Detail Poster</a></span>
-          <li><a href="/reports" class="nav-link px-2 link-dark">Отчеты</a></li>
-          <li><a href="/statistics" class="nav-link px-2 link-dark">Статистика</a></li>
-          <li><a href="{{ url_for('admin.index') }}" class="nav-link px-2 link-dark">Админка</a></li>
-        </ul>
-
+        {% include '_nav_bar.html' %}
         <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
           <input type="search" class="form-control" placeholder="Поиск..." aria-label="Search">
         </form>
-
-        <div class="dropdown text-end">
-          <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-            <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle">
-          </a>
-          <ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1" style="">
-            <li><a class="dropdown-item" href="{{ url_for('user_profile', user_name=current_user.name) }}">Профиль {{current_user.name}}</a></li>
-            <li><a class="dropdown-item" href="{{ url_for('create_report') }}">Создание отчёта</a></li>
-            <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#SupplyModal">Поступление</a></li>
-            <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#ConsumptionModal">Расход</a></li>
-            <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#ByWeightModal">Продажа развеса</a></li>
-            <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#WriteOffModal">Списание</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="{{ url_for('logout') }}">Выход</a></li>
-          </ul>
-        </div>
+        {% include '_user_menu.html' %}
       </div>
     </div>
   </header>
 <body class="d-flex flex-column h-100">
 <main class="flex-shrink-0">
-  <div class="container">
-    {% block content %}
-    {% endblock %}
-  </div>
+<div class="container">
+{% with messages = get_flashed_messages() %}
+   {% if messages %}
+       {% for message in messages %}
+           <div class="alert alert-info" role="alert">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+{% block content %}
+{% endblock %}
+</div>
 </main>
 <!-- Приход -->
 <div class="modal fade" id="SupplyModal" tabindex="-1" aria-labelledby="SupplyModal" aria-hidden="true">
@@ -75,65 +63,12 @@
     </div>
   </div>
 </div>
-<!-- Расход -->
-<div class="modal fade" id="ConsumptionModal" tabindex="-1" aria-labelledby="ConsumptionModal" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="ConsumptionModal">Расход</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        ...
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-        <button type="button" class="btn btn-primary">Подтвердить</button>
-      </div>
-    </div>
-  </div>
-</div>
-<!-- Продажа развеса -->
-<div class="modal fade" id="ByWeightModal" tabindex="-1" aria-labelledby="ByWeightModal" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="ByWeightModal">Продажа развеса</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        ...
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-        <button type="button" class="btn btn-primary">Подтвердить</button>
-      </div>
-    </div>
-  </div>
-</div>
-<!-- Списание -->
-<div class="modal fade" id="WriteOffModal" tabindex="-1" aria-labelledby="WriteOffModal" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="WriteOffModal">Списание</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        ...
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-        <button type="button" class="btn btn-primary">Подтвердить</button>
-      </div>
-    </div>
-  </div>
-</div>
 <footer class="bd-footer py-5 mt-5 bg-light">
   <div class="container py-3">
     <span class="text-muted">
         {% block footer %}
-        &copy; 2021
+        <p>Рус/Укр</p>
+        <p>&copy; 2021</p>
         {% endblock %}
     </span>
   </div>

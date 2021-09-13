@@ -7,6 +7,7 @@ from flask_moment import Moment
 from flask_admin.contrib.sqla import ModelView
 from flask_security import Security, SQLAlchemyUserDatastore
 from flask_debugtoolbar import DebugToolbarExtension
+from werkzeug.security import generate_password_hash
 from config import DevelopmentConfig
 
 
@@ -24,13 +25,13 @@ from app import views, models, forms, admin
 user_datastore = SQLAlchemyUserDatastore(db, models.Barista, models.Role)
 security = Security(app, user_datastore)
 
-
 # Create a user to test with
-# @app.before_first_request
-# def create_user():
-#     db.create_all()
-#     user_datastore.create_user(name='Oleg', email='matt@nobien.net', password_hash='1111')
-#     db.session.commit()
+#@app.before_first_request
+def __create_user():
+    db.create_all()
+    password = generate_password_hash('1111')
+    user_datastore.create_user(name='Admin', email='altwulf7@gmail.com', password_hash=password, phone_number=1111)
+    db.session.commit()
 
 
 admin.add_view(ModelView(models.CoffeeShop, db.session, name='Кофейня', category="CoffeShop"))

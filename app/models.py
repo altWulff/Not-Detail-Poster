@@ -47,12 +47,12 @@ class Warehouse(db.Model):
         return f'<Warehouse: {self.coffee_shop.place_name}>'
 
 
-permissions = db.Table('permissions',
+roles = db.Table('roles',
                        db.Column('barista_id', db.Integer(), db.ForeignKey('barista.id')),
                        db.Column('role_id', db.Integer(), db.ForeignKey('role.id')))
 
 
-class Barista(UserMixin, db.Model):
+class Barista(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     phone_number = db.Column(db.String(120), unique=True)
@@ -62,8 +62,7 @@ class Barista(UserMixin, db.Model):
     email = db.Column(db.String(255), unique=True)
     active = db.Column(db.Boolean())
     confirmed_at = db.Column(db.DateTime())
-    permissions = db.relationship('Role', secondary=permissions,
-                                  backref=db.backref('users', lazy='dynamic'))
+    roles = db.relationship('Role', secondary=roles, backref=db.backref('barista', lazy='dynamic'))
 
     def __repr__(self):
         return f'<Barista: {self.name}>'
