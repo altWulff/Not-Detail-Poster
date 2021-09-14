@@ -50,21 +50,24 @@ def edit_profile():
 @login_required
 def create_report():
     form = ReportForm()
+    coffee_shop_list = enumerate(CoffeeShop.query.all())
+    form.coffee_shop.choices = [(g.id, g.place_name +'/'+ g.address ) for g in CoffeeShop.query.order_by('place_name')]
     if form.validate_on_submit():
         daily_report = DailyReport(cashbox=form.cashbox.data, cash_balance=form.cash_balance.data,
                                    cashless=form.cashless.data, remainder_of_day=form.remainder_of_day.data,
-                                   barista=current_user)
+                                   barista=current_user, coffee_shop=form.coffee_shop)
         db.session.add(daily_report)
         db.session.commit()
         flash('Your daily report is now live!')
         return redirect(url_for('home'))
-    return render_template('create_report.html', title='Create daily report', form=form)
+    return render_template('create_report.html', title='Create daily report', coffee_shop_list=coffee_shop_list, form=form)
 
 
 @app.route('/reports/<coffee_shop_address>')
 @login_required
 def reports_on_address(coffee_shop_address):
     daily_reports = CoffeeShop.query.filter_by(address=coffee_shop_address).first_or_404().daily_reports
+    g.current_coffee_shop = CoffeeShop.query.filter_by(address=coffee_shop_address).first()
     return render_template('reports.html', daily_reports=daily_reports)
 
 
@@ -88,15 +91,16 @@ def login():
         return redirect('index')
     return render_template('login.html', title='Sign In', form=form)
 
-@app.route('/new_staff')
+@app.route('/new_staff', methods=['GET', 'POST'])
 def create_new_staff():
     #if current_user.is_authenticated:
         #return redirect(url_for('home'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = Barista(name=form.username.data,
+        user = Barista(name=form.name.data,
         phone_number=form.phone_number.data, email=form.email.data)
         user.set_password(form.password.data)
+        user.confirmed_at = datetime.utcnow()
         db.session.add(user)
         db.session.commit()
         flash('Congratulations, you are now a registered user!')

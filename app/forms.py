@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, TextAreaField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, TextAreaField, SelectField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from app.models import Barista
 
@@ -45,9 +45,10 @@ class EditProfileForm(FlaskForm):
 
 
 class ReportForm(FlaskForm):
-    cashbox = IntegerField('Cashbox', validators=[DataRequired()])
-    cash_balance = IntegerField('Cash balance', validators=[DataRequired()])
-    cashless = IntegerField('Cashless', validators=[DataRequired()])
-    remainder_of_day = IntegerField('Remainder of day', validators=[DataRequired()])
+    coffee_shop = SelectField('Coffee Shop')
+    cashbox = IntegerField('Cashbox')
+    cash_balance = IntegerField('Cash balance')
+    cashless = IntegerField('Cashless')
+    remainder_of_day = IntegerField('Remainder of day')
     submit = SubmitField('Submit')
 
