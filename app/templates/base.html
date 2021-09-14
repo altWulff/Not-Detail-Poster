@@ -19,25 +19,25 @@
 </head>
 <header class="p-3 mb-3 border-bottom">
     <div class="container">
-      <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-        <a href="{{ url_for('home') }}" class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none">
-          <svg class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap"><use xlink:href="#bootstrap"></use></svg>
-        </a>
-        {% include '_nav_bar.html' %}
-        <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
-          <input type="search" class="form-control" placeholder="Поиск..." aria-label="Search">
-        </form>
-        {% include '_user_menu.html' %}
-      </div>
+        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+            <a href="{{ url_for('home') }}" class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none">
+                <svg class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap"><use xlink:href="#bootstrap"></use></svg>
+            </a>
+            {% include '_nav_bar.html' %}
+            <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
+                <input type="search" class="form-control" placeholder="Поиск..." aria-label="Search">
+            </form>
+            {% include '_user_menu.html' %}
+        </div>
     </div>
-  </header>
+</header>
 <body class="d-flex flex-column h-100">
 <main class="flex-shrink-0">
 <div class="container">
 {% with messages = get_flashed_messages() %}
-   {% if messages %}
-       {% for message in messages %}
-           <div class="alert alert-info" role="alert">{{ message }}</div>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-info" role="alert">{{ message }}</div>
         {% endfor %}
     {% endif %}
 {% endwith %}
@@ -45,24 +45,6 @@
 {% endblock %}
 </div>
 </main>
-<!-- Приход -->
-<div class="modal fade" id="SupplyModal" tabindex="-1" aria-labelledby="SupplyModal" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="SupplyModal">Поступление</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        ...
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-        <button type="button" class="btn btn-primary">Подтвердить</button>
-      </div>
-    </div>
-  </div>
-</div>
 <footer class="bd-footer py-5 mt-5 bg-light">
   <div class="container py-3">
     <span class="text-muted">

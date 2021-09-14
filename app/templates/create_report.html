@@ -2,34 +2,34 @@
 {% block content %}
 <form action="" method="post" novalidate>
     {{ form.csrf_token }}
-   {{ form.coffee_shop(class="form-select mb-3") }}
+    {{ form.coffee_shop(class="form-select mb-3") }}
     <div class="form-floating mb-3">
-   {{ form.cashbox(class="form-control", id="floatingInput", placeholder=' ') }}
-    {{ form.cashbox.label(for="floatingInput")}}
-    {% for error in form.cashbox.errors %}
-        <span style="color: red;">{{ error }}</span>
-    {% endfor %}
+        {{ form.cashbox(class="form-control", id="floatingInput", placeholder=' ') }}
+        {{ form.cashbox.label(for="floatingInput")}}
+        {% for error in form.cashbox.errors %}
+            <span style="color: red;">{{ error }}</span>
+        {% endfor %}
     </div>
     <div class="form-floating mb-3">
-    {{ form.cash_balance(class="form-control", id="floatingInput", placeholder=' ') }}
-    {{ form.cash_balance.label(for="floatingInput")}}
-    {% for error in form.cash_balance.errors %}
-        <span style="color: red;">[{{ error }}</span>
-    {% endfor %}
+        {{ form.cash_balance(class="form-control", id="floatingInput", placeholder=' ') }}
+        {{ form.cash_balance.label(for="floatingInput")}}
+        {% for error in form.cash_balance.errors %}
+            <span style="color: red;">[{{ error }}</span>
+        {% endfor %}
     </div>
     <div class="form-floating mb-3">
-    {{ form.cashless(class="form-control", id="floatingInput", placeholder=' ') }}
-    {{ form.cashless.label(for="floatingInput")}}
-    {% for error in form.cashless.errors %}
-        <span style="color: red;">[{{ error }}</span>
-    {% endfor %}
+        {{ form.cashless(class="form-control", id="floatingInput", placeholder=' ') }}
+        {{ form.cashless.label(for="floatingInput")}}
+        {% for error in form.cashless.errors %}
+            <span style="color: red;">[{{ error }}</span>
+        {% endfor %}
     </div>
     <div class="form-floating mb-3">
-    {{ form.remainder_of_day(class="form-control", id="floatingInput", placeholder=' ') }}
-    {{ form.remainder_of_day.label(for="floatingInput")}}
-    {% for error in form.remainder_of_day.errors %}
-        <span style="color: red;">[{{ error }}</span>
-    {% endfor %}
+        {{ form.remainder_of_day(class="form-control", id="floatingInput", placeholder=' ') }}
+        {{ form.remainder_of_day.label(for="floatingInput")}}
+        {% for error in form.remainder_of_day.errors %}
+            <span style="color: red;">[{{ error }}</span>
+        {% endfor %}
     </div>
     <p>{{ form.submit(class="w-100 btn btn-lg btn-primary") }}</p>
     </form>
