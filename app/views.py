@@ -91,6 +91,7 @@ def login():
         return redirect('index')
     return render_template('login.html', title='Sign In', form=form)
 
+
 @app.route('/new_staff', methods=['GET', 'POST'])
 def create_new_staff():
     #if current_user.is_authenticated:
@@ -106,6 +107,7 @@ def create_new_staff():
         flash('Congratulations, you are now a registered user!')
         return redirect(url_for('login'))
     return render_template('new_staff.html', form=form)
+
 
 @app.route('/logout')
 def logout():
