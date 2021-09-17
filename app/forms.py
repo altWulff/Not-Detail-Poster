@@ -1,8 +1,17 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, TextAreaField, SelectField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, FloatField, TextAreaField, SelectField, FormField, FieldList
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from app.models import Barista
 
+
+class MyFloatField(FloatField):
+    def process_formdata(self, valuelist):
+        if valuelist:
+            try:
+                self.data = float(valuelist[0].replace(',', '.'))
+            except ValueError:
+                self.data = None
+                raise ValueError(self.gettext('Not a valid float value'))
 
 class LoginForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
@@ -44,11 +53,20 @@ class EditProfileForm(FlaskForm):
     submit = SubmitField('Submit')
 
 
+class ExpanceForm(FlaskForm):
+    category = StringField('Category')
+    type_cost = StringField('Type')
+    money = IntegerField('Money')
+
 class ReportForm(FlaskForm):
     coffee_shop = SelectField('Coffee Shop')
     cashbox = IntegerField('Cashbox')
     cash_balance = IntegerField('Cash balance')
     cashless = IntegerField('Cashless')
     remainder_of_day = IntegerField('Remainder of day')
+    milk = MyFloatField('Milk')
+    blend = MyFloatField('Blend')
+    arabica = MyFloatField('Arabica')
+    expanses = FieldList(FormField(ExpanceForm))
     submit = SubmitField('Submit')
 
