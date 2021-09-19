@@ -22,6 +22,21 @@
 <form action="" method="post">
     {{ form.csrf_token }}
     <div class="form-floating mb-3">
+<<<<<<< HEAD
+    {{ form.name(class="form-control", id="floatingInput") }}
+    {{ form.name.label(for="floatingInput")}}
+    {{ with_errors(form.name) }}
+    </div>
+    <div class="form-floating mb-3">
+    {{ form.phone_number(class="form-control", id="floatingInput") }}
+    {{ form.phone_number.label(for="floatingInput")}}
+    {{ with_errors(form.phone_number) }}
+    </div>
+    <div class="form-floating mb-3">
+    {{ form.email(class="form-control", id="floatingInput") }}
+    {{ form.email.label(for="floatingInput")}}
+    {{ with_errors(form.email) }}
+=======
         {{ form.name(class="form-control", id="floatingInput") }}
         {{ form.name.label(for="floatingInput")}}
         {% for error in form.name.errors %}
@@ -41,6 +56,7 @@
         {% for error in form.email.errors %}
             <span style="color: red;">[{{ error }}</span>
         {% endfor %}
+>>>>>>> 2b4ed6b886a071065042da2ad481cfa6b9e78a5c
     </div>
     <p>{{ form.submit(class="w-100 btn btn-lg btn-primary") }}</p>
 </form>

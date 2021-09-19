@@ -8,6 +8,6 @@
         <p>Milk: {{coffee_shop.warehouse.milk}}</p>
         <p>Panini: {{coffee_shop.warehouse.panini}}</p>
         <p>Hot-dogs: {{coffee_shop.warehouse.hot_dogs}}</p>
-        <a href="{{ url_for('reports_on_address', coffee_shop_address=coffee_shop.address) }}">Все отчеты</a>
+        <a href="/reports/{{coffee_shop.address}}">Все отчеты</a>
     </div>
 </div>

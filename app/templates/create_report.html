@@ -4,6 +4,41 @@
     {{ form.csrf_token }}
     {{ form.coffee_shop(class="form-select mb-3") }}
     <div class="form-floating mb-3">
+<<<<<<< HEAD
+    {{ form.cashbox(class="form-control", id="floatingInput", placeholder=' ') }}
+    {{ form.cashbox.label(for="floatingInput")}}
+    {{ with_errors(form.cashbox) }}
+    </div>
+    <div class="form-floating mb-3">
+    {{ form.cash_balance(class="form-control", id="floatingInput", placeholder=' ') }}
+    {{ form.cash_balance.label(for="floatingInput")}}
+    {{ with_errors(form.cash_balance) }}
+    </div>
+    <div class="form-floating mb-3">
+    {{ form.cashless(class="form-control", id="floatingInput", placeholder=' ') }}
+    {{ form.cashless.label(for="floatingInput")}}
+    {{ with_errors(form.cashless) }}
+    </div>
+    <div class="form-floating mb-3">
+    {{ form.remainder_of_day(class="form-control", id="floatingInput", placeholder=' ') }}
+    {{ form.remainder_of_day.label(for="floatingInput")}}
+    {{ with_errors(form.remainder_of_day) }}
+    </div>
+    <div class="form-floating mb-3">
+    {{ form.milk(class="form-control", id="floatingInput", placeholder=' ') }}
+    {{ form.milk.label(for="floatingInput")}}
+    {{ with_errors(form.milk) }}
+    </div>
+    <div class="form-floating mb-3">
+    {{ form.blend(class="form-control", id="floatingInput", placeholder=' ') }}
+    {{ form.blend.label(for="floatingInput")}}
+    {{ with_errors(form.blend) }}
+    </div>
+    <div class="form-floating mb-3">
+    {{ form.arabica(class="form-control", id="floatingInput", placeholder=' ') }}
+    {{ form.arabica.label(for="floatingInput")}}
+    {{ with_errors(form.arabica) }}
+=======
         {{ form.cashbox(class="form-control", id="floatingInput", placeholder=' ') }}
         {{ form.cashbox.label(for="floatingInput")}}
         {% for error in form.cashbox.errors %}
@@ -30,6 +65,7 @@
         {% for error in form.remainder_of_day.errors %}
             <span style="color: red;">[{{ error }}</span>
         {% endfor %}
+>>>>>>> 2b4ed6b886a071065042da2ad481cfa6b9e78a5c
     </div>
     <p>{{ form.submit(class="w-100 btn btn-lg btn-primary") }}</p>
     </form>

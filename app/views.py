@@ -49,18 +49,20 @@ def edit_profile():
 @app.route('/create_report', methods=['GET', 'POST'])
 @login_required
 def create_report():
+    #form = ReportForm()
+    #coffee_shop_list = enumerate(CoffeeShop.query.all())
     form = ReportForm()
-    coffee_shop_list = enumerate(CoffeeShop.query.all())
     form.coffee_shop.choices = [(g.id, g.place_name +'/'+ g.address ) for g in CoffeeShop.query.order_by('place_name')]
     if form.validate_on_submit():
+        coffee_shop = CoffeeShop.query.filter_by(id=form.coffee_shop.data).first_or_404()
         daily_report = DailyReport(cashbox=form.cashbox.data, cash_balance=form.cash_balance.data,
                                    cashless=form.cashless.data, remainder_of_day=form.remainder_of_day.data,
-                                   barista=current_user, coffee_shop=form.coffee_shop)
+                                   barista=current_user, coffee_shop=coffee_shop)
         db.session.add(daily_report)
         db.session.commit()
         flash('Your daily report is now live!')
         return redirect(url_for('home'))
-    return render_template('create_report.html', title='Create daily report', coffee_shop_list=coffee_shop_list, form=form)
+    return render_template('create_report.html', title='Create daily report', form=form)
 
 
 @app.route('/reports/<coffee_shop_address>')
