@@ -26,13 +26,9 @@
     {{ form.csrf_token }}
     <h1 class="h3 mb-3 fw-normal">Log-in to your account</h1>
 
-    <div class="form-floating">\
+    <div class="form-floating">
         {{ form.name(class="form-control", id="floatingInput", placeholder='Name') }}
         <label for="floatingInput">Name</label>
-    </div>
-    <div class="form-floating">
-        {{ form.phone_number(class="form-control", id="floatingPhoneNumber", placeholder='Phone number')}}
-        <label for="floatingPhoneNumber">Phone number</label>
     </div>
     <div class="form-floating">
         {{ form.password(class="form-control", id="floatingPassword", placeholder='Password')}}

@@ -13,9 +13,9 @@ class MyFloatField(FloatField):
                 self.data = None
                 raise ValueError(self.gettext('Not a valid float value'))
 
+
 class LoginForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
-    phone_number = IntegerField('Phone Number', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
     remember_me = BooleanField('Remember Me')
     submit = SubmitField('Sign In')
@@ -57,6 +57,7 @@ class ExpanceForm(FlaskForm):
     category = StringField('Category')
     type_cost = StringField('Type')
     money = IntegerField('Money')
+
 
 class ReportForm(FlaskForm):
     coffee_shop = SelectField('Coffee Shop')
