@@ -13,7 +13,6 @@
 {% if messages %}
     {% for message in messages %}
         <div class="alert alert-info" role="alert">{{ message }}</div>
-
     {% endfor %}
 {% endif %}
 {% endwith %}
@@ -25,7 +24,6 @@
 {% endfor %}
 <form action="" method="post" novalidate>
     {{ form.csrf_token }}
-<!--    <img class="mb-4" src="/docs/5.0/assets/brand/bootstrap-logo.svg" alt="" width="72" height="57">-->
     <h1 class="h3 mb-3 fw-normal">Log-in to your account</h1>
 
     <div class="form-floating">\
