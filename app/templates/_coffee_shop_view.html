@@ -1,13 +1,31 @@
  <div class="col-md-6">
     <div class="h-100 p-5 bg-light border rounded-3">
         <h2>{{coffee_shop.place_name}} / {{coffee_shop.address}}</h2>
-        <p>Cash: {{coffee_shop.cash}}</p>
-        <p>Cashless: {{coffee_shop.cashless}}</p>
-        <p>Arabika: {{coffee_shop.warehouse.coffee_arabika}}</p>
-        <p>Blend: {{coffee_shop.warehouse.coffee_blend}}</p>
-        <p>Milk: {{coffee_shop.warehouse.milk}}</p>
-        <p>Panini: {{coffee_shop.warehouse.panini}}</p>
-        <p>Hot-dogs: {{coffee_shop.warehouse.hot_dogs}}</p>
-        <a href="{{ url_for('reports', coffee_shop_address=coffee_shop.address)}}" class="btn btn-primary">Все отчеты</a>
+        <p>Наличка: {{coffee_shop.cash}} грн.</p>
+        <p>Безнал: {{coffee_shop.cashless}} грн.</p>
+        <p><a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseWarehouse_{{coffee_shop.id}}" role="button" aria-expanded="false" aria-controls="collapseWarehouse_{{coffee_shop.id}}">Склад</a></p>
+        <div class="collapse" id="collapseWarehouse_{{coffee_shop.id}}">
+            <div class="card card-body">
+                <p>Арабика: {{warehouse.query.filter_by(id=coffee_shop.id).first().coffee_arabika}} кг</p>
+                <p>Купаж: {{warehouse.query.filter_by(id=coffee_shop.id).first().coffee_blend}} кг</p>
+                <p>Молоко: {{warehouse.query.filter_by(id=coffee_shop.id).first().milk}} л</p>
+                <p>Панини: {{warehouse.query.filter_by(id=coffee_shop.id).first().panini}} шт.</p>
+                <p>Хот-доги: {{warehouse.query.filter_by(id=coffee_shop.id).first().hot_dogs}} шт.</p>
+            </div>
+            <br/>
+        </div>
+        <p><a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseEquipment_{{coffee_shop.id}}" role="button" aria-expanded="false" aria-controls="collapseEquipment_{{coffee_shop.id}}">Оборудование</a></p>
+        <div class="collapse" id="collapseEquipment_{{coffee_shop.id}}">
+            <div class="card card-body">
+                <p>Кофе Машина: {{cs_equip.query.filter_by(id=coffee_shop.id).first().coffee_machine}}</p>
+                <p>Кофемолка 1: {{cs_equip.query.filter_by(id=coffee_shop.id).first().grinder_1}}</p>
+                <p>Кофемолка 2: {{cs_equip.query.filter_by(id=coffee_shop.id).first().grinder_2}}</p>
+            </div>
+            <br/>
+        </div>
+        <a href="{{ url_for('reports', coffee_shop_address=coffee_shop.address)}}" class="btn btn-primary">Отчеты</a>
     </div>
+</div>
+<div>
+    <br />
 </div>

@@ -2,15 +2,17 @@ from flask import render_template, redirect, url_for, abort, request, flash, g
 from flask_security import login_required,  login_user, logout_user, current_user, roles_required
 from app import app, db
 from app.forms import LoginForm, ReportForm, EditProfileForm, RegistrationForm
-from app.models import Barista, CoffeeShop, DailyReport
+from app.models import Barista, CoffeeShop, DailyReport, Warehouse, CoffeeShopEquipment
 
 
 @app.route('/')
 @app.route('/index')
 @login_required
 def home():
+    warehouse= Warehouse
+    cs_equip = CoffeeShopEquipment
     coffee_shop_list = CoffeeShop.query.all()
-    return render_template('index.html', coffee_shop_list=coffee_shop_list)
+    return render_template('index.html', coffee_shop_list=coffee_shop_list, warehouse=warehouse,cs_equip=cs_equip)
 
 
 @app.route('/reports')
