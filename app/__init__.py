@@ -25,14 +25,6 @@ from app import views, models, forms, admin
 user_datastore = SQLAlchemyUserDatastore(db, models.Barista, models.Role)
 security = Security(app, user_datastore)
 
-# Create a user to test with
-#@app.before_first_request
-def __create_user():
-    db.create_all()
-    password = generate_password_hash('1111')
-    user_datastore.create_user(name='Admin', email='altwulf7@gmail.com', password_hash=password, phone_number=1111)
-    db.session.commit()
-
 
 admin.add_view(ModelView(models.CoffeeShop, db.session, name='Кофейня', category="CoffeShop"))
 admin.add_view(ModelView(models.CoffeeShopEquipment, db.session, name='Оборудование', category="CoffeShop"))
