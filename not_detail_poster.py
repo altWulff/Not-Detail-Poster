@@ -24,5 +24,4 @@ def create_superuser(username, password):
     user_datastore.activate_user(user)
     user_datastore.add_role_to_user(user, role)
     db.session.commit()
-    print (f'Create superuser with name: {name}'
-    
+    print (f'Create superuser with name: {name}')
