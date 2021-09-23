@@ -21,17 +21,33 @@
 <div class="modal fade" id="ConsumptionModal" tabindex="-1" aria-labelledby="ConsumptionModal" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
+            <form action="{{ url_for('new_expance') }}" method="post">
             <div class="modal-header">
                 <h5 class="modal-title" id="ConsumptionModal">Расход</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                ...
+                <div class="form-floating mb-3">
+                    {{ expance_form.category(class="form-control", id="floatingInput", placeholder=' ') }}
+                    {{ expance_form.category.label(for="floatingInput")}}
+                    {{ with_errors(expance_form.category) }}
+                </div>
+                <div class="form-floating mb-3">
+                    {{ expance_form.type_cost(class="form-control", id="floatingInput", placeholder=' ') }}
+                    {{ expance_form.type_cost.label(for="floatingInput")}}
+                    {{ with_errors(expance_form.type_cost) }}
+                </div>
+                <div class="form-floating mb-3">
+                    {{ expance_form.money(class="form-control", id="floatingInput", placeholder=' ') }}
+                    {{ expance_form.money.label(for="floatingInput")}}
+                    {{ with_errors(expance_form.money) }}
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                <button type="button" class="btn btn-primary">Подтвердить</button>
+                {{ expance_form.submit(class="btn btn-primary") }}
             </div>
+            </form>
         </div>
     </div>
 </div>

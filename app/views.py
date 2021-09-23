@@ -1,12 +1,17 @@
-from flask import render_template, redirect, url_for, abort, request, flash, g
+from datetime import datetime
+from flask import render_template, redirect, url_for, abort, request, flash, g, json
 from flask_security import login_required,  login_user, logout_user, current_user, roles_required
 from app import app, db
-from app.forms import LoginForm, ReportForm, EditProfileForm, RegistrationForm
-from app.models import Barista, CoffeeShop, DailyReport, Warehouse, CoffeeShopEquipment
+from app.forms import LoginForm, ReportForm, EditProfileForm, RegistrationForm, ExpanceForm
+from app.models import Barista, CoffeeShop, DailyReport, Warehouse, CoffeeShopEquipment, Expense
 
+@app.context_processor
+def inject_form():
+    expance_form = ExpanceForm()
+    return dict(expance_form=expance_form)
 
 @app.route('/')
-@app.route('/index')
+@app.route('/index', methods=["POST","GET"])
 @login_required
 def home():
     warehouse= Warehouse
@@ -20,7 +25,6 @@ def home():
 def reports():
     daily_reports = CoffeeShop.query.first().daily_reports
     return render_template('reports.html', daily_reports=daily_reports)
-
 
 @app.route('/user/<user_name>')
 @login_required
@@ -117,3 +121,20 @@ def create_new_staff():
 def logout():
     logout_user()
     return redirect('index')
+
+
+@app.route('/expance', methods=['POST'])
+def new_expance():
+    form = ExpanceForm()
+    if request.method == "POST":
+        category = form.category.data
+        type_cost = form.type_cost.data
+        money=form.money.data
+        expance = Expense(category=category, type_cost=type_cost, money=money)
+        expance.timestamp = datetime.utcnow()
+        db.session.add(expance)
+        db.session.commit()
+        flash(form.data)
+        return redirect(url_for("home"))
+
+    return render_template("index.html")

@@ -57,17 +57,16 @@ class ExpanceForm(FlaskForm):
     category = StringField('Category')
     type_cost = StringField('Type')
     money = IntegerField('Money')
+    submit = SubmitField('Submit')
 
 
 class ReportForm(FlaskForm):
     coffee_shop = SelectField('Coffee Shop')
-    cashbox = IntegerField('Cashbox')
-    cash_balance = IntegerField('Cash balance')
-    cashless = IntegerField('Cashless')
-    remainder_of_day = IntegerField('Remainder of day')
-    milk = MyFloatField('Milk')
-    blend = MyFloatField('Blend')
-    arabica = MyFloatField('Arabica')
+    cashless = IntegerField('Безнал')
+    remainder_of_day = IntegerField('Фактический остаток')
+    milk = MyFloatField('Остаток молока')
+    blend = MyFloatField('Остаток купажа')
+    arabica = MyFloatField('Остаток арабики')
     expanses = FieldList(FormField(ExpanceForm))
     submit = SubmitField('Submit')
 

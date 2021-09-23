@@ -4,16 +4,6 @@
     {{ form.csrf_token }}
     {{ form.coffee_shop(class="form-select mb-3") }}
     <div class="form-floating mb-3">
-        {{ form.cashbox(class="form-control", id="floatingInput", placeholder=' ') }}
-        {{ form.cashbox.label(for="floatingInput")}}
-        {{ with_errors(form.cashbox) }}
-    </div>
-    <div class="form-floating mb-3">
-        {{ form.cash_balance(class="form-control", id="floatingInput", placeholder=' ') }}
-        {{ form.cash_balance.label(for="floatingInput")}}
-        {{ with_errors(form.cash_balance) }}
-    </div>
-    <div class="form-floating mb-3">
         {{ form.cashless(class="form-control", id="floatingInput", placeholder=' ') }}
         {{ form.cashless.label(for="floatingInput")}}
         {{ with_errors(form.cashless) }}
