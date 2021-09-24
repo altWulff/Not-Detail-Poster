@@ -27,21 +27,9 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="form-floating mb-3">
-                    {{ expance_form.category(class="form-control", id="floatingInput", placeholder=' ') }}
-                    {{ expance_form.category.label(for="floatingInput")}}
-                    {{ with_errors(expance_form.category) }}
-                </div>
-                <div class="form-floating mb-3">
-                    {{ expance_form.type_cost(class="form-control", id="floatingInput", placeholder=' ') }}
-                    {{ expance_form.type_cost.label(for="floatingInput")}}
-                    {{ with_errors(expance_form.type_cost) }}
-                </div>
-                <div class="form-floating mb-3">
-                    {{ expance_form.money(class="form-control", id="floatingInput", placeholder=' ') }}
-                    {{ expance_form.money.label(for="floatingInput")}}
-                    {{ with_errors(expance_form.money) }}
-                </div>
+                {{ render_field(expance_form.category) }}
+                {{ render_field(expance_form.type_cost) }}
+                {{ render_field(expance_form.money) }}
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>

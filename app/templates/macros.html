@@ -3,3 +3,11 @@
         <span style="color: red;">{{ error }}</span>
     {% endfor %}
 {% endmacro %}
+
+{% macro render_field(field) %}
+ <div class="form-floating mb-3">
+    {{ field(class="form-control", id="floatingInput", placeholder=' ') }}
+    {{ field.label(for="floatingInput")}}
+    {{ with_errors(field) }}
+</div>
+{% endmacro %}

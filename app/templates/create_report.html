@@ -3,31 +3,11 @@
 <form action="" method="post" novalidate>
     {{ form.csrf_token }}
     {{ form.coffee_shop(class="form-select mb-3") }}
-    <div class="form-floating mb-3">
-        {{ form.cashless(class="form-control", id="floatingInput", placeholder=' ') }}
-        {{ form.cashless.label(for="floatingInput")}}
-        {{ with_errors(form.cashless) }}
-    </div>
-    <div class="form-floating mb-3">
-        {{ form.remainder_of_day(class="form-control", id="floatingInput", placeholder=' ') }}
-        {{ form.remainder_of_day.label(for="floatingInput")}}
-        {{ with_errors(form.remainder_of_day) }}
-    </div>
-    <div class="form-floating mb-3">
-        {{ form.milk(class="form-control", id="floatingInput", placeholder=' ') }}
-        {{ form.milk.label(for="floatingInput")}}
-        {{ with_errors(form.milk) }}
-    </div>
-    <div class="form-floating mb-3">
-        {{ form.blend(class="form-control", id="floatingInput", placeholder=' ') }}
-        {{ form.blend.label(for="floatingInput")}}
-        {{ with_errors(form.blend) }}
-    </div>
-    <div class="form-floating mb-3">
-        {{ form.arabica(class="form-control", id="floatingInput", placeholder=' ') }}
-        {{ form.arabica.label(for="floatingInput")}}
-        {{ with_errors(form.arabica) }}
-    </div>
+    {{ render_field(form.cashless) }}
+    {{ render_field(form.remainder_of_day) }}
+    {{ render_field(form.milk) }}
+    {{ render_field(form.blend) }}
+    {{ render_field(form.arabica) }}
     <p>{{ form.submit(class="w-100 btn btn-lg btn-primary") }}</p>
     </form>
 {% endblock %}
