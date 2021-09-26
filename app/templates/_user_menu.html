@@ -28,6 +28,11 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+                <select name="coffee_shop" class="form-select mb-3">
+                    {% for cs in coffee_shop_list %}
+                        <option>{{ cs.place_name }}</option>
+                    {% endfor%}
+                </select>
                 {{ render_field(expense_form.category) }}
                 {{ render_field(expense_form.type_cost) }}
                 {{ render_field(expense_form.money) }}

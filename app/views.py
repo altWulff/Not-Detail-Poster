@@ -132,9 +132,14 @@ def new_expense():
         money = form.money.data
         expense = Expense(category=category, type_cost=type_cost, money=money)
         expense.timestamp = datetime.utcnow()
+        coffee_shop = CoffeeShop.query.filter_by(place_name=form.coffee_shop.data).first_or_404()
+        if form.type_cost.data == 'cashless':
+            coffee_shop.cashless -= form.money.data
+        else:
+            coffee_shop.cash -= form.money.data
         db.session.add(expense)
         db.session.commit()
-        flash(form.data)
+        flash('New expense')
         return redirect(url_for("home"))
 
     return render_template("index.html")

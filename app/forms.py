@@ -55,6 +55,7 @@ class EditProfileForm(FlaskForm):
 
 
 class ExpanseForm(FlaskForm):
+    coffee_shop = SelectField('Coffee Shop')
     category = StringField('Category')
     type_cost = StringField('Type')
     money = IntegerField('Money')
