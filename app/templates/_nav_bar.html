@@ -1,6 +1,15 @@
  <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
     <span class="navbar-brand mb-0 h1"><a href="{{ url_for('home') }}" class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none">Not Detail Poster</a></span>
-    <li><a href="{{ url_for('reports') }}" class="nav-link px-2 link-dark">Отчеты</a></li>
+        <li class="nav-item dropdown">
+            <a class="nav-link px-2 link-dark dropdown-toggle" href="#" id="navbarDarkDropdownMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Отчеты
+            </a>
+            <ul class="dropdown-menu text-small" aria-labelledby="navbarDarkDropdownMenuLink">
+                {% for coffee_shop in coffee_shop_list %}
+                    <li><a class="dropdown-item" href="{{ url_for('reports_on_address', coffee_shop_address=coffee_shop.address)}}">{{coffee_shop.place_name}} / {{coffee_shop.address}}</a></li>
+                {% endfor %}
+            </ul>
+        </li>
     <li><a href="{{ url_for('statistics') }}" class="nav-link px-2 link-dark">Статистика</a></li>
     <li><a href="{{ url_for('admin.index') }}" class="nav-link px-2 link-dark">Админка</a></li>
 </ul>

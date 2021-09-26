@@ -1,10 +1,11 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, FloatField, TextAreaField, SelectField, FormField, FieldList
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, FloatField, TextAreaField, \
+    SelectField, FormField, FieldList, DecimalField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from app.models import Barista
 
 
-class MyFloatField(FloatField):
+class MyFloatField(DecimalField):
     def process_formdata(self, valuelist):
         if valuelist:
             try:
@@ -53,7 +54,7 @@ class EditProfileForm(FlaskForm):
     submit = SubmitField('Submit')
 
 
-class ExpanceForm(FlaskForm):
+class ExpanseForm(FlaskForm):
     category = StringField('Category')
     type_cost = StringField('Type')
     money = IntegerField('Money')
@@ -67,6 +68,25 @@ class ReportForm(FlaskForm):
     milk = MyFloatField('Остаток молока')
     blend = MyFloatField('Остаток купажа')
     arabica = MyFloatField('Остаток арабики')
-    expanses = FieldList(FormField(ExpanceForm))
+    panini = IntegerField('Панини')
+    hot_dogs = IntegerField('Хот-доги')
+    expanses = FieldList(FormField(ExpanseForm))
     submit = SubmitField('Submit')
 
+
+class CoffeeShopForm(FlaskForm):
+    place_name = StringField('Название кофейни')
+    address = StringField('Адрес')
+    cash = IntegerField('Наличка')
+    cashless = IntegerField('Безнал')
+
+    coffee_machine = StringField('Кофе машина')
+    grinder_1 = StringField('Кофемолка')
+    grinder_2 = StringField('Type')
+
+    milk = MyFloatField('Молоко')
+    blend = MyFloatField('Купаж')
+    arabica = MyFloatField('Бленд')
+    panini = IntegerField('Панини')
+    hot_dogs = IntegerField('Хот-доги')
+    submit = SubmitField('Создать')
