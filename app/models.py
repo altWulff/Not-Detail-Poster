@@ -18,6 +18,8 @@ class CoffeeShop(db.Model):
     coffee_shop_equipments = db.relationship('CoffeeShopEquipment', backref='coffee_shop', lazy=True)
     warehouse = db.relationship('Warehouse', backref='coffee_shop', lazy=True)
     daily_reports = db.relationship('DailyReport', backref='coffee_shop', lazy=True)
+    baristas = db.relationship('Barista', backref='coffee_shop', lazy=True)
+    expenses = db.relationship('Expense', backref='coffee_shop', lazy=True)
 
     def __repr__(self):
         return f'<CoffeeShop: {self.place_name}>'
@@ -57,6 +59,7 @@ class Barista(db.Model, UserMixin):
     name = db.Column(db.String(64), index=True, unique=True)
     phone_number = db.Column(db.String(120), unique=True)
     salary_rate = db.Column(db.Integer)
+    coffee_shop_id = db.Column(db.Integer, db.ForeignKey('coffee_shop.id'))
     daily_reports = db.relationship('DailyReport', backref='barista', lazy=True)
     password_hash = db.Column(db.String(255))
     email = db.Column(db.String(255), unique=True)
@@ -115,6 +118,8 @@ class Expense(db.Model):
     # налл, безнал
     type_cost = db.Column(db.String(64), index=True)
     money = db.Column(db.Integer)
+    # один ко многому одна Кофейня много расходов
+    coffee_shop_id = db.Column(db.Integer, db.ForeignKey('coffee_shop.id'))
 
     def __repr__(self):
         return f'<Expense: {self.category}({self.type_cost}) - {self.money}>'
