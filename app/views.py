@@ -1,23 +1,25 @@
 from datetime import datetime
 from flask import render_template, redirect, url_for, abort, request, flash, g, json
-from flask_security import login_required,  login_user, logout_user, current_user, roles_required
+from flask_security import login_required, login_user, logout_user, current_user, roles_required
 from app import app, db
-from app.forms import LoginForm, ReportForm, EditProfileForm, RegistrationForm, ExpanceForm
+from app.forms import LoginForm, ReportForm, EditProfileForm, RegistrationForm, ExpanseForm, CoffeeShopForm
 from app.models import Barista, CoffeeShop, DailyReport, Warehouse, CoffeeShopEquipment, Expense
+
 
 @app.context_processor
 def inject_form():
-    expance_form = ExpanceForm()
-    return dict(expance_form=expance_form)
+    expense_form = ExpanseForm()
+    coffee_shop_list = CoffeeShop.query.all()
+    return dict(expense_form=expense_form, coffee_shop_list=coffee_shop_list)
+
 
 @app.route('/')
-@app.route('/index', methods=["POST","GET"])
+@app.route('/index', methods=["POST", "GET"])
 @login_required
 def home():
-    warehouse= Warehouse
+    warehouse = Warehouse
     cs_equip = CoffeeShopEquipment
-    coffee_shop_list = CoffeeShop.query.all()
-    return render_template('index.html', coffee_shop_list=coffee_shop_list, warehouse=warehouse,cs_equip=cs_equip)
+    return render_template('index.html', warehouse=warehouse, cs_equip=cs_equip)
 
 
 @app.route('/reports')
@@ -25,6 +27,7 @@ def home():
 def reports():
     daily_reports = CoffeeShop.query.first().daily_reports
     return render_template('reports.html', daily_reports=daily_reports)
+
 
 @app.route('/user/<user_name>')
 @login_required
@@ -55,10 +58,8 @@ def edit_profile():
 @app.route('/create_report', methods=['GET', 'POST'])
 @login_required
 def create_report():
-    #form = ReportForm()
-    #coffee_shop_list = enumerate(CoffeeShop.query.all())
     form = ReportForm()
-    form.coffee_shop.choices = [(g.id, g.place_name +'/'+ g.address ) for g in CoffeeShop.query.order_by('place_name')]
+    form.coffee_shop.choices = [(g.id, g.place_name + '/' + g.address) for g in CoffeeShop.query.order_by('place_name')]
     if form.validate_on_submit():
         coffee_shop = CoffeeShop.query.filter_by(id=form.coffee_shop.data).first_or_404()
         daily_report = DailyReport(cashbox=form.cashbox.data, cash_balance=form.cash_balance.data,
@@ -102,12 +103,11 @@ def login():
 
 @app.route('/new_staff', methods=['GET', 'POST'])
 def create_new_staff():
-    #if current_user.is_authenticated:
-        #return redirect(url_for('home'))
     form = RegistrationForm()
     if form.validate_on_submit():
         user = Barista(name=form.name.data,
-        phone_number=form.phone_number.data, email=form.email.data)
+                       phone_number=form.phone_number.data,
+                       email=form.email.data)
         user.set_password(form.password.data)
         user.confirmed_at = datetime.utcnow()
         db.session.add(user)
@@ -123,18 +123,42 @@ def logout():
     return redirect('index')
 
 
-@app.route('/expance', methods=['POST'])
-def new_expance():
-    form = ExpanceForm()
+@app.route('/expense', methods=['POST'])
+def new_expense():
+    form = ExpanseForm()
     if request.method == "POST":
         category = form.category.data
         type_cost = form.type_cost.data
-        money=form.money.data
-        expance = Expense(category=category, type_cost=type_cost, money=money)
-        expance.timestamp = datetime.utcnow()
-        db.session.add(expance)
+        money = form.money.data
+        expense = Expense(category=category, type_cost=type_cost, money=money)
+        expense.timestamp = datetime.utcnow()
+        coffee_shop = CoffeeShop.query.filter_by(place_name=form.coffee_shop.data).first_or_404()
+        if form.type_cost.data == 'cashless':
+            coffee_shop.cashless -= form.money.data
+        else:
+            coffee_shop.cash -= form.money.data
+        db.session.add(expense)
         db.session.commit()
-        flash(form.data)
+        flash('New expense')
         return redirect(url_for("home"))
 
     return render_template("index.html")
+
+
+@app.route('/new_coffee_shop', methods=['GET', 'POST'])
+def new_coffee_shop():
+    form = CoffeeShopForm()
+    if form.validate_on_submit():
+        coffee_shop = CoffeeShop(place_name=form.place_name.data, address=form.address.data, cash=form.cash.data,
+                                 cashless=form.cashless.data)
+        warehouse = Warehouse(coffee_arabika=form.arabica.data, coffee_blend=form.blend.data, milk=form.milk.data,
+                              panini=form.panini.data, hot_dogs=form.hot_dogs.data)
+        equipments = CoffeeShopEquipment(coffee_machine=form.coffee_machine.data, grinder_1=form.grinder_1.data,
+                                         grinder_2=form.grinder_2.data)
+        coffee_shop.coffee_shop_equipments.append(equipments)
+        coffee_shop.warehouse.append(warehouse)
+        db.session.add(coffee_shop)
+        db.session.commit()
+        flash('Congratulations, you are create a new coffee shop!')
+        return redirect(url_for('home'))
+    return render_template('new_coffee_shop.html', form=form)

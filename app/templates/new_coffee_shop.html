@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Создание новой кофейни{% endblock %}
+{% block content %}
+<h1>Создание кофейни</h1>
+    <form method="post">
+      {{ form.csrf_token }}
+      {{ render_field(form.place_name) }}
+      {{ render_field(form.address) }}
+      {{ render_field(form.cash) }}
+      {{ render_field(form.cashless) }}
+      <h4>Оборудование</h4>
+      {{ render_field(form.coffee_machine) }}
+      {{ render_field(form.grinder_1) }}
+      {{ render_field(form.grinder_2) }}
+      <h4>Склад</h4>
+      {{ render_field(form.milk) }}
+      {{ render_field(form.blend) }}
+      {{ render_field(form.arabica) }}
+      {{ render_field(form.panini) }}
+      {{ render_field(form.hot_dogs) }}
+      <p>{{ form.submit(class="w-100 btn btn-lg btn-primary") }}</p>
+    </form>
+{% endblock %}

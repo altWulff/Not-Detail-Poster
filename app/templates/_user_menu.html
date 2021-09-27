@@ -12,6 +12,7 @@
     <li><hr class="dropdown-divider"></li>
     
     <li><a class="dropdown-item" href="{{ url_for('create_new_staff') }}">Новый персонал</a></li>
+    <li><a class="dropdown-item" href="{{ url_for('new_coffee_shop') }}">Новая кофейня</a></li>
     <li><hr class="dropdown-divider"></li>
     
     <li><a class="dropdown-item" href="{{ url_for('logout') }}">Выход</a></li>
@@ -21,19 +22,24 @@
 <div class="modal fade" id="ConsumptionModal" tabindex="-1" aria-labelledby="ConsumptionModal" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="{{ url_for('new_expance') }}" method="post">
+            <form action="{{ url_for('new_expense') }}" method="post">
             <div class="modal-header">
                 <h5 class="modal-title" id="ConsumptionModal">Расход</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                {{ render_field(expance_form.category) }}
-                {{ render_field(expance_form.type_cost) }}
-                {{ render_field(expance_form.money) }}
+                <select name="coffee_shop" class="form-select mb-3">
+                    {% for cs in coffee_shop_list %}
+                        <option>{{ cs.place_name }}</option>
+                    {% endfor%}
+                </select>
+                {{ render_field(expense_form.category) }}
+                {{ render_field(expense_form.type_cost) }}
+                {{ render_field(expense_form.money) }}
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                {{ expance_form.submit(class="btn btn-primary") }}
+                {{ expense_form.submit(class="btn btn-primary") }}
             </div>
             </form>
         </div>
