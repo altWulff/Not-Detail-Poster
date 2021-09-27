@@ -98,13 +98,33 @@ class DailyReport(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     coffee_shop_id = db.Column(db.Integer, db.ForeignKey('coffee_shop.id'))
     barista_id = db.Column(db.Integer, db.ForeignKey('barista.id'))
+    # Дата
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    # Касса - остаток дня в сумме с расходами
     cashbox = db.Column(db.Integer)
-    cash_balance = db.Column(db.Integer)
-    cashless = db.Column(db.Integer)
-    remainder_of_day = db.Column(db.Integer)
+    # Расходы
     expenses = db.relationship('Expense', secondary=expenses, lazy='subquery',
                                backref=db.backref('daily_reports', lazy=True))
+    # О.Д. - сумма нала и безнала за день
+    remainder_of_day = db.Column(db.Integer)
+    # Б.Н. безнал да день
+    cashless = db.Column(db.Integer)
+    # О.Н. остаток наличности за день
+    cash_balance = db.Column(db.Integer)
+    # Ф.О. остаток налички на коней дня
+    actual_balance = db.Column(db.Integer)
+    # потребление за день
+    consumption_coffee_arabika = db.Column(db.Float)
+    consumption_coffee_blend = db.Column(db.Float)
+    consumption_milk = db.Column(db.Float)
+    consumption_panini = db.Column(db.Integer)
+    consumption_hot_dogs = db.Column(db.Integer)
+    # остаток продукции в конце дня
+    coffee_arabika = db.Column(db.Float)
+    coffee_blend = db.Column(db.Float)
+    milk = db.Column(db.Float)
+    panini = db.Column(db.Integer)
+    hot_dogs = db.Column(db.Integer)
 
     def __repr__(self):
         return f'<DailyReport {self.timestamp}>'
