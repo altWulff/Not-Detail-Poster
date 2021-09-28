@@ -4,17 +4,17 @@
     {{ form.csrf_token }}
     {{ form.coffee_shop(class="form-select mb-3") }}
     {{ render_field(form.cashless) }}
-    {{ render_field(form.remainder_of_day) }}
-    {{ render_field(form.milk) }}
-    {{ render_field(form.blend) }}
-    {{ render_field(form.arabica) }}
-    {{ render_field(form.panini) }}
-    {{ render_field(form.hot_dogs) }}
+    {{ render_field(form.actual_balance) }}
     {% for entry in form.expanses %}
         <p>Expanse</p>
         {{ entry() }}
         <br />
     {% endfor %}
+    {{ render_field(form.milk) }}
+    {{ render_field(form.blend) }}
+    {{ render_field(form.arabica) }}
+    {{ render_field(form.panini) }}
+    {{ render_field(form.hot_dogs) }}
     <p>{{ form.submit(class="w-100 btn btn-lg btn-primary") }}</p>
     </form>
 {% endblock %}
