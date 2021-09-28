@@ -55,9 +55,9 @@ class EditProfileForm(FlaskForm):
 
 
 class LocalExpanseForm(FlaskForm):
-    category = StringField('Category')
-    type_cost = StringField('Type')
-    money = IntegerField('Money')
+    category = StringField('Category', validators=[DataRequired()])
+    type_cost = StringField('Type', validators=[DataRequired()])
+    money = IntegerField('Money', validators=[DataRequired()])
 
  
 class ExpanseForm(LocalExpanseForm):
@@ -68,7 +68,7 @@ class ExpanseForm(LocalExpanseForm):
 class ReportForm(FlaskForm):
     coffee_shop = SelectField('Coffee Shop')
     cashless = IntegerField('Безнал', default=0)
-    remainder_of_day = IntegerField('Фактический остаток', default=0)
+    actual_balance = IntegerField('Фактический остаток', default=0)
     milk = MyFloatField('Остаток молока', default=0.0)
     blend = MyFloatField('Остаток купажа', default=0.0)
     arabica = MyFloatField('Остаток арабики', default=0.0)
@@ -79,18 +79,18 @@ class ReportForm(FlaskForm):
 
 
 class CoffeeShopForm(FlaskForm):
-    place_name = StringField('Название кофейни')
-    address = StringField('Адрес')
-    cash = IntegerField('Наличка')
-    cashless = IntegerField('Безнал')
+    place_name = StringField('Название кофейни', validators=[DataRequired()])
+    address = StringField('Адрес', validators=[DataRequired()])
+    cash = IntegerField('Наличка', default=0)
+    cashless = IntegerField('Безнал', default=0)
 
-    coffee_machine = StringField('Кофе машина')
-    grinder_1 = StringField('Кофемолка')
-    grinder_2 = StringField('Type')
+    coffee_machine = StringField('Кофе машина', default='')
+    grinder_1 = StringField('Кофемолка 1', default='')
+    grinder_2 = StringField('Кофемолка 2', default='')
 
-    milk = MyFloatField('Молоко')
-    blend = MyFloatField('Купаж')
-    arabica = MyFloatField('Бленд')
-    panini = IntegerField('Панини')
-    hot_dogs = IntegerField('Хот-доги')
+    milk = MyFloatField('Молоко', default=0.0)
+    blend = MyFloatField('Купаж', default=0.0)
+    arabica = MyFloatField('Бленд', default=0.0)
+    panini = IntegerField('Панини', default=0)
+    hot_dogs = IntegerField('Хот-доги', default=0)
     submit = SubmitField('Создать')
