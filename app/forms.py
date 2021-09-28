@@ -54,24 +54,27 @@ class EditProfileForm(FlaskForm):
     submit = SubmitField('Submit')
 
 
-class ExpanseForm(FlaskForm):
-    coffee_shop = SelectField('Coffee Shop')
+class LocalExpanseForm(FlaskForm):
     category = StringField('Category')
     type_cost = StringField('Type')
     money = IntegerField('Money')
-    submit = SubmitField('Submit')
+
+ 
+class ExpanseForm(LocalExpanseForm):
+    coffee_shop = SelectField('Coffee Shop')
+    submit = SubmitField('Submit')   
 
 
 class ReportForm(FlaskForm):
     coffee_shop = SelectField('Coffee Shop')
-    cashless = IntegerField('Безнал')
-    remainder_of_day = IntegerField('Фактический остаток')
-    milk = MyFloatField('Остаток молока')
-    blend = MyFloatField('Остаток купажа')
-    arabica = MyFloatField('Остаток арабики')
-    panini = IntegerField('Панини')
-    hot_dogs = IntegerField('Хот-доги')
-    expanses = FieldList(FormField(ExpanseForm))
+    cashless = IntegerField('Безнал', default=0)
+    remainder_of_day = IntegerField('Фактический остаток', default=0)
+    milk = MyFloatField('Остаток молока', default=0.0)
+    blend = MyFloatField('Остаток купажа', default=0.0)
+    arabica = MyFloatField('Остаток арабики', default=0.0)
+    panini = IntegerField('Панини', default=0)
+    hot_dogs = IntegerField('Хот-доги', default=0)
+    expanses = FieldList(FormField(LocalExpanseForm), min_entries=1, max_entries=5)
     submit = SubmitField('Submit')
 
 

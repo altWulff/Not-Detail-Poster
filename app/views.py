@@ -62,9 +62,33 @@ def create_report():
     form.coffee_shop.choices = [(g.id, g.place_name + '/' + g.address) for g in CoffeeShop.query.order_by('place_name')]
     if form.validate_on_submit():
         coffee_shop = CoffeeShop.query.filter_by(id=form.coffee_shop.data).first_or_404()
-        daily_report = DailyReport(cashbox=form.cashbox.data, cash_balance=form.cash_balance.data,
-                                   cashless=form.cashless.data, remainder_of_day=form.remainder_of_day.data,
+        warehouse = Warehouse.query.filter_by(coffee_shop_id=coffee_shop.id).first_or_404()
+        cash_balance = form.remainder_of_day.data - coffee_shop.cash
+        coffee_shop.cash += cash_balance
+        coffee_shop.cashless += form.cashless.data
+        daily_report = DailyReport(cash_balance=cash_balance, cashless=form.cashless.data, remainder_of_day=form.remainder_of_day.data,
                                    barista=current_user, coffee_shop=coffee_shop)
+        # consumption
+        daily_report.consumption_coffee_arabika = warehouse.coffee_arabika - form.arabica.data
+        daily_report.coffee_arabika = form.arabica.data
+        warehouse.coffee_arabika -= daily_report.consumption_coffee_arabika
+        
+        daily_report.consumption_coffee_blend = warehouse.coffee_blend - form.blend.data
+        daily_report.coffee_blend = form.blend.data
+        warehouse.coffee_blend -= daily_report.consumption_coffee_blend
+
+        daily_report.consumption_milk = warehouse.milk - form.milk.data
+        daily_report.milk = form.milk.data
+        warehouse.milk -= daily_report.consumption_milk
+        
+        daily_report.consumption_panini = warehouse.panini - form.panini.data
+        daily_report.panini = form.panini.data
+        warehouse.panini -= daily_report.consumption_panini
+        
+        daily_report.consumption_hot_dogs = warehouse.hot_dogs - form.hot_dogs.data
+        daily_report.hot_dogs = form.hot_dogs.data
+        warehouse.hot_dogs -= daily_report.consumption_hot_dogs
+        
         db.session.add(daily_report)
         db.session.commit()
         flash('Your daily report is now live!')
@@ -76,7 +100,6 @@ def create_report():
 @login_required
 def reports_on_address(coffee_shop_address):
     daily_reports = CoffeeShop.query.filter_by(address=coffee_shop_address).first_or_404().daily_reports
-    g.current_coffee_shop = CoffeeShop.query.filter_by(address=coffee_shop_address).first()
     return render_template('reports.html', daily_reports=daily_reports)
 
 

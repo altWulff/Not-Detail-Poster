@@ -8,6 +8,13 @@
     {{ render_field(form.milk) }}
     {{ render_field(form.blend) }}
     {{ render_field(form.arabica) }}
+    {{ render_field(form.panini) }}
+    {{ render_field(form.hot_dogs) }}
+    {% for entry in form.expanses %}
+        <p>Expanse</p>
+        {{ entry() }}
+        <br />
+    {% endfor %}
     <p>{{ form.submit(class="w-100 btn btn-lg btn-primary") }}</p>
     </form>
 {% endblock %}
