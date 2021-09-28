@@ -63,11 +63,16 @@ def create_report():
     if form.validate_on_submit():
         coffee_shop = CoffeeShop.query.filter_by(id=form.coffee_shop.data).first_or_404()
         warehouse = Warehouse.query.filter_by(coffee_shop_id=coffee_shop.id).first_or_404()
-        cash_balance = form.remainder_of_day.data - coffee_shop.cash
+        cash_balance = form.actual_balance.data - coffee_shop.cash
         coffee_shop.cash += cash_balance
         coffee_shop.cashless += form.cashless.data
-        daily_report = DailyReport(cash_balance=cash_balance, cashless=form.cashless.data, remainder_of_day=form.remainder_of_day.data,
+        remainder_of_day = form.cashless.data + cash_balance
+        expanses = sum([exp['money'] for exp in form.expanses.data])
+        daily_report = DailyReport(cash_balance=cash_balance, cashless=form.cashless.data,
+                                   actual_balance=form.actual_balance.data,
+                                   remainder_of_day=remainder_of_day,
                                    barista=current_user, coffee_shop=coffee_shop)
+        daily_report.cashbox = remainder_of_day + expanses
         # consumption
         daily_report.consumption_coffee_arabika = warehouse.coffee_arabika - form.arabica.data
         daily_report.coffee_arabika = form.arabica.data
