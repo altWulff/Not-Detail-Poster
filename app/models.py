@@ -33,7 +33,9 @@ class CoffeeShopEquipment(db.Model):
     coffee_shop_id = db.Column(db.Integer, db.ForeignKey('coffee_shop.id'))
 
     def __repr__(self):
-        return f'<CoffeeShopEquipment: {self.coffee_shop.place_name}>'
+        if self.coffee_shop_id:
+            return f'<CoffeeShopEquipment: {self.coffee_shop.place_name}>'
+        return  f'<CoffeeShopEquipment: {self.id}>'
 
 
 class Warehouse(db.Model):
@@ -46,7 +48,10 @@ class Warehouse(db.Model):
     coffee_shop_id = db.Column(db.Integer, db.ForeignKey('coffee_shop.id'))
 
     def __repr__(self):
-        return f'<Warehouse: {self.coffee_shop.place_name}>'
+        if self.coffee_shop_id:
+            return f'<Warehouse: {self.coffee_shop.place_name}>'
+        else:
+            return f'<Warehouse: {self.id}>'
 
 
 roles = db.Table('roles',
