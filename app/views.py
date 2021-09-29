@@ -180,7 +180,7 @@ def new_expense():
 
 @app.route('/new_coffee_shop', methods=['GET', 'POST'])
 def new_coffee_shop():
-    form = CoffeeShopForm(request.form)
+    form = CoffeeShopForm(request.POST)
     if form.validate_on_submit():
         coffee_shop = CoffeeShop(place_name=form.place_name.data, address=form.address.data, cash=form.cash.data,
                                  cashless=form.cashless.data)
