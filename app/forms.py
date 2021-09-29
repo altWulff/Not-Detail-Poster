@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, FloatField, TextAreaField, \
-    SelectField, FormField, FieldList, DecimalField
-from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
+    SelectField, FormField, FieldList, DecimalField, RadioField
+from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, NumberRange, Required
 from app.models import Barista
 
 
@@ -56,8 +56,8 @@ class EditProfileForm(FlaskForm):
 
 class LocalExpanseForm(FlaskForm):
     category = StringField('Category', validators=[DataRequired()])
-    type_cost = StringField('Type', validators=[DataRequired()])
-    money = IntegerField('Money', validators=[DataRequired()])
+    type_cost = RadioField('Type', choices=[('cash','Наличка'),('cashless','Безнал')], validators=[Required()], default='cash')
+    money = IntegerField('Money', validators=[Required(), NumberRange(min=0)])
 
  
 class ExpanseForm(LocalExpanseForm):

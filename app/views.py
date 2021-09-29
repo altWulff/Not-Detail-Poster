@@ -10,16 +10,16 @@ from app.models import Barista, CoffeeShop, DailyReport, Warehouse, CoffeeShopEq
 def inject_form():
     expense_form = ExpanseForm()
     coffee_shop_list = CoffeeShop.query.all()
-    return dict(expense_form=expense_form, coffee_shop_list=coffee_shop_list)
+    warehouse = Warehouse
+    cs_equip = CoffeeShopEquipment
+    return dict(expense_form=expense_form, coffee_shop_list=coffee_shop_list, warehouse=warehouse, cs_equip=cs_equip)
 
 
 @app.route('/')
 @app.route('/index', methods=["POST", "GET"])
 @login_required
 def home():
-    warehouse = Warehouse
-    cs_equip = CoffeeShopEquipment
-    return render_template('index.html', warehouse=warehouse, cs_equip=cs_equip)
+    return render_template('index.html')
 
 
 @app.route('/reports')
@@ -67,11 +67,14 @@ def create_report():
         coffee_shop.cash += cash_balance
         coffee_shop.cashless += form.cashless.data
         remainder_of_day = form.cashless.data + cash_balance
-        expanses = sum([exp['money'] for exp in form.expanses.data])
         daily_report = DailyReport(cash_balance=cash_balance, cashless=form.cashless.data,
                                    actual_balance=form.actual_balance.data,
                                    remainder_of_day=remainder_of_day,
                                    barista=current_user, coffee_shop=coffee_shop)
+        for expense_dict in form.expanses.data:
+            expense = Expense(category=expense_dict['category'], type_cost=expense_dict['type_cost'], money=expense_dict['money'])
+            daily_report.expenses.append(expense)
+        expanses = sum([exp['money'] for exp in form.expanses.data])
         daily_report.cashbox = remainder_of_day + expanses
         # consumption
         daily_report.consumption_coffee_arabika = warehouse.coffee_arabika - form.arabica.data
@@ -153,7 +156,7 @@ def logout():
 
 @app.route('/expense', methods=['POST'])
 def new_expense():
-    form = ExpanseForm()
+    form = ExpanseForm(request.POST)
     if request.method == "POST":
         category = form.category.data
         type_cost = form.type_cost.data
@@ -161,10 +164,12 @@ def new_expense():
         expense = Expense(category=category, type_cost=type_cost, money=money)
         expense.timestamp = datetime.utcnow()
         coffee_shop = CoffeeShop.query.filter_by(place_name=form.coffee_shop.data).first_or_404()
-        if form.type_cost.data == 'cashless':
-            coffee_shop.cashless -= form.money.data
-        else:
+        flash(form.type_cost.data)
+        if form.type_cost.data == 'cash':
             coffee_shop.cash -= form.money.data
+        else:
+            coffee_shop.cashless -= form.money.data
+        coffee_shop.expenses.append(expense)
         db.session.add(expense)
         db.session.commit()
         flash('New expense')
@@ -175,7 +180,7 @@ def new_expense():
 
 @app.route('/new_coffee_shop', methods=['GET', 'POST'])
 def new_coffee_shop():
-    form = CoffeeShopForm()
+    form = CoffeeShopForm(request.form)
     if form.validate_on_submit():
         coffee_shop = CoffeeShop(place_name=form.place_name.data, address=form.address.data, cash=form.cash.data,
                                  cashless=form.cashless.data)

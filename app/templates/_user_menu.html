@@ -34,7 +34,13 @@
                     {% endfor%}
                 </select>
                 {{ render_field(expense_form.category) }}
-                {{ render_field(expense_form.type_cost) }}
+                
+                <div class="form-check">
+                {% for radio in expense_form.type_cost %}
+                   {{ radio }} 
+                   {{ radio.label}}
+                {% endfor %}
+                </div>
                 {{ render_field(expense_form.money) }}
             </div>
             <div class="modal-footer">
