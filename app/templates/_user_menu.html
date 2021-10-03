@@ -23,6 +23,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <form action="{{ url_for('new_expense') }}" method="post">
+            {{ expense_form.csrf_token }}
             <div class="modal-header">
                 <h5 class="modal-title" id="ConsumptionModal">Расход</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -55,6 +56,8 @@
 <div class="modal fade" id="ByWeightModal" tabindex="-1" aria-labelledby="ByWeightModal" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
+            <form action="{{ url_for('by_weight') }}" method="post">
+            {{ by_weight_form.csrf_token }}
             <div class="modal-header">
                 <h5 class="modal-title" id="ByWeightModal">Продажа развеса</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -64,8 +67,9 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                <button type="button" class="btn btn-primary">Подтвердить</button>
+                {{ by_weight_form.submit(class="btn btn-primary") }}
             </div>
+            </form>
         </div>
     </div>
 </div>
@@ -73,6 +77,8 @@
 <div class="modal fade" id="WriteOffModal" tabindex="-1" aria-labelledby="WriteOffModal" aria-hidden="true">\
     <div class="modal-dialog">
         <div class="modal-content">
+            <form action="{{ url_for('write_off') }}" method="post">
+            {{ write_off_form.csrf_token }}
             <div class="modal-header">
                 <h5 class="modal-title" id="WriteOffModal">Списание</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -82,8 +88,9 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                <button type="button" class="btn btn-primary">Подтвердить</button>
+                {{ write_off_form.submit(class="btn btn-primary") }}
             </div>
+            </form>
         </div>
     </div>
 </div>
@@ -91,6 +98,8 @@
 <div class="modal fade" id="SupplyModal" tabindex="-1" aria-labelledby="SupplyModal" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
+            <form action="{{ url_for('supply') }}" method="post">
+            {{ supply_form.csrf_token }}
             <div class="modal-header">
                 <h5 class="modal-title" id="SupplyModal">Поступление</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -100,8 +109,9 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                <button type="button" class="btn btn-primary">Подтвердить</button>
+                {{ supply_form.submit(class="btn btn-primary") }}
             </div>
+            </form>
         </div>
     </div>
 </div>

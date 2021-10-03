@@ -65,6 +65,18 @@ class ExpanseForm(LocalExpanseForm):
     submit = SubmitField('Submit')   
 
 
+class ByWeightForm(FlaskForm):
+    submit = SubmitField('Отправить')
+
+
+class WriteOffForm(FlaskForm):
+    submit = SubmitField('Отправить')
+
+
+class SupplyForm(FlaskForm):
+    submit = SubmitField('Отправить')
+
+
 class ReportForm(FlaskForm):
     coffee_shop = SelectField('Coffee Shop')
     cashless = IntegerField('Безнал', default=0)

@@ -2,17 +2,19 @@ from datetime import datetime
 from flask import render_template, redirect, url_for, abort, request, flash, g, json
 from flask_security import login_required, login_user, logout_user, current_user, roles_required
 from app import app, db
-from app.forms import LoginForm, ReportForm, EditProfileForm, RegistrationForm, ExpanseForm, CoffeeShopForm
+from app.forms import LoginForm, ReportForm, EditProfileForm, RegistrationForm, ExpanseForm, ByWeightForm, WriteOffForm, SupplyForm, CoffeeShopForm
 from app.models import Barista, CoffeeShop, DailyReport, Warehouse, CoffeeShopEquipment, Expense
 
 
 @app.context_processor
 def inject_form():
-    expense_form = ExpanseForm()
+    expense_form, by_weight_form, write_off_form, supply_form = ExpanseForm(), ByWeightForm(), WriteOffForm(), SupplyForm()
     coffee_shop_list = CoffeeShop.query.all()
     warehouse = Warehouse
     cs_equip = CoffeeShopEquipment
-    return dict(expense_form=expense_form, coffee_shop_list=coffee_shop_list, warehouse=warehouse, cs_equip=cs_equip)
+    return dict(expense_form=expense_form, by_weight_form=by_weight_form,
+                write_off_form=write_off_form, supply_form=supply_form,
+                coffee_shop_list=coffee_shop_list, warehouse=warehouse, cs_equip=cs_equip)
 
 
 @app.route('/')
@@ -156,7 +158,7 @@ def logout():
 
 @app.route('/expense', methods=['POST'])
 def new_expense():
-    form = ExpanseForm(request.POST)
+    form = ExpanseForm()
     if request.method == "POST":
         category = form.category.data
         type_cost = form.type_cost.data
@@ -164,7 +166,6 @@ def new_expense():
         expense = Expense(category=category, type_cost=type_cost, money=money)
         expense.timestamp = datetime.utcnow()
         coffee_shop = CoffeeShop.query.filter_by(place_name=form.coffee_shop.data).first_or_404()
-        flash(form.type_cost.data)
         if form.type_cost.data == 'cash':
             coffee_shop.cash -= form.money.data
         else:
@@ -178,9 +179,42 @@ def new_expense():
     return render_template("index.html")
 
 
+@app.route('/by_weight', methods=['POST'])
+def by_weight():
+    form = ByWeightForm()
+    if request.method == "POST":
+        # db.session.add()
+        # db.session.commit()
+        flash('New trade by weight')
+        return redirect(url_for("home"))
+    return render_template("index.html")
+
+
+@app.route('/write_off', methods=['POST'])
+def write_off():
+    form = WriteOffForm()
+    if request.method == "POST":
+        # db.session.add()
+        # db.session.commit()
+        flash('New write off')
+        return redirect(url_for("home"))
+    return render_template("index.html")
+
+
+@app.route('/supply', methods=['POST'])
+def supply():
+    form = SupplyForm()
+    if request.method == "POST":
+        # db.session.add()
+        # db.session.commit()
+        flash('New Supply')
+        return redirect(url_for("home"))
+    return render_template("index.html")
+
+
 @app.route('/new_coffee_shop', methods=['GET', 'POST'])
 def new_coffee_shop():
-    form = CoffeeShopForm(request.POST)
+    form = CoffeeShopForm()
     if form.validate_on_submit():
         coffee_shop = CoffeeShop(place_name=form.place_name.data, address=form.address.data, cash=form.cash.data,
                                  cashless=form.cashless.data)
