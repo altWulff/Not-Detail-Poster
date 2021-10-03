@@ -56,7 +56,7 @@ class EditProfileForm(FlaskForm):
 
 class LocalExpanseForm(FlaskForm):
     category = StringField('Category', validators=[DataRequired()])
-    type_cost = RadioField('Type', choices=[('cash','Наличка'),('cashless','Безнал')], validators=[Required()], default='cash')
+    type_cost = RadioField('Type', choices=[('cash','Наличка'), ('cashless','Безнал')], validators=[Required()], default='cash')
     money = IntegerField('Money', validators=[Required(), NumberRange(min=0)])
 
  
@@ -66,14 +66,33 @@ class ExpanseForm(LocalExpanseForm):
 
 
 class ByWeightForm(FlaskForm):
+    coffee_shop = SelectField('Coffee Shop')
+    by_weight_choice = RadioField('Выбор товара', choices=[
+        ('blend', 'Бленд'), ('arabica', 'Арабика')], validators=[Required()], default='blend')
+    amount = MyFloatField('Количество', default=0.0)
+    money = IntegerField('Сумма', validators=[Required(), NumberRange(min=0)])
+    cash_type = RadioField('Тип денег', choices=[('cash', 'Наличка'), ('cashless', 'Безнал')],
+                           validators=[Required()], default='cash')
     submit = SubmitField('Отправить')
 
 
 class WriteOffForm(FlaskForm):
+    coffee_shop = SelectField('Coffee Shop')
+    write_off_choice = RadioField('Выбор товара', choices=[
+        ('blend', 'Бленд'), ('arabica', 'Арабика'), ('milk', 'Молоко'),
+        ('panini', 'Панини'), ('hot_dogs', 'Хот-доги')], validators=[Required()], default='blend')
+    amount = MyFloatField('Количество', default=0.0)
     submit = SubmitField('Отправить')
 
 
 class SupplyForm(FlaskForm):
+    coffee_shop = SelectField('Coffee Shop')
+    supply_choice = RadioField('Выбор товара', choices=[
+        ('blend', 'Бленд'), ('arabica', 'Арабика'), ('milk', 'Молоко'),
+        ('panini', 'Панини'), ('hot_dogs', 'Хот-доги')], validators=[Required()], default='blend')
+    amount = MyFloatField('Количество', default=0.0)
+    cash_type = RadioField('Тип денег', choices=[('cash', 'Наличка'), ('cashless', 'Безнал')], validators=[Required()], default='cash')
+    money = IntegerField('Сумма', validators=[Required(), NumberRange(min=0)])
     submit = SubmitField('Отправить')
 
 

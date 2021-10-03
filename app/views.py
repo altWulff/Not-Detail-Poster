@@ -183,9 +183,20 @@ def new_expense():
 def by_weight():
     form = ByWeightForm()
     if request.method == "POST":
+        coffee_shop = CoffeeShop.query.filter_by(place_name=form.coffee_shop.data).first_or_404()
+        warehouse = Warehouse.query.filter_by(coffee_shop_id=coffee_shop.id).first_or_404()
+        if form.by_weight_choice.data == 'blend':
+            warehouse.coffee_blend -= form.amount.data
+        else:
+            warehouse.coffee_arabika -= form.amount.data
+
+        if form.cash_type.data == 'cash':
+            coffee_shop.cash += form.money.data
+        else:
+            coffee_shop.cashless += form.money.data
         # db.session.add()
-        # db.session.commit()
-        flash('New trade by weight')
+        db.session.commit()
+        flash(f'New trade by weight {form.by_weight_choice.data} on amount {form.amount.data} kg')
         return redirect(url_for("home"))
     return render_template("index.html")
 
@@ -194,9 +205,21 @@ def by_weight():
 def write_off():
     form = WriteOffForm()
     if request.method == "POST":
+        coffee_shop = CoffeeShop.query.filter_by(place_name=form.coffee_shop.data).first_or_404()
+        warehouse = Warehouse.query.filter_by(coffee_shop_id=coffee_shop.id).first_or_404()
+        if form.write_off_choice.data == 'blend':
+            warehouse.coffee_blend -= form.amount.data
+        elif form.write_off_choice.data == 'arabica':
+            warehouse.coffee_arabika -= form.amount.data
+        elif form.write_off_choice.data == 'milk':
+            warehouse.milk -= form.amount.data
+        elif form.write_off_choice.data == 'panini':
+            warehouse.panini -= int(form.amount.data)
+        else:
+            warehouse.hot_dogs -= int(form.amount.data)
         # db.session.add()
-        # db.session.commit()
-        flash('New write off')
+        db.session.commit()
+        flash(f'New write off {form.write_off_choice.data} on amount {form.amount.data}')
         return redirect(url_for("home"))
     return render_template("index.html")
 
@@ -205,9 +228,25 @@ def write_off():
 def supply():
     form = SupplyForm()
     if request.method == "POST":
-        # db.session.add()
-        # db.session.commit()
-        flash('New Supply')
+        coffee_shop = CoffeeShop.query.filter_by(place_name=form.coffee_shop.data).first_or_404()
+        warehouse = Warehouse.query.filter_by(coffee_shop_id=coffee_shop.id).first_or_404()
+        if form.supply_choice.data == 'blend':
+            warehouse.coffee_blend += form.amount.data
+        elif form.supply_choice.data == 'arabica':
+            warehouse.coffee_arabika += form.amount.data
+        elif form.supply_choice.data == 'milk':
+            warehouse.milk += form.amount.data
+        elif form.supply_choice.data == 'panini':
+            warehouse.panini += int(form.amount.data)
+        else:
+            warehouse.hot_dogs += int(form.amount.data)
+
+        if form.cash_type.data == 'cash':
+            coffee_shop.cash -= form.money.data
+        else:
+            coffee_shop.cashless -= form.money.data
+        db.session.commit()
+        flash(f'New Supply {form.supply_choice.data} on amount {form.amount.data}')
         return redirect(url_for("home"))
     return render_template("index.html")
 
