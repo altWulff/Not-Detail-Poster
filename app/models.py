@@ -20,6 +20,9 @@ class CoffeeShop(db.Model):
     daily_reports = db.relationship('DailyReport', backref='coffee_shop', lazy=True)
     baristas = db.relationship('Barista', backref='coffee_shop', lazy=True)
     expenses = db.relationship('Expense', backref='coffee_shop', lazy=True)
+    supplies = db.relationship('Supply', backref='coffee_shop', lazy=True)
+    by_weights = db.relationship('ByWeight', backref='coffee_shop', lazy=True)
+    write_offs = db.relationship('WriteOff', backref='coffee_shop', lazy=True)
 
     def __repr__(self):
         return f'<CoffeeShop: {self.place_name}>'
@@ -148,3 +151,31 @@ class Expense(db.Model):
 
     def __repr__(self):
         return f'<Expense: {self.category}({self.type_cost}) - {self.money}>'
+
+
+class Supply(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    coffee_shop_id = db.Column(db.Integer, db.ForeignKey('coffee_shop.id'))
+    product_name = db.Column(db.String(80))
+    amount = db.Column(db.Float)
+    type_cost = db.Column(db.String(64), index=True)
+    money = db.Column(db.Integer)
+
+
+class ByWeight(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    coffee_shop_id = db.Column(db.Integer, db.ForeignKey('coffee_shop.id'))
+    product_name = db.Column(db.String(80))
+    amount = db.Column(db.Float)
+    type_cost = db.Column(db.String(64), index=True)
+    money = db.Column(db.Integer)
+
+
+class WriteOff(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    coffee_shop_id = db.Column(db.Integer, db.ForeignKey('coffee_shop.id'))
+    amount = db.Column(db.Float)
+    product_name = db.Column(db.String(80))

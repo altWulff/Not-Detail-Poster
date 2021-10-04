@@ -3,7 +3,7 @@ from flask import render_template, redirect, url_for, abort, request, flash, g, 
 from flask_security import login_required, login_user, logout_user, current_user, roles_required
 from app import app, db
 from app.forms import LoginForm, ReportForm, EditProfileForm, RegistrationForm, ExpanseForm, ByWeightForm, WriteOffForm, SupplyForm, CoffeeShopForm
-from app.models import Barista, CoffeeShop, DailyReport, Warehouse, CoffeeShopEquipment, Expense
+from app.models import Barista, CoffeeShop, DailyReport, Warehouse, CoffeeShopEquipment, Expense, Supply, ByWeight, WriteOff
 
 
 @app.context_processor
@@ -194,7 +194,10 @@ def by_weight():
             coffee_shop.cash += form.money.data
         else:
             coffee_shop.cashless += form.money.data
-        # db.session.add()
+        by_weight = ByWeight(coffee_shop=coffee_shop, amount=form.amount.data, product_name=form.by_weight_choice.data,
+                             type_cost=form.cash_type.data, money=form.money.data)
+        by_weight.timestamp = datetime.utcnow()
+        db.session.add(by_weight)
         db.session.commit()
         flash(f'New trade by weight {form.by_weight_choice.data} on amount {form.amount.data} kg')
         return redirect(url_for("home"))
@@ -217,7 +220,9 @@ def write_off():
             warehouse.panini -= int(form.amount.data)
         else:
             warehouse.hot_dogs -= int(form.amount.data)
-        # db.session.add()
+        write_off = WriteOff(coffee_shop=coffee_shop, amount=form.amount.data, product_name=form.write_off_choice.data)
+        write_off.timestamp = datetime.utcnow()
+        db.session.add(write_off)
         db.session.commit()
         flash(f'New write off {form.write_off_choice.data} on amount {form.amount.data}')
         return redirect(url_for("home"))
@@ -245,6 +250,11 @@ def supply():
             coffee_shop.cash -= form.money.data
         else:
             coffee_shop.cashless -= form.money.data
+
+        supply = Supply(coffee_shop=coffee_shop, product_name=form.supply_choice.data,
+                        amount=form.amount.data, type_cost=form.cash_type.data, money=form.money.data)
+        supply.timestamp = datetime.utcnow()
+        db.session.add(supply)
         db.session.commit()
         flash(f'New Supply {form.supply_choice.data} on amount {form.amount.data}')
         return redirect(url_for("home"))
