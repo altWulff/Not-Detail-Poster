@@ -24,13 +24,6 @@ def home():
     return render_template('index.html')
 
 
-@app.route('/reports')
-@login_required
-def reports():
-    daily_reports = CoffeeShop.query.first().daily_reports
-    return render_template('reports.html', daily_reports=daily_reports)
-
-
 @app.route('/user/<user_name>')
 @login_required
 def user_profile(user_name):
@@ -109,7 +102,8 @@ def create_report():
 @app.route('/reports/<coffee_shop_address>')
 @login_required
 def reports_on_address(coffee_shop_address):
-    daily_reports = CoffeeShop.query.filter_by(address=coffee_shop_address).first_or_404().daily_reports
+    coffee_shop = CoffeeShop.query.filter_by(address=coffee_shop_address).first_or_404()
+    daily_reports = DailyReport.query.filter_by(coffee_shop_id=coffee_shop.id).order_by(DailyReport.timestamp.desc())
     return render_template('reports.html', daily_reports=daily_reports)
 
 
@@ -274,6 +268,7 @@ def new_coffee_shop():
         coffee_shop.coffee_shop_equipments.append(equipments)
         coffee_shop.warehouse.append(warehouse)
         db.session.add(coffee_shop)
+        db.session.add(warehouse)
         db.session.commit()
         flash('Congratulations, you are create a new coffee shop!')
         return redirect(url_for('home'))
