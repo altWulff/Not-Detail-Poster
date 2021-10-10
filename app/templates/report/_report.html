@@ -5,7 +5,7 @@
     </div>
     <div class="card-body">
         <table class="table table-borderless">
-            <caption>Отправил <a href="{{ url_for('user_profile', user_name=day_report.barista.name) }}" class="link-secondary">{{ day_report.barista.name }}</caption>
+            <caption>Отправил <a href="{{ url_for('user.profile', user_name=day_report.barista.name) }}" class="link-secondary">{{ day_report.barista.name }}</caption>
                 <thead>
                     <tr>
                         <th scope="col"><h5>Отчет отправлен {{ moment(day_report.timestamp).fromNow() }}</h5></th>

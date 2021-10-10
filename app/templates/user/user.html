@@ -5,6 +5,6 @@
 <h1>Моб.тел.: {{ user.phone_number }}</h1>
 <h1>Емейл: {{ user.email }}</h1>
 {% if current_user == user %}
-    <a href="{{ url_for('edit_profile', user_name=current_user.name) }} ">Редактировать профиль</a>
+    <a href="{{ url_for('user.edit', user_name=current_user.name) }} ">Редактировать профиль</a>
 {% endif %}
 {% endblock %}

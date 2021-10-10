@@ -6,7 +6,7 @@
 {% if daily_reports %}
 <div class="row row-cols-1 row-cols-sm-1 row-cols-md-1 g-2">
     {% for day_report in daily_reports %}
-       {% include '_report.html' %}
+       {% include 'report/_report.html' %}
     {% endfor %}
 </div>
 {% else %}
