@@ -1,4 +1,5 @@
-from . import datetime
+from sqlalchemy import func
+from . import datetime, date
 from . import render_template, redirect, url_for, flash, Blueprint
 from . import login_required, login_user, logout_user, current_user, roles_required
 from . import db
@@ -14,9 +15,18 @@ report = Blueprint('report', __name__, url_prefix='/report')
 def create():
     form = ReportForm()
     form.coffee_shop.choices = [(g.id, g.place_name + '/' + g.address) for g in CoffeeShop.query.order_by('place_name')]
+  
     if form.validate_on_submit():
         coffee_shop = CoffeeShop.query.filter_by(id=form.coffee_shop.data).first_or_404()
         warehouse = Warehouse.query.filter_by(coffee_shop_id=coffee_shop.id).first_or_404()
+        reports_on_coffee_shop = DailyReport.query.filter_by(coffee_shop_id=coffee_shop.id)
+        day_reports = reports_on_coffee_shop.filter(func.date(DailyReport.timestamp) == date.today()).all()
+
+        if len(day_reports) >= 1:
+            flash("Today report already exist")
+            return redirect(url_for('home'))
+            
+        
         cash_balance = form.actual_balance.data - coffee_shop.cash
         coffee_shop.cash += cash_balance
         coffee_shop.cashless += form.cashless.data
@@ -51,7 +61,7 @@ def create():
         daily_report.consumption_hot_dogs = warehouse.hot_dogs - form.hot_dogs.data
         daily_report.hot_dogs = form.hot_dogs.data
         warehouse.hot_dogs -= daily_report.consumption_hot_dogs
-
+        daily_report.timestamp = datetime.utcnow()
         db.session.add(daily_report)
         db.session.commit()
         flash('Your daily report is now live!')

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 from flask import render_template, redirect, url_for, flash, Blueprint, request
 from flask_security import login_required, login_user, logout_user, current_user, roles_required
 from app import app, db, login
