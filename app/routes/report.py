@@ -63,5 +63,7 @@ def create():
 @login_required
 def on_address(coffee_shop_address):
     coffee_shop = CoffeeShop.query.filter_by(address=coffee_shop_address).first_or_404()
-    daily_reports = DailyReport.query.filter_by(coffee_shop_id=coffee_shop.id).order_by(DailyReport.timestamp.desc())
-    return render_template('report/reports.html', daily_reports=daily_reports)
+    ordered_reports = DailyReport.query.filter_by(coffee_shop_id=coffee_shop.id).order_by(DailyReport.timestamp.desc())
+    if not (current_user.has_role('admin') or current_user.has_role('moderator')):
+        ordered_reports = ordered_reports.limit(3)
+    return render_template('report/reports.html', daily_reports=ordered_reports)
