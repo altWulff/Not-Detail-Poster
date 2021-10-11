@@ -25,7 +25,7 @@ def edit():
         current_user.email = form.email.data
         db.session.commit()
         flash('Your changes have been saved.')
-        return redirect(url_for('user_profile', user_name=current_user.name))
+        return redirect(url_for('user.profile', user_name=current_user.name))
     elif request.method == 'GET':
         form.name.data = current_user.name
         form.phone_number.data = current_user.phone_number

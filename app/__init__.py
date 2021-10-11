@@ -25,7 +25,6 @@ moment = Moment(app)
 
 from app import routes, models, forms, admin, routes
 from app.routes import errors
-from app.routes.auth import auth
 from app.routes.user import user
 from app.routes.menu import menu
 from app.routes.report import report
@@ -34,7 +33,6 @@ from app.routes.errors import errors
 user_datastore = SQLAlchemyUserDatastore(db, models.Barista, models.Role)
 security = Security(app, user_datastore)
 
-app.register_blueprint(auth)
 app.register_blueprint(user)
 app.register_blueprint(menu)
 app.register_blueprint(report)

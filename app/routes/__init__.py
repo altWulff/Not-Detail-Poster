@@ -29,3 +29,38 @@ def home():
 @login_required
 def statistics():
     return render_template('statistics.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    app.logger.info(form.validate_on_submit())
+    if form.validate_on_submit():
+        user = Barista.query.filter_by(name=form.name.data).first()
+        if user is None:
+            flash('Invalid name, phone number or password')
+            return redirect(url_for('login'))
+        login_user(user, remember=form.remember_me.data)
+        return redirect('index')
+    return render_template('auth/login.html', title='Sign In', form=form)
+
+
+@app.route('/new_staff', methods=['GET', 'POST'])
+def create_new_staff():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        user = Barista(name=form.name.data,
+                       phone_number=form.phone_number.data,
+                       email=form.email.data)
+        user.set_password(form.password.data)
+        user.confirmed_at = datetime.utcnow()
+        db.session.add(user)
+        db.session.commit()
+        flash('Congratulations, you are now a registered user!')
+        return redirect(url_for('login'))
+    return render_template('auth/new_staff.html', form=form)
+
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect('index')
