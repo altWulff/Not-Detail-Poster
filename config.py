@@ -10,6 +10,8 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     DEBUG_TB_INTERCEPT_REDIRECTS = False
+    REPORTS_USER_VIEW = 3
+    REPORTS_PER_PAGE = 3
 
 
 class ProductionConfig(Config):

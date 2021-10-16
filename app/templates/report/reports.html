@@ -3,13 +3,14 @@
 {% block head %}
 {% endblock %}
 {% block content %}
-{% if daily_reports %}
+{{ pagination(prev_url, next_url) }}
 <div class="row row-cols-1 row-cols-sm-1 row-cols-md-1 g-2">
     {% for day_report in daily_reports %}
        {% include 'report/_report.html' %}
+    {% else %}
+    <h5>Отчеты. Здесь пока что ничего нет ...</h5>
     {% endfor %}
 </div>
-{% else %}
-    <p>Отчеты. Здесь пока что ничего нет ...</p>
-{% endif %}
+<br/>
+{{ pagination(prev_url, next_url) }}
 {% endblock %}

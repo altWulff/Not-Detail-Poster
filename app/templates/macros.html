@@ -11,3 +11,22 @@
     {{ with_errors(field) }}
 </div>
 {% endmacro %}
+
+{% macro pagination(prev_url, next_url) %}
+<ul class="pagination">
+    {% if prev_url %}
+        <li class="page-item">
+          <a class="page-link" href="{{ prev_url }}">
+            <span aria-hidden="true">Новые отчеты</span>
+          </a>
+        </li>
+    {% endif %}
+    {% if next_url %}
+    <li class="page-item">
+      <a class="page-link" href="{{ next_url }}">
+        <span aria-hidden="true">Старые отчеты</span>
+      </a>
+    </li>
+    {% endif %}
+</ul>
+{% endmacro %}

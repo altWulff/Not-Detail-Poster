@@ -1,8 +1,8 @@
 from sqlalchemy import func
 from . import datetime, date
-from . import render_template, redirect, url_for, flash, Blueprint
+from flask import render_template, redirect, url_for, flash, Blueprint, request
 from . import login_required, login_user, logout_user, current_user, roles_required
-from . import db
+from app import db, app
 from . import ReportForm
 from . import Barista, CoffeeShop, DailyReport, Warehouse, CoffeeShopEquipment, Expense
 
@@ -25,8 +25,7 @@ def create():
         if len(day_reports) >= 1:
             flash("Today report already exist")
             return redirect(url_for('home'))
-            
-        
+
         cash_balance = form.actual_balance.data - coffee_shop.cash
         coffee_shop.cash += cash_balance
         coffee_shop.cashless += form.cashless.data
@@ -73,7 +72,16 @@ def create():
 @login_required
 def on_address(coffee_shop_address):
     coffee_shop = CoffeeShop.query.filter_by(address=coffee_shop_address).first_or_404()
-    ordered_reports = DailyReport.query.filter_by(coffee_shop_id=coffee_shop.id).order_by(DailyReport.timestamp.desc())
+    reports = DailyReport.query.filter_by(coffee_shop_id=coffee_shop.id).order_by(DailyReport.timestamp.desc())
     if not (current_user.has_role('admin') or current_user.has_role('moderator')):
-        ordered_reports = ordered_reports.limit(3)
-    return render_template('report/reports.html', daily_reports=ordered_reports)
+        reports = reports.limit(app.config['REPORTS_USER_VIEW']).from_self()
+
+    page = request.args.get('page', 1, type=int)
+    reports = reports.paginate(
+        page, app.config['REPORTS_PER_PAGE'], False)
+    next_url = url_for('report.on_address', coffee_shop_address=coffee_shop.address, page=reports.next_num) \
+        if reports.has_next else None
+    prev_url = url_for('report.on_address', coffee_shop_address=coffee_shop.address, page=reports.prev_num) \
+        if reports.has_prev else None
+    return render_template("report/reports.html", daily_reports=reports.items, next_url=next_url,
+                           prev_url=prev_url)
