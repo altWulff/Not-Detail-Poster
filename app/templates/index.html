@@ -3,7 +3,11 @@
 {% block content %}
 <div class="row align-items-md-stretch">
     {% for coffee_shop in coffee_shop_list %}
-        {% include '_coffee_shop_view.html' %}
+        {% if current_user.has_role('admin') or current_user.has_role('moderator') %}
+            {% include '_coffee_shop_view.html' %}
+        {% elif current_user in coffee_shop.baristas %}
+            {% include '_coffee_shop_view.html' %}
+        {% endif %}
    <br />
     {% endfor %}
 </div>

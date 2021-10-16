@@ -10,11 +10,11 @@
     <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#ByWeightModal">Продажа развеса</a></li>
     <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#WriteOffModal">Списание</a></li>
     <li><hr class="dropdown-divider"></li>
-    
-    <li><a class="dropdown-item" href="{{ url_for('create_new_staff') }}">Новый персонал</a></li>
-    <li><a class="dropdown-item" href="{{ url_for('menu.create_coffee_shop') }}">Новая кофейня</a></li>
-    <li><hr class="dropdown-divider"></li>
-    
+    {% if current_user.has_role('admin') or current_user.has_role('moderator') %}
+        <li><a class="dropdown-item" href="{{ url_for('create_new_staff') }}">Новый персонал</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('menu.create_coffee_shop') }}">Новая кофейня</a></li>
+        <li><hr class="dropdown-divider"></li>
+    {% endif %}
     <li><a class="dropdown-item" href="{{ url_for('logout') }}">Выход</a></li>
 </ul>
 </div>
