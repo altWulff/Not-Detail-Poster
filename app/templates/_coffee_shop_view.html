@@ -1,6 +1,19 @@
- <div class="col-md-10">
+<div class="col-md-10">
     <div class="h-150 p-4 bg-light border rounded-3">
         <h2>{{coffee_shop.place_name}} / {{coffee_shop.address}}</h2>
+        <h6>Наличка: {{coffee_shop.cash}} грн.</h6>
+        <h6>Безнал: {{coffee_shop.cashless}} грн.</h6>
+        {% if coffee_shop.baristas %}
+            <h6>Сотрудники:</h6>
+            <div class="container">
+                <ul>
+                    {% for barista in coffee_shop.baristas %}
+                        <li><a href="{{ url_for('user.profile', user_name=barista.name) }}" class="link-secondary">{{ barista.name }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <br />
+        {% endif %}
         <p>Наличка: {{coffee_shop.cash}} грн.</p>
         <p>Безнал: {{coffee_shop.cashless}} грн.</p>
         <p><a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseWarehouse_{{coffee_shop.id}}" role="button" aria-expanded="false" aria-controls="collapseWarehouse_{{coffee_shop.id}}">Склад</a></p>
