@@ -1,9 +1,15 @@
 {% extends "base.html" %}
 {% block title %}Профиль {{user.name}}{% endblock %}
 {% block content %}
-<h1>Имя: {{ user.name }}</h1>
-<h1>Моб.тел.: {{ user.phone_number }}</h1>
-<h1>Емейл: {{ user.email }}</h1>
+<h4>Имя: {{ user.name }}</h4>
+<h4>Моб.тел.: {{ user.phone_number }}</h4>
+<h4>Емейл: {{ user.email }}</h4>
+<h4>Роли:</h4>
+<ul>
+    {% for role in user.roles %}
+        <li>{{role.name}}</li>
+    {% endfor %}
+</ul>
 {% if current_user == user %}
     <a href="{{ url_for('user.edit', user_name=current_user.name) }} ">Редактировать профиль</a>
 {% endif %}
