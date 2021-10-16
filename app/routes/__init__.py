@@ -30,6 +30,7 @@ def home():
 def statistics():
     return render_template('statistics.html')
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -53,6 +54,7 @@ def create_new_staff():
                        email=form.email.data)
         user.set_password(form.password.data)
         user.confirmed_at = datetime.utcnow()
+        user.active = True
         db.session.add(user)
         db.session.commit()
         flash('Congratulations, you are now a registered user!')
