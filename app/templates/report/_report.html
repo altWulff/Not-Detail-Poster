@@ -8,7 +8,7 @@
             <caption>Отправил <a href="{{ url_for('user.profile', user_name=day_report.barista.name) }}" class="link-secondary">{{ day_report.barista.name }}</caption>
                 <thead>
                     <tr>
-                        <th scope="col"><h5>Отчет отправлен {{ moment(day_report.timestamp).fromNow() }}</h5></th>
+                        <th scope="col"><h5>{{ day_report.timestamp.date().strftime("%d-%m-%y") }}</h5></th>
                         <th><h5>Глобальные траты</h5></th>
                         <th><h5>Расход за день</h5></th>
                     </tr>
@@ -30,8 +30,11 @@
 <!--                    Глобальный расход за эту дату в списке-->
                     <td>
                         <ul class="list-group list-group-flush">
-                            <li class="list-group-item">Глобальный расход 1</li>
-                            <li class="list-group-item">Глобальный расход 2</li>
+                        {%for global_exp in   global_expense %}
+                        {% if global_exp.timestamp.date() == day_report.timestamp.date() %}
+                            <li class="list-group-item">{{  global_exp.money }} грн.({{ global_exp.category }})/{{ global_exp.type_cost }}    </li>
+                            {% endif %}
+                       {% endfor %}
                         </ul>
                     </td>
                     <td>

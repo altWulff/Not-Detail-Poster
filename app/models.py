@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_security import UserMixin, RoleMixin
 from . import db, login
@@ -141,6 +141,7 @@ class DailyReport(db.Model):
 class Expense(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    # is_global = db.Column(db.Boolean(default=False))
     # целевое назначение траты
     category = db.Column(db.String(64), index=True)
     # налл, безнал

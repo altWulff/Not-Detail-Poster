@@ -1,7 +1,7 @@
 import click
 from werkzeug.security import generate_password_hash
 from app import app, db, user_datastore
-from app.models import Barista, DailyReport, Role, CoffeeShop, CoffeeShopEquipment
+from app.models import Barista, DailyReport, Role, CoffeeShop, CoffeeShopEquipment, Expense
 
 
 @app.shell_context_processor
@@ -12,7 +12,8 @@ def make_shell_context():
         'DailyReport': DailyReport,
         'Role': Role,
         'CoffeeShop': CoffeeShop,
-        'CoffeeShopEquipment': CoffeeShopEquipment
+        'CoffeeShopEquipment': CoffeeShopEquipment,
+        'Expense': Expense
     }
 
 

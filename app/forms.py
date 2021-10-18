@@ -23,13 +23,13 @@ class LoginForm(FlaskForm):
 
 
 class RegistrationForm(FlaskForm):
-    name = StringField('Name', validators=[DataRequired()])
-    phone_number = IntegerField('Phone Number', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
+    name = StringField('Имя', validators=[DataRequired()])
+    phone_number = IntegerField('Телефон', validators=[DataRequired()])
+    email = StringField('Емейл', validators=[DataRequired(), Email()])
+    password = PasswordField('Пароль', validators=[DataRequired()])
     password2 = PasswordField(
-        'Repeat Password', validators=[DataRequired(), EqualTo('password')])
-    submit = SubmitField('Register')
+        'Повтор пароля', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Добавить')
 
     def validate_username(self, name):
         user = Barista.query.filter_by(name=name.data).first()

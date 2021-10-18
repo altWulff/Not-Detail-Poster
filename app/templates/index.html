@@ -8,6 +8,14 @@
         {% elif current_user in coffee_shop.baristas %}
             {% include '_coffee_shop_view.html' %}
         {% endif %}
+        {% else %}
+        <div class='container'>
+        <h4>Кофейня не создана</h4>
+           {% if current_user.has_role('admin') or current_user.has_role('moderator') %}
+           <a class="btn btn-primary" href="{{ url_for('menu.create_coffee_shop') }}" role="button">Создать новую?</a>
+           {% endif %}
+        </div>
+       
    <br />
     {% endfor %}
 </div>

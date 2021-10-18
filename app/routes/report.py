@@ -75,6 +75,9 @@ def on_address(coffee_shop_address):
     reports = DailyReport.query.filter_by(coffee_shop_id=coffee_shop.id).order_by(DailyReport.timestamp.desc())
     if not (current_user.has_role('admin') or current_user.has_role('moderator')):
         reports = reports.limit(app.config['REPORTS_USER_VIEW']).from_self()
+        
+    time = datetime(datetime.today().year, datetime.today().month, datetime.today().day)
+    global_expense = Expense.query.filter(Expense.timestamp >= time).filter_by(category='Global')
 
     page = request.args.get('page', 1, type=int)
     reports = reports.paginate(
@@ -83,5 +86,5 @@ def on_address(coffee_shop_address):
         if reports.has_next else None
     prev_url = url_for('report.on_address', coffee_shop_address=coffee_shop.address, page=reports.prev_num) \
         if reports.has_prev else None
-    return render_template("report/reports.html", daily_reports=reports.items, next_url=next_url,
+    return render_template("report/reports.html", daily_reports=reports.items, global_expense=global_expense , next_url=next_url,
                            prev_url=prev_url)

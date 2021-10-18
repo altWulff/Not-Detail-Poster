@@ -131,4 +131,4 @@ def create_coffee_shop():
         db.session.commit()
         flash('Congratulations, you are create a new coffee shop!')
         return redirect(url_for('home'))
-    return render_template('new_coffee_shop.html', form=form)
+    return render_template('menu/new_coffee_shop.html', form=form)
