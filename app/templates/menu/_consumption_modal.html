@@ -1,0 +1,32 @@
+<div class="modal fade" id="ConsumptionModal" tabindex="-1" aria-labelledby="ConsumptionModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ url_for('menu.expense') }}" method="post">
+            {{ expense_form.csrf_token }}
+            <div class="modal-header">
+                <h5 class="modal-title" id="ConsumptionModal">Расход</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <select name="coffee_shop" class="form-select mb-3">
+                    {% for cs in coffee_shop_list %}
+                        <option>{{ cs.place_name }}</option>
+                    {% endfor%}
+                </select>
+                {{ render_field(expense_form.category) }}
+
+                <div class="form-check">
+                {% for radio in expense_form.type_cost %}
+                   {{ radio.label}} {{ radio }}
+                {% endfor %}
+                </div>
+                {{ render_field(expense_form.money) }}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                {{ expense_form.submit(class="btn btn-primary") }}
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
