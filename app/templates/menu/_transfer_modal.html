@@ -1,0 +1,30 @@
+<div class="modal fade" id="TransferModal" tabindex="-1" aria-labelledby="TransferModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ url_for('menu.transfer') }}" method="post">
+            {{ transfer_form.csrf_token }}
+            <div class="modal-header">
+                <h5 class="modal-title" id="TransferModal">Перемешение</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <select class="form-select">
+                    {% for cs in coffee_shop_list %}
+                    <option>{{ cs.place_name }}</option>
+                    {% endfor%}
+                </select>
+                <br>
+                <select class="form-select">
+                    {% for cs in coffee_shop_list %}
+                    <option>{{ cs.place_name }}</option>
+                    {% endfor%}
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                {{ transfer_form.submit(class="btn btn-primary") }}
+            </div>
+            </form>
+        </div>
+    </div>
+</div>

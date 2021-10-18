@@ -91,6 +91,12 @@ class SupplyForm(FlaskForm):
     submit = SubmitField('Отправить')
 
 
+class TransferForm(FlaskForm):
+    where_choice = SelectField('Откуда')
+    from_choice = SelectField('Куда')
+    submit = SubmitField('Отправить')
+
+
 class ReportForm(FlaskForm):
     coffee_shop = SelectField('Coffee Shop')
     cashless = IntegerField('Безнал', default=0)

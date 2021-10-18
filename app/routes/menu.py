@@ -2,8 +2,8 @@ from . import datetime
 from . import render_template, redirect, url_for, flash, Blueprint, request
 from . import login_required, login_user, logout_user, current_user, roles_required
 from . import db
-from . import ExpanseForm, ByWeightForm, WriteOffForm, SupplyForm, CoffeeShopForm
-from . import Barista, CoffeeShop, DailyReport, Warehouse, CoffeeShopEquipment, Expense, Supply, ByWeight, WriteOff
+from app.forms import ExpanseForm, ByWeightForm, WriteOffForm, SupplyForm, CoffeeShopForm, TransferForm
+from app.models import Barista, CoffeeShop, DailyReport, Warehouse, CoffeeShopEquipment, Expense, Supply, ByWeight, WriteOff
 
 
 menu = Blueprint('menu', __name__, url_prefix='/menu')
@@ -111,6 +111,19 @@ def supply():
         db.session.commit()
         flash(f'New Supply {form.supply_choice.data} on amount {form.amount.data}')
         return redirect(url_for("home"))
+    return render_template("index.html")
+
+
+@menu.route('/transfer', methods=['POST'])
+def transfer():
+    form = TransferForm(data=request.form)
+    if request.method == "POST":
+        # db.session.add()
+        # db.session.commit()
+        flash(f'Transfer {form.where_choice} to {form.from_choice}')
+        return redirect(url_for("home"))
+    else:
+        flash(f'Errr... ')
     return render_template("index.html")
 
 
