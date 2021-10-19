@@ -38,8 +38,8 @@
                         </ul>
                     </td>
                     <td>
-                        <p>КА: {{day_report.consumption_coffee_arabika}} кг, КБ: {{day_report.consumption_coffee_blend}} кг</p>
-                        <p>М: {{day_report.consumption_milk}} л</p>
+                        <p>КА: {{ "%.2f"|format(day_report.consumption_coffee_arabika) }} кг, КБ: {{ "%.2f"|format(day_report.consumption_coffee_blend) }} кг</p>
+                        <p>М: {{ "%.2f"|format(day_report.consumption_milk) }} л</p>
                         <p>П: {{day_report.consumption_panini}} шт., К: {{day_report.consumption_hot_dogs}} шт.</p>
                     </td>
                 </tr>
@@ -50,8 +50,9 @@
                 <tr>
                     <td colspan="2"></td>
                     <td>
-                        <p>КА: {{day_report.coffee_arabika}} кг, КБ: {{day_report.coffee_blend}} кг</p>
-                        <p>М: {{day_report.milk}} л</p>
+
+                        <p>КА: {{"%.2f"|format(day_report.coffee_arabika)}} кг, КБ: {{ "%.2f"|format(day_report.coffee_blend) }} кг</p>
+                        <p>М: {{ "%.2f"|format(day_report.milk) }} л</p>
                         <p>П: {{day_report.panini}} шт., К: {{day_report.hot_dogs}} шт.</p>
                     </td>
                 </tr>
