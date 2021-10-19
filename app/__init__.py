@@ -29,8 +29,10 @@ from app.routes.menu import menu
 from app.routes.report import report
 from app.routes.errors import errors
 from app.admin_view import MyModelView as ModelView
+from app.admin_view import BaristaAdmin
 user_datastore = SQLAlchemyUserDatastore(db, models.Barista, models.Role)
 security = Security(app, user_datastore)
+
 
 @security.context_processor
 def security_context_processor():
@@ -39,6 +41,8 @@ def security_context_processor():
         admin_view=admin.index_view,
         h=admin_helpers,
     )
+
+
 app.register_blueprint(user)
 app.register_blueprint(menu)
 app.register_blueprint(report)
@@ -51,7 +55,7 @@ admin.add_view(ModelView(models.Supply, db.session,  name='Поступлени�
 admin.add_view(ModelView(models.ByWeight, db.session,  name='Развес', category="Движения товаров"))
 admin.add_view(ModelView(models.WriteOff, db.session,  name='Списания', category="Движения товаров"))
 admin.add_view(ModelView(models.Expense, db.session, name='Расходы', category='Кассовые средства'))
-admin.add_view(ModelView(models.Barista, db.session, name='Сотрудники'))
+admin.add_view(BaristaAdmin(models.Barista, db.session, name='Сотрудники'))
 admin.add_view(ModelView(models.Role, db.session, name='Роли'))
 # admin.add_view(ModelView(models.expenses, db.session))
 
