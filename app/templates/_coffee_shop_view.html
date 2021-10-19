@@ -7,7 +7,7 @@
             <div class="container">
                 <ul>
                     {% for barista in coffee_shop.baristas %}
-                        <li><a href="{{ url_for('user.profile', user_name=barista.name) }}" class="link-secondary">{{ barista.name }}</li>
+                        <li><a href="{{ url_for('user.profile', user_name=barista.name) }}" class="link-secondary">{{ barista.name }}</a></li>
                         {% else %}
                         <p>Отсутствуют </p> 
                            {% if current_user.has_role('admin') or current_user.has_role('moderator') %}
@@ -17,8 +17,6 @@
                 </ul>
             </div>
             <br />
-        <p>Наличка: {{coffee_shop.cash}} грн.</p>
-        <p>Безнал: {{coffee_shop.cashless}} грн.</p>
         <p><a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseWarehouse_{{coffee_shop.id}}" role="button" aria-expanded="false" aria-controls="collapseWarehouse_{{coffee_shop.id}}">Склад</a></p>
         <div class="collapse" id="collapseWarehouse_{{coffee_shop.id}}">
             <div class="card card-body">
