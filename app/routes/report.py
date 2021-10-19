@@ -36,7 +36,7 @@ def create():
                                    barista=current_user, coffee_shop=coffee_shop)
         for expense_dict in form.expanses.data:
             expense = Expense(category=expense_dict['category'], type_cost=expense_dict['type_cost'],
-                              money=expense_dict['money'])
+                              money=expense_dict['money'], coffee_shop=coffee_shop)
             daily_report.expenses.append(expense)
         expanses = sum([exp['money'] for exp in form.expanses.data])
         daily_report.cashbox = remainder_of_day + expanses

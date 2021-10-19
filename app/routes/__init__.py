@@ -6,6 +6,7 @@ from app.forms import LoginForm, RegistrationForm, CoffeeShopForm, ExpanseForm, 
 from app.models import Barista, CoffeeShop, Warehouse, CoffeeShopEquipment, DailyReport, Expense, Supply, ByWeight, WriteOff
 
 
+
 @app.context_processor
 def inject_form():
     expense_form, by_weight_form, write_off_form = ExpanseForm(), ByWeightForm(), WriteOffForm()
@@ -16,6 +17,7 @@ def inject_form():
     return dict(expense_form=expense_form, by_weight_form=by_weight_form,
                 write_off_form=write_off_form, supply_form=supply_form, transfer_form=transfer_form,
                 coffee_shop_list=coffee_shop_list, warehouse=warehouse, cs_equip=cs_equip)
+
 
 
 @app.route('/')
