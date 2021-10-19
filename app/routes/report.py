@@ -4,7 +4,7 @@ from flask import render_template, redirect, url_for, flash, Blueprint, request
 from . import login_required, login_user, logout_user, current_user, roles_required
 from app import db, app
 from . import ReportForm
-from . import Barista, CoffeeShop, DailyReport, Warehouse, CoffeeShopEquipment, Expense
+from app.models import Barista, CoffeeShop, DailyReport, Warehouse, CoffeeShopEquipment, Expense, Supply
 
 
 report = Blueprint('report', __name__, url_prefix='/report')
@@ -78,7 +78,7 @@ def on_address(coffee_shop_address):
         
     time = datetime(datetime.today().year, datetime.today().month, datetime.today().day)
     global_expense = Expense.query.filter(Expense.timestamp >= time).filter_by(category='Global')
-
+    day_supply = Supply.query.filter(Supply.timestamp >= time).filter_by(coffee_shop_id=coffee_shop.id)
     page = request.args.get('page', 1, type=int)
     reports = reports.paginate(
         page, app.config['REPORTS_PER_PAGE'], False)
@@ -86,5 +86,5 @@ def on_address(coffee_shop_address):
         if reports.has_next else None
     prev_url = url_for('report.on_address', coffee_shop_address=coffee_shop.address, page=reports.prev_num) \
         if reports.has_prev else None
-    return render_template("report/reports.html", daily_reports=reports.items, global_expense=global_expense , next_url=next_url,
+    return render_template("report/reports.html", daily_reports=reports.items, global_expense=global_expense, day_supply=day_supply, next_url=next_url,
                            prev_url=prev_url)
