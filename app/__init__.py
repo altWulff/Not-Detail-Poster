@@ -29,7 +29,7 @@ from app.routes.menu import menu
 from app.routes.report import report
 from app.routes.errors import errors
 from app.admin_view import MyModelView as ModelView
-from app.admin_view import BaristaAdmin
+from app.admin_view import BaristaAdmin, DailyReportAdmin
 user_datastore = SQLAlchemyUserDatastore(db, models.Barista, models.Role)
 security = Security(app, user_datastore)
 
@@ -50,7 +50,7 @@ app.register_blueprint(report)
 admin.add_view(ModelView(models.CoffeeShop, db.session, name='Все кофейни', category="Кофейни"))
 admin.add_view(ModelView(models.CoffeeShopEquipment, db.session, name='Оборудование', category="Кофейни"))
 admin.add_view(ModelView(models.Warehouse, db.session,  name='Все товары', category="Склады"))
-admin.add_view(ModelView(models.DailyReport, db.session, name='Отчеты', category='Статистика'))
+admin.add_view(DailyReportAdmin(models.DailyReport, db.session, name='Отчеты', category='Статистика'))
 admin.add_view(ModelView(models.Supply, db.session,  name='Поступления', category="Движения товаров"))
 admin.add_view(ModelView(models.ByWeight, db.session,  name='Развес', category="Движения товаров"))
 admin.add_view(ModelView(models.WriteOff, db.session,  name='Списания', category="Движения товаров"))
