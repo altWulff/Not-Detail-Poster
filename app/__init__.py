@@ -28,7 +28,19 @@ from app.routes.user import user
 from app.routes.menu import menu
 from app.routes.report import report
 from app.routes.errors import errors
-from app.admin_view import ModelView, CoffeeShopAdmin, CoffeeShopEquipmentAdmin, WarehouseAdmin, DailyReportAdmin, BaristaAdmin, ReportsAdminView, RoleAdmin
+from app.admin_view import (
+    ModelView,
+    CoffeeShopAdmin,
+    CoffeeShopEquipmentAdmin,
+    WarehouseAdmin,
+    DailyReportAdmin,
+    BaristaAdmin,
+    ReportsAdminView,
+    RoleAdmin,
+    ByWeightAdmin,
+    SupplyAdmin,
+    WriteOffAdmin
+)
 user_datastore = SQLAlchemyUserDatastore(db, models.Barista, models.Role)
 security = Security(app, user_datastore)
 
@@ -50,9 +62,9 @@ admin.add_view(CoffeeShopAdmin(models.CoffeeShop, db.session, name='Все ко�
 admin.add_view(CoffeeShopEquipmentAdmin(models.CoffeeShopEquipment, db.session, name='Оборудование', category="Кофейни"))
 admin.add_view(WarehouseAdmin(models.Warehouse, db.session,  name='Все товары', category="Склады"))
 admin.add_view(DailyReportAdmin(models.DailyReport, db.session, name='Отчеты', category='Статистика'))
-admin.add_view(ModelView(models.Supply, db.session,  name='Поступления', category="Движения товаров"))
-admin.add_view(ModelView(models.ByWeight, db.session,  name='Развес', category="Движения товаров"))
-admin.add_view(ModelView(models.WriteOff, db.session,  name='Списания', category="Движения товаров"))
+admin.add_view(SupplyAdmin(models.Supply, db.session,  name='Поступления', category="Движения товаров"))
+admin.add_view(ByWeightAdmin(models.ByWeight, db.session,  name='Развес', category="Движения товаров"))
+admin.add_view(WriteOffAdmin(models.WriteOff, db.session,  name='Списания', category="Движения товаров"))
 admin.add_view(ModelView(models.Expense, db.session, name='Расходы', category='Кассовые средства'))
 admin.add_view(BaristaAdmin(models.Barista, db.session, name='Сотрудники'))
 admin.add_view(RoleAdmin(models.Role, db.session, name='Доступ'))

@@ -198,3 +198,34 @@ class RoleAdmin(ModelView):
         barista='Бариста'
     )
     column_formatters = dict(name=lambda v, c, m, p: m.name.title())
+
+
+class SupplyAdmin(ModelView):
+    column_labels = dict(
+        timestamp='Дата',
+        product_name='Название товара',
+        amount='Количество',
+        type_cost='Тип растраты',
+        money='Сумма',
+    )
+    column_formatters = dict(timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"))
+
+
+class ByWeightAdmin(ModelView):
+    column_labels = dict(
+        timestamp='Дата',
+        product_name='Название товара',
+        amount='Количество',
+        type_cost='Тип растраты',
+        money='Сумма',
+    )
+    column_formatters = dict(timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"))
+
+
+class WriteOffAdmin(ModelView):
+    column_labels = dict(
+        timestamp='Дата',
+        product_name='Название товара',
+        amount='Количество',
+    )
+    column_formatters = dict(timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"))
