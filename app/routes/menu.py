@@ -1,7 +1,7 @@
-from . import datetime
-from . import render_template, redirect, url_for, flash, Blueprint, request
-from . import login_required, login_user, logout_user, current_user, roles_required
-from . import db
+from datetime import datetime
+from flask import render_template, redirect, url_for, flash, Blueprint, request
+from flask_security import login_required
+from app import db
 from app.forms import ExpanseForm, ByWeightForm, WriteOffForm, SupplyForm, CoffeeShopForm, TransferForm
 from app.models import Barista, CoffeeShop, DailyReport, Warehouse, CoffeeShopEquipment, Expense, Supply, ByWeight, WriteOff
 
@@ -10,6 +10,7 @@ menu = Blueprint('menu', __name__, url_prefix='/menu')
 
 
 @menu.route('/expense', methods=['POST'])
+@login_required
 def expense():
     form = ExpanseForm()
     if request.method == "POST":
@@ -33,6 +34,7 @@ def expense():
 
 
 @menu.route('/by_weight', methods=['POST'])
+@login_required
 def by_weight():
     form = ByWeightForm()
     if request.method == "POST":
@@ -58,6 +60,7 @@ def by_weight():
 
 
 @menu.route('/write_off', methods=['POST'])
+@login_required
 def write_off():
     form = WriteOffForm()
     if request.method == "POST":
@@ -83,6 +86,7 @@ def write_off():
 
 
 @menu.route('/supply', methods=['POST'])
+@login_required
 def supply():
     form = SupplyForm()
     if request.method == "POST":
@@ -115,6 +119,7 @@ def supply():
 
 
 @menu.route('/transfer', methods=['POST'])
+@login_required
 def transfer():
     form = TransferForm(data=request.form)
     if request.method == "POST":
@@ -128,6 +133,7 @@ def transfer():
 
 
 @menu.route('/create_coffee_shop', methods=['GET', 'POST'])
+@login_required
 def create_coffee_shop():
     form = CoffeeShopForm()
     if form.validate_on_submit():

@@ -1,5 +1,5 @@
-from . import render_template, Blueprint
-from . import db
+from flask import render_template, Blueprint
+from app import db
 
 
 errors = Blueprint('errors', __name__, url_prefix='/error')

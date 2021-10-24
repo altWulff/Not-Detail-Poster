@@ -1,7 +1,6 @@
-from datetime import datetime
 from flask import render_template, redirect, url_for, flash, Blueprint, request
-from flask_security import login_required, login_user, logout_user, current_user, roles_required
-from app import app, db, login
+from flask_security import login_required, current_user
+from app import db
 from app.forms import EditProfileForm
 from app.models import Barista
 
