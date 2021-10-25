@@ -1,4 +1,5 @@
 import click
+from datetime import datetime
 from werkzeug.security import generate_password_hash
 from app import app, db, user_datastore
 from app.models import Barista, DailyReport, Role, CoffeeShop, CoffeeShopEquipment, Expense
@@ -36,6 +37,7 @@ def create_superuser(username, password):
     user_datastore.create_user(name=name, password_hash=password)
     create_roles()
     user = Barista.query.filter_by(name=name).first()
+    user.confirmed_at = datetime.utcnow()
     role = Role.query.filter_by(name='admin').first()
     user_datastore.activate_user(user)
     user_datastore.add_role_to_user(user, role)

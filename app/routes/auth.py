@@ -13,13 +13,6 @@ def home():
     return render_template('index.html')
 
 
-@app.route('/statistics')
-@roles_required('admin')
-@login_required
-def statistics():
-    return render_template('statistics.html')
-
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -35,6 +28,7 @@ def login():
 
 
 @app.route('/new_staff', methods=['GET', 'POST'])
+@login_required
 def create_new_staff():
     form = RegistrationForm()
     if form.validate_on_submit():
@@ -52,6 +46,7 @@ def create_new_staff():
 
 
 @app.route('/logout')
+@login_required
 def logout():
     logout_user()
     return redirect('index')
