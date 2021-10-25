@@ -109,7 +109,7 @@ class DailyReportAdmin(ModelView):
         'panini',
         'hot_dogs',
     )
-    column_filters = ('timestamp', )
+    column_filters = ('timestamp', 'barista','coffee_shop')
     column_labels = dict(
         coffee_shop='Кофейня',
         barista='Бариста',
@@ -133,39 +133,46 @@ class DailyReportAdmin(ModelView):
     column_formatters = dict(timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"))
     list_template = 'admin/model/custom_list.html'
     page_size = 5
-
+    
+    def get_model_data(self):
+        view_args = self._get_list_extra_args()
+        sort_column = self._get_column_by_idx(view_args.sort)
+        if sort_column is not None:
+            sort_column = sort_column[0]
+            
+        count, data = self.get_list(view_args.page, sort_column, view_args.sort_desc, view_args.search, view_args.filters, page_size=self.page_size)
+        return data
+    
     def page_cashbox(self, current_page):
-        # this should take into account any filters/search inplace
-        _query = self.get_query().limit(self.page_size).offset(current_page * self.page_size)
+        _query = self.get_model_data()
         return sum([p.cashbox for p in _query])
 
     def total_cashbox(self):
-        # this should take into account any filters/search inplace
         return self.session.query(func.sum(DailyReport.cashbox)).scalar()
 
     def page_cash_balance(self, current_page):
-        _query = self.session.query(DailyReport).limit(self.page_size).offset(current_page * self.page_size)
+        _query = self.get_model_data()
         return sum([p.cash_balance for p in _query])
 
     def total_cash_balance(self):
         return self.session.query(func.sum(DailyReport.cash_balance)).scalar()
 
     def page_remainder_of_day(self, current_page):
-        _query = self.session.query(DailyReport).limit(self.page_size).offset(current_page * self.page_size)
+        _query = self.get_model_data()
         return sum([p.remainder_of_day for p in _query])
 
     def total_remainder_of_day(self):
         return self.session.query(func.sum(DailyReport.remainder_of_day)).scalar()
 
     def page_cashless(self, current_page):
-        _query = self.session.query(DailyReport).limit(self.page_size).offset(current_page * self.page_size)
+        _query = self.get_model_data()
         return sum([p.cashless for p in _query])
 
     def total_cashless(self):
         return self.session.query(func.sum(DailyReport.cashless)).scalar()
 
     def page_actual_balance(self, current_page):
-        _query = self.session.query(DailyReport).limit(self.page_size).offset(current_page * self.page_size)
+        _query = self.get_model_data()
         return sum([p.actual_balance for p in _query])
 
     def total_actual_balance(self):
