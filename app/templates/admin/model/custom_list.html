@@ -2,35 +2,34 @@
 {% block model_list_table %}
 {{ super() }}
 <h3>Сведение</h3>
-
 <div class="table-responsive">
     <table class="table table-striped table-bordered table-hover model-list">
         <thead>
             <tr>
-                {% if actions %}
-                <th class="list-checkbox-column">
-                </th>
-                {% endif %}
-
-                <th class="col-md-1"></th>
-                {% for c, name in list_columns %}
-                    {% set column = loop.index0 %}
-                    <th class="column-header col-{{c}}">
+                <td colspan="2"></td>
+                {% for name in summary_data['on_page'] %}
+                    <td class="col-1">
                         {{ name }}
-                    </th>
-                {% endfor %}
-            </tr>
-        </thead>
-        {% for row in summary_data %}
-            <tr>
-                <td colspan="2"><strong>{{ row['title'] or ''}}</strong></td>
-                {% for c, name in list_columns %}
-                    <td class="col-{{c}}">
-                        {{ row[c] or ''}}
                     </td>
                 {% endfor %}
             </tr>
-        {% endfor %}
+        </thead>
+        <tr>
+            <td colspan="2"><strong>На странице</strong></td>
+            {% for name in summary_data['on_page'] %}
+                <td class="col-1">
+                    {{ summary_data['on_page'][name] }}
+                </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td colspan="2"><strong>Полная сумма</strong></td>
+            {% for name in summary_data['total'] %}
+                <td class="col-1">
+                    {{ summary_data['on_page'][name] }}
+                </td>
+            {% endfor %}
+        </tr>
     </table>
 </div>
 {% endblock %}

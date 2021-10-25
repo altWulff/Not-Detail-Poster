@@ -23,13 +23,21 @@ class ModelView(sqla.ModelView):
             else:
                 # login
                 return redirect(url_for('login', next=request.url))
+
     def get_model_data(self):
         view_args = self._get_list_extra_args()
         sort_column = self._get_column_by_idx(view_args.sort)
         if sort_column is not None:
             sort_column = sort_column[0]
             
-        count, data = self.get_list(view_args.page, sort_column, view_args.sort_desc, view_args.search, view_args.filters, page_size=self.page_size)
+        count, data = self.get_list(
+            view_args.page,
+            sort_column,
+            view_args.sort_desc,
+            view_args.search,
+            view_args.filters,
+            page_size=self.page_size
+        )
         return data
 
 
@@ -166,18 +174,23 @@ class DailyReportAdmin(ModelView):
         if template == 'admin/model/custom_list.html':
             # append a summary_data dictionary into kwargs
             _current_page = kwargs['page']
-            kwargs['summary_data'] = [
-                {'title': 'На странице', 'name': None, 'cashbox': self.page_cashbox(_current_page)},
-                {'title': 'Полная сумма', 'name': None, 'cashbox': self.total_cashbox()},
-                {'title': 'На странице', 'name': None, 'cash_balance': self.page_cash_balance(_current_page)},
-                {'title': 'Полная сумма', 'name': None, 'cash_balance': self.total_cash_balance()},
-                {'title': 'На странице', 'name': None, 'remainder_of_day': self.page_remainder_of_day(_current_page)},
-                {'title': 'Полная сумма', 'name': None, 'remainder_of_day': self.total_remainder_of_day()},
-                {'title': 'На странице', 'name': None, 'cashless': self.page_cashless(_current_page)},
-                {'title': 'Полная сумма', 'name': None, 'cashless': self.total_cashless()},
-                {'title': 'На странице', 'name': None, 'actual_balance': self.page_actual_balance(_current_page)},
-                {'title': 'Полная сумма', 'name': None, 'actual_balance': self.total_actual_balance()},
-            ]
+            kwargs['summary_data'] = {
+                'on_page': {
+                    'cashbox': self.page_cashbox(_current_page),
+                    'cash_balance': self.page_cash_balance(_current_page),
+                    'remainder_of_day': self.page_remainder_of_day(_current_page),
+                    'cashless': self.page_cashless(_current_page),
+                    'actual_balance': self.page_actual_balance(_current_page),
+                },
+                'total': {
+                    'cashbox': self.total_cashbox(),
+                    'cash_balance': self.total_cash_balance(),
+                    'remainder_of_day': self.total_remainder_of_day(),
+                    'cashless': self.total_cashless(),
+                    'actual_balance': self.total_actual_balance(),
+                }
+            }
+
         return super(DailyReportAdmin, self).render(template, **kwargs)
 
 
