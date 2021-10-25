@@ -5,7 +5,6 @@ from flask_admin.contrib import sqla
 from flask_admin.model.template import macro
 from flask_admin import BaseView, expose
 from app.models import DailyReport, CoffeeShop, Barista
-from app.admin_forms import ReportsFilterForm
 
 
 class ModelView(sqla.ModelView):
@@ -24,20 +23,14 @@ class ModelView(sqla.ModelView):
             else:
                 # login
                 return redirect(url_for('login', next=request.url))
-
-
-class ReportsAdminView(BaseView):
-    @expose('/', methods=('POST', 'GET'))
-    def index(self):
-        form = ReportsFilterForm()
-        reports = DailyReport.query.all()
-        form.target_coffee_shop.choices = [(g.id, g.place_name) for g in CoffeeShop.query.order_by('place_name')]
-        form.target_barista.choices = [(g.id, g.name) for g in Barista.query.order_by('name')]
-        if request.method == "POST":
-            reports = DailyReport.query.filter_by(coffee_shop_id=form.target_coffee_shop.data).filter_by(barista_name=form.target_barista.data).first_or_404()
-            flash('...')
-            return self.render('admin/reports_filter.html', reports=reports, form=form)
-        return self.render('admin/reports_filter.html', reports=reports, form=form)
+    def get_model_data(self):
+        view_args = self._get_list_extra_args()
+        sort_column = self._get_column_by_idx(view_args.sort)
+        if sort_column is not None:
+            sort_column = sort_column[0]
+            
+        count, data = self.get_list(view_args.page, sort_column, view_args.sort_desc, view_args.search, view_args.filters, page_size=self.page_size)
+        return data
 
 
 class CoffeeShopAdmin(ModelView):
@@ -132,16 +125,6 @@ class DailyReportAdmin(ModelView):
     )
     column_formatters = dict(timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"))
     list_template = 'admin/model/custom_list.html'
-    page_size = 5
-    
-    def get_model_data(self):
-        view_args = self._get_list_extra_args()
-        sort_column = self._get_column_by_idx(view_args.sort)
-        if sort_column is not None:
-            sort_column = sort_column[0]
-            
-        count, data = self.get_list(view_args.page, sort_column, view_args.sort_desc, view_args.search, view_args.filters, page_size=self.page_size)
-        return data
     
     def page_cashbox(self, current_page):
         _query = self.get_model_data()

@@ -35,7 +35,6 @@ from app.admin_view import (
     WarehouseAdmin,
     DailyReportAdmin,
     BaristaAdmin,
-    ReportsAdminView,
     RoleAdmin,
     ByWeightAdmin,
     SupplyAdmin,
@@ -68,7 +67,6 @@ admin.add_view(WriteOffAdmin(models.WriteOff, db.session,  name='Списани�
 admin.add_view(ModelView(models.Expense, db.session, name='Расходы', category='Кассовые средства'))
 admin.add_view(BaristaAdmin(models.Barista, db.session, name='Сотрудники'))
 admin.add_view(RoleAdmin(models.Role, db.session, name='Доступ'))
-admin.add_view(ReportsAdminView(name='Фильт отчетов', category='Статистика', endpoint='reports'))
 
 if not app.debug:
     if not os.path.exists('logs'):
