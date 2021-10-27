@@ -173,7 +173,7 @@ class Expense(db.Model):
     # один ко многому одна Кофейня много расходов
     coffee_shop_id = db.Column(db.Integer, db.ForeignKey('coffee_shop.id'))
     categories = db.relationship('Category', secondary=categories, lazy='subquery',
-                                 backref=db.backref('categories', lazy=True))
+                                 backref=db.backref('expense', lazy=True))
 
     def __repr__(self):
         return f'<Expense: {self.category}({self.type_cost}) - {self.money}>'
