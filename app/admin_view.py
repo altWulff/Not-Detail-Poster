@@ -174,6 +174,7 @@ class DailyReportAdmin(ModelView):
         if template == 'admin/model/custom_list.html':
             # append a summary_data dictionary into kwargs
             _current_page = kwargs['page']
+            kwargs['column_labels'] = self.column_labels
             kwargs['summary_data'] = {
                 'on_page': {
                     'cashbox': self.page_cashbox(_current_page),

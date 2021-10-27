@@ -9,7 +9,7 @@
                 <td colspan="2"></td>
                 {% for name in summary_data['on_page'] %}
                     <td class="col-1">
-                        {{ name }}
+                        <strong>{{ column_labels.get(name, name) }}</strong>
                     </td>
                 {% endfor %}
             </tr>
