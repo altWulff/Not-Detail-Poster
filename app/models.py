@@ -1,7 +1,9 @@
 from datetime import datetime, date
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy import func
 from flask_security import UserMixin, RoleMixin
 from . import db, login
+
 
 
 @login.user_loader
@@ -107,7 +109,7 @@ class DailyReport(db.Model):
     coffee_shop_id = db.Column(db.Integer, db.ForeignKey('coffee_shop.id'))
     barista_id = db.Column(db.Integer, db.ForeignKey('barista.id'))
     # Дата
-    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime(timezone=True), server_default=func.now())
     # Касса - остаток дня в сумме с расходами
     cashbox = db.Column(db.Integer)
     # Расходы
