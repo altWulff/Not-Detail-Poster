@@ -36,9 +36,11 @@ from app.admin_view import (
     DailyReportAdmin,
     BaristaAdmin,
     RoleAdmin,
+    ExpenseAdmin,
     ByWeightAdmin,
     SupplyAdmin,
-    WriteOffAdmin
+    WriteOffAdmin,
+    CategoryAdmin
 )
 user_datastore = SQLAlchemyUserDatastore(db, models.Barista, models.Role)
 security = Security(app, user_datastore)
@@ -64,9 +66,9 @@ admin.add_view(DailyReportAdmin(models.DailyReport, db.session, name='Отчет
 admin.add_view(SupplyAdmin(models.Supply, db.session,  name='Поступления', category="Движения товаров"))
 admin.add_view(ByWeightAdmin(models.ByWeight, db.session,  name='Развес', category="Движения товаров"))
 admin.add_view(WriteOffAdmin(models.WriteOff, db.session,  name='Списания', category="Движения товаров"))
-admin.add_view(ModelView(models.Expense, db.session, name='Расходы', category='Кассовые средства'))
+admin.add_view(ExpenseAdmin(models.Expense, db.session, name='Расходы', category='Кассовые средства'))
 admin.add_view(BaristaAdmin(models.Barista, db.session, name='Сотрудники'))
-admin.add_view(ModelView(models.Category, db.session, name='Категории', category='Разное'))
+admin.add_view(CategoryAdmin(models.Category, db.session, name='Категории', category='Разное'))
 admin.add_view(RoleAdmin(models.Role, db.session, name='Доступ', category='Разное'))
 
 if not app.debug:

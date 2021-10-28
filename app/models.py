@@ -166,6 +166,7 @@ class Expense(db.Model):
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     is_global = db.Column(db.Boolean, default=False)
     # целевое назначение траты
+    # TODO удалить category, есть categories
     category = db.Column(db.String(64), index=True)
     # налл, безнал
     type_cost = db.Column(db.String(64), index=True)

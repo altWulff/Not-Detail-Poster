@@ -209,18 +209,34 @@ class SupplyAdmin(ModelView):
         timestamp='Дата',
         product_name='Название товара',
         amount='Количество',
-        type_cost='Тип растраты',
+        type_cost='Тип траты',
         money='Сумма',
     )
     column_formatters = dict(timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"))
 
+
+
+class ExpenseAdmin(ModelView):
+    column_filters = ('timestamp', 'is_global', 'type_cost', 'categories', 'coffee_shop')
+    column_searchable_list = ('timestamp', 'type_cost')
+    column_labels = dict(
+        timestamp='Дата',
+        is_global='Глобальный?',
+        type_cost='Тип траты',
+        money='Сумма траты',
+        categories='Категории'
+    )
+    can_view_details = True
+    column_default_sort = ('timestamp', True)
+    column_exclude_list = ('category', )
+    column_formatters = dict(timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"))
 
 class ByWeightAdmin(ModelView):
     column_labels = dict(
         timestamp='Дата',
         product_name='Название товара',
         amount='Количество',
-        type_cost='Тип растраты',
+        type_cost='Тип траты',
         money='Сумма',
     )
     column_formatters = dict(timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"))
@@ -233,3 +249,9 @@ class WriteOffAdmin(ModelView):
         amount='Количество',
     )
     column_formatters = dict(timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"))
+
+
+class CategoryAdmin(ModelView):
+    column_labels = dict(
+        name='Название категории',
+    )
