@@ -51,9 +51,9 @@ class CoffeeShopEquipment(db.Model):
 
 class Warehouse(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    coffee_arabika = db.Column(db.Float(64))
-    coffee_blend = db.Column(db.Float(64))
-    milk = db.Column(db.Float(64))
+    coffee_arabika = db.Column(db.Float(50))
+    coffee_blend = db.Column(db.Float(50))
+    milk = db.Column(db.Float(50))
     panini = db.Column(db.Integer)
     hot_dogs = db.Column(db.Integer)
     coffee_shop_id = db.Column(db.Integer, db.ForeignKey('coffee_shop.id'))
@@ -130,15 +130,15 @@ class DailyReport(db.Model):
     # Ф.О. остаток налички на коней дня
     actual_balance = db.Column(db.Integer)
     # потребление за день
-    consumption_coffee_arabika = db.Column(db.Float(64))
-    consumption_coffee_blend = db.Column(db.Float(64))
-    consumption_milk = db.Column(db.Float(64))
+    consumption_coffee_arabika = db.Column(db.Float(50))
+    consumption_coffee_blend = db.Column(db.Float(50))
+    consumption_milk = db.Column(db.Float(50))
     consumption_panini = db.Column(db.Integer)
     consumption_hot_dogs = db.Column(db.Integer)
     # остаток продукции в конце дня
-    coffee_arabika = db.Column(db.Float(64))
-    coffee_blend = db.Column(db.Float(64))
-    milk = db.Column(db.Float(64))
+    coffee_arabika = db.Column(db.Float(50))
+    coffee_blend = db.Column(db.Float(50))
+    milk = db.Column(db.Float(50))
     panini = db.Column(db.Integer)
     hot_dogs = db.Column(db.Integer)
 
@@ -184,7 +184,7 @@ class Supply(db.Model):
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     coffee_shop_id = db.Column(db.Integer, db.ForeignKey('coffee_shop.id'))
     product_name = db.Column(db.String(80))
-    amount = db.Column(db.Float(120))
+    amount = db.Column(db.Float(50))
     type_cost = db.Column(db.String(64), index=True)
     money = db.Column(db.Integer)
 
@@ -194,7 +194,7 @@ class ByWeight(db.Model):
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     coffee_shop_id = db.Column(db.Integer, db.ForeignKey('coffee_shop.id'))
     product_name = db.Column(db.String(80))
-    amount = db.Column(db.Float(120))
+    amount = db.Column(db.Float(50))
     type_cost = db.Column(db.String(64), index=True)
     money = db.Column(db.Integer)
 
@@ -203,5 +203,5 @@ class WriteOff(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     coffee_shop_id = db.Column(db.Integer, db.ForeignKey('coffee_shop.id'))
-    amount = db.Column(db.Float(120))
+    amount = db.Column(db.Float(50))
     product_name = db.Column(db.String(80))
