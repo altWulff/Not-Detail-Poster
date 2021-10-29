@@ -5,6 +5,8 @@ from flask_admin.contrib import sqla
 from flask_admin.model.template import macro
 from flask_admin import BaseView, expose
 from app.models import DailyReport, CoffeeShop, Barista
+from wtforms import RadioField
+from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, NumberRange, Required
 
 
 class ModelView(sqla.ModelView):
@@ -243,23 +245,57 @@ class RoleAdmin(ModelView):
         return False
 
 class SupplyAdmin(ModelView):
+    can_set_page_size = True
+    column_list = ('timestamp', 'product_name', 'amount', 'type_cost', 'money', 'coffee_shop' )
     column_labels = dict(
         timestamp='Дата',
         product_name='Название товара',
         amount='Количество',
         type_cost='Тип траты',
         money='Сумма',
+        coffee_shop='Кофейня'
     )
-    column_formatters = dict(timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"))
+    column_filters = ('timestamp', 'type_cost', 'coffee_shop')
+    column_searchable_list = ('timestamp', )
+    form_create_rules = ('timestamp', 'product_name', 'amount', 'type_cost', 'money', 'coffee_shop')
+    form_edit_rules = ('timestamp', 'product_name', 'amount', 'type_cost', 'money', 'coffee_shop')
+    column_formatters = dict(
+        timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"),
+        type_cost=lambda v, c, m, p: 'Наличка' if m.type_cost == 'cash' else 'Безнал'
+    )
+    form_extra_fields = {
+        'type_cost':  RadioField('Тип траты', choices=[('cash', 'Наличка'), ('cashless', 'Безнал')], validators=[Required()], default='cash')
+    }
+    form_widget_args = {
+        'money': {
+            'placeholder': 'В гривнях'
+        },
+        'type_cost': {
+            'class': 'form-check'
+        }
+    }
+    form_ajax_refs = {
+        'coffee_shop': {
+            'fields': ('place_name', 'address'),
+            'placeholder': 'Кофейня',
+            'page_size': 10,
+            'minimum_input_length': 0,
+        }
+    }
 
 
 
 class ExpenseAdmin(ModelView):
+    can_set_page_size = True
+    column_list = ('timestamp', 'money', 'type_cost', 'is_global', 'categories', 'coffee_shop' )
+    form_create_rules = ('timestamp',
+    'type_cost', 'money', 'is_global' ,'categories', 'coffee_shop' )
+    form_edit_rules = ('timestamp', 'type_cost', 'money', 'is_global' ,'categories', 'coffee_shop' )
     column_filters = ('timestamp', 'is_global', 'type_cost', 'categories', 'coffee_shop')
-    column_searchable_list = ('timestamp', 'type_cost')
+    column_searchable_list = ('timestamp', )
     column_labels = dict(
         timestamp='Дата',
-        is_global='Глобальный?',
+        is_global='Глобальная?',
         type_cost='Тип траты',
         money='Сумма траты',
         categories='Категории',
@@ -267,27 +303,94 @@ class ExpenseAdmin(ModelView):
     )
     can_view_details = True
     column_default_sort = ('timestamp', True)
-    column_exclude_list = ('category', )
-    column_formatters = dict(timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"))
+    column_formatters = dict(
+        timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"),
+        type_cost=lambda v, c, m, p: 'Наличка' if m.type_cost == 'cash' else 'Безнал',
+        is_global=lambda v, c, m, p: 'Да' if m.is_global else 'Нет'
+    )
+    form_extra_fields = {
+        'type_cost':  RadioField('Тип траты', choices=[('cash', 'Наличка'), ('cashless', 'Безнал')], validators=[Required()], default='cash')
+    }
+    form_widget_args = {
+        'money': {
+            'placeholder': 'В гривнях'
+        },
+        'type_cost': {
+            'class': 'form-check'
+        }
+    }
+    
+    form_ajax_refs = {
+        'categories': {
+            'fields': ('name', ),
+            'placeholder': 'Добавить категорию',
+            'page_size': 10,
+            'minimum_input_length': 0,
+        },
+        'coffee_shop': {
+            'fields': ('place_name', 'address'),
+            'placeholder': 'Кофейня',
+            'page_size': 10,
+            'minimum_input_length': 0,
+        }
+    }
+
 
 class ByWeightAdmin(ModelView):
+    can_set_page_size = True
+    column_list = ('timestamp', 'product_name', 'amount', 'type_cost', 'money', 'coffee_shop' )
     column_labels = dict(
         timestamp='Дата',
         product_name='Название товара',
         amount='Количество',
         type_cost='Тип траты',
         money='Сумма',
+        coffee_shop='Кофейня'
     )
-    column_formatters = dict(timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"))
+    column_formatters = dict(
+        timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"),
+        type_cost=lambda v, c, m, p: 'Наличка' if m.type_cost == 'cash' else 'Безнал'
+    )
+    form_create_rules = ('timestamp', 'product_name', 'amount', 'type_cost', 'money', 'coffee_shop')
+    form_edit_rules = ('timestamp', 'product_name', 'amount', 'type_cost', 'money', 'coffee_shop')
+    form_extra_fields = {
+        'type_cost':  RadioField('Тип траты', choices=[('cash', 'Наличка'), ('cashless', 'Безнал')], validators=[Required()], default='cash')
+    }
+    form_widget_args = {
+        'money': {
+            'placeholder': 'В гривнях'
+        },
+        'type_cost': {
+            'class': 'form-check'
+        }
+    }
+    form_ajax_refs = {
+        'coffee_shop': {
+            'fields': ('place_name', 'address'),
+            'placeholder': 'Кофейня',
+            'page_size': 10,
+            'minimum_input_length': 0,
+        }
+    }
 
 
 class WriteOffAdmin(ModelView):
+    can_set_page_size = True
     column_labels = dict(
         timestamp='Дата',
         product_name='Название товара',
         amount='Количество',
+        coffee_shop='Кофейня'
     )
     column_formatters = dict(timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"))
+    form_ajax_refs = {
+        'coffee_shop': {
+            'fields': ('place_name', 'address'),
+            'placeholder': 'Кофейня',
+            'page_size': 10,
+            'minimum_input_length': 0,
+        }
+    }
 
 
 class CategoryAdmin(ModelView):

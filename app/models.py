@@ -34,7 +34,8 @@ class CoffeeShop(db.Model):
 
     def __repr__(self):
         return f'<CoffeeShop: {self.place_name}>'
-
+    def __str__(self):
+        return f'{self.place_name} / {self.address}'
 
 class CoffeeShopEquipment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -159,15 +160,15 @@ class Category(db.Model):
 
     def __repr__(self):
         return f'<Category: {self.name}>'
+        
+    def __str__(self):
+        return self.name
 
 
 class Expense(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     is_global = db.Column(db.Boolean, default=False)
-    # целевое назначение траты
-    # TODO удалить category, есть categories
-    category = db.Column(db.String(64), index=True)
     # налл, безнал
     type_cost = db.Column(db.String(64), index=True)
     money = db.Column(db.Integer)
