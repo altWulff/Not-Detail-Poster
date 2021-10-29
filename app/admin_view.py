@@ -8,9 +8,30 @@ from app.models import DailyReport, CoffeeShop, Barista
 
 
 class ModelView(sqla.ModelView):
+    @property
+    def can_delete(self):
+        is_admin = current_user.has_role('admin')
+        is_active = current_user.is_active and current_user.is_authenticated
+        
+        if is_active and is_admin:
+            return True
+        return False
+
+    @property
+    def can_create(self):
+        is_admin = current_user.has_role('admin')
+        is_active = current_user.is_active and current_user.is_authenticated
+        
+        if is_active and is_admin:
+            return True
+        return False
+
     def is_accessible(self):
-        return (current_user.is_active and current_user.is_authenticated and current_user.has_role('admin')
-                )
+        is_active = current_user.is_active and current_user.is_authenticated
+        is_admin = current_user.has_role('admin')
+        is_moderator = current_user.has_role('moderator')
+        
+        return is_active and is_admin or is_moderator
 
     def _handle_view(self, name, **kwargs):
         """
@@ -92,6 +113,15 @@ class BaristaAdmin(ModelView):
         roles='Доступ',
     )
     column_formatters = dict(confirmed_at=lambda v, c, m, p: m.confirmed_at.date().strftime("%d.%m.%Y"))
+    
+    @property
+    def can_edit(self):
+        is_admin = current_user.has_role('admin')
+        is_active = current_user.is_active and current_user.is_authenticated
+        
+        if is_active and is_admin:
+            return True
+        return False
 
 
 class DailyReportAdmin(ModelView):
@@ -202,7 +232,15 @@ class RoleAdmin(ModelView):
         barista='Бариста'
     )
     column_formatters = dict(name=lambda v, c, m, p: m.name.title())
-
+    
+    @property
+    def can_edit(self):
+        is_admin = current_user.has_role('admin')
+        is_active = current_user.is_active and current_user.is_authenticated
+        
+        if is_active and is_admin:
+            return True
+        return False
 
 class SupplyAdmin(ModelView):
     column_labels = dict(
@@ -224,7 +262,8 @@ class ExpenseAdmin(ModelView):
         is_global='Глобальный?',
         type_cost='Тип траты',
         money='Сумма траты',
-        categories='Категории'
+        categories='Категории',
+        coffee_shop='Кофейня'
     )
     can_view_details = True
     column_default_sort = ('timestamp', True)
@@ -252,6 +291,8 @@ class WriteOffAdmin(ModelView):
 
 
 class CategoryAdmin(ModelView):
+    can_view_details = True
     column_labels = dict(
         name='Название категории',
     )
+    
