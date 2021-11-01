@@ -1,12 +1,10 @@
 from sqlalchemy import func
-from flask import abort, redirect, request, url_for, flash
+from flask import abort, redirect, request, url_for
 from flask_security import current_user
 from flask_admin.contrib import sqla
-from flask_admin.model.template import macro
-from flask_admin import BaseView, expose
-from app.models import DailyReport, CoffeeShop, Barista
+from app.models import Report
 from wtforms import RadioField
-from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, NumberRange, Required
+from wtforms.validators import Required
 
 
 class ModelView(sqla.ModelView):
@@ -64,7 +62,7 @@ class ModelView(sqla.ModelView):
         return data
 
 
-class CoffeeShopAdmin(ModelView):
+class ShopAdmin(ModelView):
     column_searchable_list = ('place_name', 'address')
     column_labels = dict(
         place_name='Название',
@@ -74,24 +72,24 @@ class CoffeeShopAdmin(ModelView):
     )
 
 
-class CoffeeShopEquipmentAdmin(ModelView):
+class ShopEquipmentAdmin(ModelView):
     column_searchable_list = ('coffee_machine', )
     column_labels = dict(
         coffee_machine='Кофе Машина',
         grinder_1='Кофемолка 1',
         grinder_2='Кофемолка 2',
-        coffee_shop='Кофейня'
+        shop='Кофейня'
     )
 
 
-class WarehouseAdmin(ModelView):
+class StorageAdmin(ModelView):
     column_labels = dict(
         coffee_arabika='Арабика',
         coffee_blend='Бленд',
         milk='Молоко',
         panini='Панини',
         hot_dogs='Хот-доги',
-        coffee_shop='Кофейня'
+        shop='Кофейня'
     )
     column_formatters = dict(
         coffee_arabika=lambda v, c, m, p: f'{m.coffee_arabika} кг',
@@ -100,6 +98,7 @@ class WarehouseAdmin(ModelView):
         panini=lambda v, c, m, p: f'{m.panini} шт.',
         hot_dogs=lambda v, c, m, p: f'{m.hot_dogs} шт.',
     )
+    column_filters = ('shop', )
 
 
 class BaristaAdmin(ModelView):
@@ -110,7 +109,7 @@ class BaristaAdmin(ModelView):
         name='Имя',
         phone_number='Тел.',
         email='Емейл',
-        coffee_shop='Кофейня',
+        shop='Кофейня',
         daily_reports='Отчеты',
         roles='Доступ',
     )
@@ -126,7 +125,7 @@ class BaristaAdmin(ModelView):
         return False
 
 
-class DailyReportAdmin(ModelView):
+class ReportAdmin(ModelView):
     can_view_details = True
     column_default_sort = ('timestamp', True)
     column_searchable_list = ('timestamp', )
@@ -142,9 +141,9 @@ class DailyReportAdmin(ModelView):
         'panini',
         'hot_dogs',
     )
-    column_filters = ('timestamp', 'barista','coffee_shop')
+    column_filters = ('timestamp', 'barista', 'shop')
     column_labels = dict(
-        coffee_shop='Кофейня',
+        shop='Кофейня',
         barista='Бариста',
         timestamp='Дата',
         cashbox='Касса',
@@ -166,40 +165,40 @@ class DailyReportAdmin(ModelView):
     column_formatters = dict(timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"))
     list_template = 'admin/model/custom_list.html'
     
-    def page_cashbox(self, current_page):
+    def page_cashbox(self):
         _query = self.get_model_data()
         return sum([p.cashbox for p in _query])
 
     def total_cashbox(self):
-        return self.session.query(func.sum(DailyReport.cashbox)).scalar()
+        return self.session.query(func.sum(Report.cashbox)).scalar()
 
-    def page_cash_balance(self, current_page):
+    def page_cash_balance(self):
         _query = self.get_model_data()
         return sum([p.cash_balance for p in _query])
 
     def total_cash_balance(self):
-        return self.session.query(func.sum(DailyReport.cash_balance)).scalar()
+        return self.session.query(func.sum(Report.cash_balance)).scalar()
 
-    def page_remainder_of_day(self, current_page):
+    def page_remainder_of_day(self):
         _query = self.get_model_data()
         return sum([p.remainder_of_day for p in _query])
 
     def total_remainder_of_day(self):
-        return self.session.query(func.sum(DailyReport.remainder_of_day)).scalar()
+        return self.session.query(func.sum(Report.remainder_of_day)).scalar()
 
-    def page_cashless(self, current_page):
+    def page_cashless(self):
         _query = self.get_model_data()
         return sum([p.cashless for p in _query])
 
     def total_cashless(self):
-        return self.session.query(func.sum(DailyReport.cashless)).scalar()
+        return self.session.query(func.sum(Report.cashless)).scalar()
 
-    def page_actual_balance(self, current_page):
+    def page_actual_balance(self):
         _query = self.get_model_data()
         return sum([p.actual_balance for p in _query])
 
     def total_actual_balance(self):
-        return self.session.query(func.sum(DailyReport.actual_balance)).scalar()
+        return self.session.query(func.sum(Report.actual_balance)).scalar()
 
     def render(self, template, **kwargs):
         # we are only interested in the list page
@@ -209,11 +208,11 @@ class DailyReportAdmin(ModelView):
             kwargs['column_labels'] = self.column_labels
             kwargs['summary_data'] = {
                 'on_page': {
-                    'cashbox': self.page_cashbox(_current_page),
-                    'cash_balance': self.page_cash_balance(_current_page),
-                    'remainder_of_day': self.page_remainder_of_day(_current_page),
-                    'cashless': self.page_cashless(_current_page),
-                    'actual_balance': self.page_actual_balance(_current_page),
+                    'cashbox': self.page_cashbox(),
+                    'cash_balance': self.page_cash_balance(),
+                    'remainder_of_day': self.page_remainder_of_day(),
+                    'cashless': self.page_cashless(),
+                    'actual_balance': self.page_actual_balance(),
                 },
                 'total': {
                     'cashbox': self.total_cashbox(),
@@ -224,7 +223,7 @@ class DailyReportAdmin(ModelView):
                 }
             }
 
-        return super(DailyReportAdmin, self).render(template, **kwargs)
+        return super(ReportAdmin, self).render(template, **kwargs)
 
 
 class RoleAdmin(ModelView):
@@ -244,62 +243,22 @@ class RoleAdmin(ModelView):
             return True
         return False
 
-class SupplyAdmin(ModelView):
-    can_set_page_size = True
-    column_list = ('timestamp', 'product_name', 'amount', 'type_cost', 'money', 'coffee_shop' )
-    column_labels = dict(
-        timestamp='Дата',
-        product_name='Название товара',
-        amount='Количество',
-        type_cost='Тип траты',
-        money='Сумма',
-        coffee_shop='Кофейня'
-    )
-    column_filters = ('timestamp', 'type_cost', 'coffee_shop')
-    column_searchable_list = ('timestamp', )
-    form_create_rules = ('timestamp', 'product_name', 'amount', 'type_cost', 'money', 'coffee_shop')
-    form_edit_rules = ('timestamp', 'product_name', 'amount', 'type_cost', 'money', 'coffee_shop')
-    column_formatters = dict(
-        timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"),
-        type_cost=lambda v, c, m, p: 'Наличка' if m.type_cost == 'cash' else 'Безнал'
-    )
-    form_extra_fields = {
-        'type_cost':  RadioField('Тип траты', choices=[('cash', 'Наличка'), ('cashless', 'Безнал')], validators=[Required()], default='cash')
-    }
-    form_widget_args = {
-        'money': {
-            'placeholder': 'В гривнях'
-        },
-        'type_cost': {
-            'class': 'form-check'
-        }
-    }
-    form_ajax_refs = {
-        'coffee_shop': {
-            'fields': ('place_name', 'address'),
-            'placeholder': 'Кофейня',
-            'page_size': 10,
-            'minimum_input_length': 0,
-        }
-    }
-
-
 
 class ExpenseAdmin(ModelView):
     can_set_page_size = True
-    column_list = ('timestamp', 'money', 'type_cost', 'is_global', 'categories', 'coffee_shop' )
+    column_list = ('timestamp', 'money', 'type_cost', 'is_global', 'categories', 'shop')
     form_create_rules = ('timestamp',
-    'type_cost', 'money', 'is_global' ,'categories', 'coffee_shop' )
-    form_edit_rules = ('timestamp', 'type_cost', 'money', 'is_global' ,'categories', 'coffee_shop' )
-    column_filters = ('timestamp', 'is_global', 'type_cost', 'categories', 'coffee_shop')
-    column_searchable_list = ('timestamp', )
+                         'type_cost', 'money', 'is_global', 'categories', 'shop')
+    form_edit_rules = ('timestamp', 'type_cost', 'money', 'is_global', 'categories', 'shop')
+    column_filters = ('timestamp', 'is_global', 'type_cost', 'categories', 'shop')
+    column_searchable_list = ('timestamp',)
     column_labels = dict(
         timestamp='Дата',
         is_global='Глобальная?',
         type_cost='Тип траты',
         money='Сумма траты',
         categories='Категории',
-        coffee_shop='Кофейня'
+        shop='Кофейня'
     )
     can_view_details = True
     column_default_sort = ('timestamp', True)
@@ -309,7 +268,8 @@ class ExpenseAdmin(ModelView):
         is_global=lambda v, c, m, p: 'Да' if m.is_global else 'Нет'
     )
     form_extra_fields = {
-        'type_cost':  RadioField('Тип траты', choices=[('cash', 'Наличка'), ('cashless', 'Безнал')], validators=[Required()], default='cash')
+        'type_cost': RadioField('Тип траты', choices=[('cash', 'Наличка'), ('cashless', 'Безнал')],
+                                validators=[Required()], default='cash')
     }
     form_widget_args = {
         'money': {
@@ -319,15 +279,15 @@ class ExpenseAdmin(ModelView):
             'class': 'form-check'
         }
     }
-    
+
     form_ajax_refs = {
         'categories': {
-            'fields': ('name', ),
+            'fields': ('name',),
             'placeholder': 'Добавить категорию',
             'page_size': 10,
             'minimum_input_length': 0,
         },
-        'coffee_shop': {
+        'shop': {
             'fields': ('place_name', 'address'),
             'placeholder': 'Кофейня',
             'page_size': 10,
@@ -336,25 +296,32 @@ class ExpenseAdmin(ModelView):
     }
 
 
-class ByWeightAdmin(ModelView):
+class SupplyAdmin(ModelView):
     can_set_page_size = True
-    column_list = ('timestamp', 'product_name', 'amount', 'type_cost', 'money', 'coffee_shop' )
+    column_list = ('timestamp', 'product_name', 'amount', 'type_cost', 'money', 'storage')
     column_labels = dict(
         timestamp='Дата',
         product_name='Название товара',
         amount='Количество',
         type_cost='Тип траты',
         money='Сумма',
-        coffee_shop='Кофейня'
+        storage='Склад'
     )
+    column_filters = ('timestamp', 'type_cost', 'storage')
+    column_searchable_list = ('timestamp', )
+    form_create_rules = ('timestamp', 'product_name', 'amount', 'type_cost', 'money', 'storage')
+    form_edit_rules = ('timestamp', 'product_name', 'amount', 'type_cost', 'money', 'storage')
     column_formatters = dict(
         timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"),
         type_cost=lambda v, c, m, p: 'Наличка' if m.type_cost == 'cash' else 'Безнал'
     )
-    form_create_rules = ('timestamp', 'product_name', 'amount', 'type_cost', 'money', 'coffee_shop')
-    form_edit_rules = ('timestamp', 'product_name', 'amount', 'type_cost', 'money', 'coffee_shop')
     form_extra_fields = {
-        'type_cost':  RadioField('Тип траты', choices=[('cash', 'Наличка'), ('cashless', 'Безнал')], validators=[Required()], default='cash')
+        'type_cost':  RadioField(
+            'Тип траты',
+            choices=[('cash', 'Наличка'), ('cashless', 'Безнал')],
+            validators=[Required()],
+            default='cash'
+        )
     }
     form_widget_args = {
         'money': {
@@ -364,12 +331,39 @@ class ByWeightAdmin(ModelView):
             'class': 'form-check'
         }
     }
-    form_ajax_refs = {
-        'coffee_shop': {
-            'fields': ('place_name', 'address'),
-            'placeholder': 'Кофейня',
-            'page_size': 10,
-            'minimum_input_length': 0,
+
+
+class ByWeightAdmin(ModelView):
+    can_set_page_size = True
+    column_list = ('timestamp', 'product_name', 'amount', 'type_cost', 'money', 'storage')
+    column_labels = dict(
+        timestamp='Дата',
+        product_name='Название товара',
+        amount='Количество',
+        type_cost='Тип траты',
+        money='Сумма',
+        storage='Склад'
+    )
+    column_formatters = dict(
+        timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"),
+        type_cost=lambda v, c, m, p: 'Наличка' if m.type_cost == 'cash' else 'Безнал'
+    )
+    form_create_rules = ('timestamp', 'product_name', 'amount', 'type_cost', 'money', 'storage')
+    form_edit_rules = ('timestamp', 'product_name', 'amount', 'type_cost', 'money', 'storage')
+    form_extra_fields = {
+        'type_cost':  RadioField(
+            'Тип траты',
+            choices=[('cash', 'Наличка'), ('cashless', 'Безнал')],
+            validators=[Required()],
+            default='cash'
+        )
+    }
+    form_widget_args = {
+        'money': {
+            'placeholder': 'В гривнях'
+        },
+        'type_cost': {
+            'class': 'form-check'
         }
     }
 
@@ -380,22 +374,16 @@ class WriteOffAdmin(ModelView):
         timestamp='Дата',
         product_name='Название товара',
         amount='Количество',
-        coffee_shop='Кофейня'
+        storage='Склад'
     )
     column_formatters = dict(timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"))
-    form_ajax_refs = {
-        'coffee_shop': {
-            'fields': ('place_name', 'address'),
-            'placeholder': 'Кофейня',
-            'page_size': 10,
-            'minimum_input_length': 0,
-        }
-    }
 
 
 class CategoryAdmin(ModelView):
     can_view_details = True
     column_labels = dict(
         name='Название категории',
+        expense='Расходы'
     )
+    form_create_rules = ('name', )
     

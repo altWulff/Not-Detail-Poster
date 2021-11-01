@@ -29,5 +29,4 @@ def edit():
         form.name.data = current_user.name
         form.phone_number.data = current_user.phone_number
         form.email.data = current_user.email
-    return render_template('user/user_edit.html', user=current_user,
-                           form=form)
+    return render_template('user/user_edit.html', user=current_user, form=form)

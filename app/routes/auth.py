@@ -1,9 +1,9 @@
 from datetime import datetime
 from flask import render_template, redirect, url_for, flash
-from flask_security import login_required, login_user, logout_user, roles_required
+from flask_security import login_required, login_user, logout_user
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, ExpanseForm, ByWeightForm, WriteOffForm, SupplyForm, TransferForm
-from app.models import Barista, CoffeeShop, Warehouse, CoffeeShopEquipment
+from app.forms import LoginForm, RegistrationForm
+from app.models import Barista
 
 
 @app.route('/')
@@ -32,9 +32,11 @@ def login():
 def create_new_staff():
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = Barista(name=form.name.data,
-                       phone_number=form.phone_number.data,
-                       email=form.email.data)
+        user = Barista(
+            name=form.name.data,
+            phone_number=form.phone_number.data,
+            email=form.email.data
+        )
         user.set_password(form.password.data)
         user.confirmed_at = datetime.utcnow()
         user.active = True

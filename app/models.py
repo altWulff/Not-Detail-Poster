@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import func
 from flask_security import UserMixin, RoleMixin
@@ -6,69 +6,77 @@ from app import db, login
 
 
 @login.user_loader
-def load_user(id):
-    return Barista.query.get(int(id))
+def load_user(user_id):
+    return Barista.query.get(int(user_id))
 
 
-baristas = db.Table('baristas',
-                    db.Column('barista_id', db.Integer, db.ForeignKey('barista.id'), primary_key=True),
-                    db.Column('coffee_shop_id', db.Integer, db.ForeignKey('coffee_shop.id'), primary_key=True))
+baristas = db.Table(
+    'baristas',
+    db.Column('barista_id', db.Integer, db.ForeignKey('barista.id'), primary_key=True),
+    db.Column('shop_id', db.Integer, db.ForeignKey('shop.id'), primary_key=True)
+)
 
 
-class CoffeeShop(db.Model):
+class Shop(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     place_name = db.Column(db.String(64), index=True, unique=True)
     address = db.Column(db.String(64), index=True, unique=True)
     cash = db.Column(db.Integer)
     cashless = db.Column(db.Integer)
-    coffee_shop_equipments = db.relationship('CoffeeShopEquipment', backref='coffee_shop', lazy=True)
-    warehouse = db.relationship('Warehouse', backref='coffee_shop', lazy=True)
-    daily_reports = db.relationship('DailyReport', backref='coffee_shop', lazy=True)
-    # baristas = db.relationship('Barista', backref='coffee_shop', lazy=True)
+    storage = db.relationship('Storage', backref='shop', lazy=True)
+    shop_equipments = db.relationship('ShopEquipment', backref='shop', lazy=True)
+    reports = db.relationship('Report', backref='shop', lazy=True)
     baristas = db.relationship('Barista', secondary=baristas, lazy='subquery',
-                               backref=db.backref('coffee_shop', lazy=True))
-    expenses = db.relationship('Expense', backref='coffee_shop', lazy=True)
-    supplies = db.relationship('Supply', backref='coffee_shop', lazy=True)
-    by_weights = db.relationship('ByWeight', backref='coffee_shop', lazy=True)
-    write_offs = db.relationship('WriteOff', backref='coffee_shop', lazy=True)
+                               backref=db.backref('shop', lazy=True))
+    expenses = db.relationship('Expense', backref='shop', lazy=True)
 
     def __repr__(self):
-        return f'<CoffeeShop: {self.place_name}>'
+        return f'<Shop: {self.place_name}>'
+
     def __str__(self):
         return f'{self.place_name} / {self.address}'
 
-class CoffeeShopEquipment(db.Model):
+
+class ShopEquipment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     coffee_machine = db.Column(db.String(64), index=True)
     grinder_1 = db.Column(db.String(64), index=True)
     grinder_2 = db.Column(db.String(64), index=True)
-    coffee_shop_id = db.Column(db.Integer, db.ForeignKey('coffee_shop.id'))
+    shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'))
 
     def __repr__(self):
-        if self.coffee_shop_id:
-            return f'<CoffeeShopEquipment: {self.coffee_shop.place_name}>'
-        return  f'<CoffeeShopEquipment: {self.id}>'
+        if self.shop_id:
+            return f'<ShopEquipment: {self.shop.place_name}>'
+        return f'<ShopEquipment: {self.id}>'
 
 
-class Warehouse(db.Model):
+class Storage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     coffee_arabika = db.Column(db.Float(50))
     coffee_blend = db.Column(db.Float(50))
     milk = db.Column(db.Float(50))
     panini = db.Column(db.Integer)
     hot_dogs = db.Column(db.Integer)
-    coffee_shop_id = db.Column(db.Integer, db.ForeignKey('coffee_shop.id'))
+    supplies = db.relationship('Supply', backref='storage', lazy=True)
+    by_weights = db.relationship('ByWeight', backref='storage', lazy=True)
+    write_offs = db.relationship('WriteOff', backref='storage', lazy=True)
+    shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'))
 
     def __repr__(self):
-        if self.coffee_shop_id:
-            return f'<Warehouse: {self.coffee_shop.place_name}>'
+        if self.shop_id:
+            return f'<Storage: {self.shop.place_name}>'
         else:
-            return f'<Warehouse: {self.id}>'
+            return f'<Storage: {self.id}>'
+
+    def __str__(self):
+        return f'{self.shop.place_name} / {self.shop.address}'
 
 
-roles = db.Table('roles',
-                 db.Column('barista_id', db.Integer(), db.ForeignKey('barista.id')),
-                 db.Column('role_id', db.Integer(), db.ForeignKey('role.id')))
+roles = db.Table(
+    'roles',
+    db.Column('barista_id', db.Integer(), db.ForeignKey('barista.id')),
+    db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
+)
 
 
 class Barista(db.Model, UserMixin):
@@ -76,8 +84,8 @@ class Barista(db.Model, UserMixin):
     name = db.Column(db.String(64), index=True, unique=True)
     phone_number = db.Column(db.String(120), unique=True)
     salary_rate = db.Column(db.Integer)
-    coffee_shop_id = db.Column(db.Integer, db.ForeignKey('coffee_shop.id'))
-    daily_reports = db.relationship('DailyReport', backref='barista', lazy=True)
+    shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'))
+    reports = db.relationship('Report', backref='barista', lazy=True)
     password_hash = db.Column(db.String(255))
     email = db.Column(db.String(255), unique=True)
     active = db.Column(db.Boolean())
@@ -106,14 +114,16 @@ class Role(db.Model, RoleMixin):
         return f'<Role: {self.name}>'
 
 
-expenses = db.Table('expenses',
-                    db.Column('expense_id', db.Integer, db.ForeignKey('expense.id'), primary_key=True),
-                    db.Column('daily_report_id', db.Integer, db.ForeignKey('daily_report.id'), primary_key=True))
+expenses = db.Table(
+    'expenses',
+    db.Column('expense_id', db.Integer, db.ForeignKey('expense.id'), primary_key=True),
+    db.Column('report_id', db.Integer, db.ForeignKey('report.id'), primary_key=True)
+)
 
 
-class DailyReport(db.Model):
+class Report(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    coffee_shop_id = db.Column(db.Integer, db.ForeignKey('coffee_shop.id'))
+    shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'))
     barista_id = db.Column(db.Integer, db.ForeignKey('barista.id'))
     # Дата
     timestamp = db.Column(db.DateTime(timezone=True), server_default=func.now())
@@ -121,7 +131,7 @@ class DailyReport(db.Model):
     cashbox = db.Column(db.Integer)
     # Расходы
     expenses = db.relationship('Expense', secondary=expenses, lazy='subquery',
-                               backref=db.backref('daily_reports', lazy=True))
+                               backref=db.backref('reports', lazy=True))
     # О.Д. - сумма нала и безнала за день
     remainder_of_day = db.Column(db.Integer)
     # Б.Н. безнал да день
@@ -144,7 +154,7 @@ class DailyReport(db.Model):
     hot_dogs = db.Column(db.Integer)
 
     def __repr__(self):
-        return f'<DailyReport {self.timestamp}>'
+        return f'<Report {self.timestamp}>'
 
 
 categories = db.Table(
@@ -173,7 +183,7 @@ class Expense(db.Model):
     type_cost = db.Column(db.String(64), index=True)
     money = db.Column(db.Integer)
     # один ко многому одна Кофейня много расходов
-    coffee_shop_id = db.Column(db.Integer, db.ForeignKey('coffee_shop.id'))
+    shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'))
     categories = db.relationship('Category', secondary=categories, lazy='subquery',
                                  backref=db.backref('expense', lazy=True))
 
@@ -184,7 +194,7 @@ class Expense(db.Model):
 class Supply(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    coffee_shop_id = db.Column(db.Integer, db.ForeignKey('coffee_shop.id'))
+    storage_id = db.Column(db.Integer, db.ForeignKey('storage.id'))
     product_name = db.Column(db.String(80))
     amount = db.Column(db.Float(50))
     type_cost = db.Column(db.String(64), index=True)
@@ -194,7 +204,7 @@ class Supply(db.Model):
 class ByWeight(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    coffee_shop_id = db.Column(db.Integer, db.ForeignKey('coffee_shop.id'))
+    storage_id = db.Column(db.Integer, db.ForeignKey('storage.id'))
     product_name = db.Column(db.String(80))
     amount = db.Column(db.Float(50))
     type_cost = db.Column(db.String(64), index=True)
@@ -204,6 +214,6 @@ class ByWeight(db.Model):
 class WriteOff(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    coffee_shop_id = db.Column(db.Integer, db.ForeignKey('coffee_shop.id'))
+    storage_id = db.Column(db.Integer, db.ForeignKey('storage.id'))
     amount = db.Column(db.Float(50))
     product_name = db.Column(db.String(80))

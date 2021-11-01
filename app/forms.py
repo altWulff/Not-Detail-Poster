@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, FloatField, TextAreaField, \
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, \
     SelectField, FormField, FieldList, DecimalField, RadioField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, NumberRange, Required
 from app.models import Barista
@@ -51,7 +51,11 @@ class EditProfileForm(FlaskForm):
 
 class LocalExpanseForm(FlaskForm):
     category = StringField('Category', validators=[DataRequired()])
-    type_cost = RadioField('Type', choices=[('cash','Наличка'), ('cashless','Безнал')], validators=[Required()], default='cash')
+    type_cost = RadioField(
+        'Type', choices=[('cash', 'Наличка'), ('cashless', 'Безнал')],
+        validators=[Required()],
+        default='cash'
+    )
     money = IntegerField('Money', validators=[Required(), NumberRange(min=0)])
 
  
@@ -86,7 +90,12 @@ class SupplyForm(FlaskForm):
         ('blend', 'Бленд'), ('arabica', 'Арабика'), ('milk', 'Молоко'),
         ('panini', 'Панини'), ('hot_dogs', 'Хот-доги')], validators=[Required()], default='blend')
     amount = MyFloatField('Количество', default=0.0)
-    cash_type = RadioField('Тип денег', choices=[('cash', 'Наличка'), ('cashless', 'Безнал')], validators=[Required()], default='cash')
+    cash_type = RadioField(
+        'Тип денег',
+        choices=[('cash', 'Наличка'), ('cashless', 'Безнал')],
+        validators=[Required()],
+        default='cash'
+    )
     money = IntegerField('Сумма', validators=[Required(), NumberRange(min=0)])
     submit = SubmitField('Отправить')
 
@@ -98,7 +107,7 @@ class TransferForm(FlaskForm):
 
 
 class ReportForm(FlaskForm):
-    coffee_shop = SelectField('Coffee Shop')
+    shop = SelectField('Coffee Shop')
     cashless = IntegerField('Безнал', default=0)
     actual_balance = IntegerField('Фактический остаток', default=0)
     milk = MyFloatField('Остаток молока', default=0.0)

@@ -10,7 +10,7 @@ from flask_moment import Moment
 from flask_security import Security, SQLAlchemyUserDatastore
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_admin import helpers as admin_helpers
-from config import DevelopmentConfig, ProductionConfig
+from config import DevelopmentConfig
 
 app = Flask(__name__)
 app.config.from_object(DevelopmentConfig)
@@ -30,10 +30,10 @@ from app.routes.report import report
 from app.routes.errors import errors
 from app.admin_view import (
     ModelView,
-    CoffeeShopAdmin,
-    CoffeeShopEquipmentAdmin,
-    WarehouseAdmin,
-    DailyReportAdmin,
+    ShopAdmin,
+    ShopEquipmentAdmin,
+    StorageAdmin,
+    ReportAdmin,
     BaristaAdmin,
     RoleAdmin,
     ExpenseAdmin,
@@ -59,10 +59,10 @@ app.register_blueprint(user)
 app.register_blueprint(menu)
 app.register_blueprint(report)
 
-admin.add_view(CoffeeShopAdmin(models.CoffeeShop, db.session, name='Все кофейни', category="Кофейни"))
-admin.add_view(CoffeeShopEquipmentAdmin(models.CoffeeShopEquipment, db.session, name='Оборудование', category="Кофейни"))
-admin.add_view(WarehouseAdmin(models.Warehouse, db.session,  name='Все товары', category="Склады"))
-admin.add_view(DailyReportAdmin(models.DailyReport, db.session, name='Отчеты', category='Статистика'))
+admin.add_view(ShopAdmin(models.Shop, db.session, name='Все кофейни', category="Кофейни"))
+admin.add_view(ShopEquipmentAdmin(models.ShopEquipment, db.session, name='Оборудование', category="Кофейни"))
+admin.add_view(StorageAdmin(models.Storage, db.session, name='Все товары', category="Склады"))
+admin.add_view(ReportAdmin(models.Report, db.session, name='Отчеты', category='Статистика'))
 admin.add_view(SupplyAdmin(models.Supply, db.session,  name='Поступления', category="Движения товаров"))
 admin.add_view(ByWeightAdmin(models.ByWeight, db.session,  name='Развес', category="Движения товаров"))
 admin.add_view(WriteOffAdmin(models.WriteOff, db.session,  name='Списания', category="Движения товаров"))
