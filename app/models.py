@@ -95,6 +95,9 @@ class Barista(db.Model, UserMixin):
     def __repr__(self):
         return f'<Barista: {self.name}>'
 
+    def __str__(self):
+        return f'{self.name}'
+
     def check_phone_number(self, phone_number):
         return self.phone_number == phone_number
 
@@ -188,7 +191,7 @@ class Expense(db.Model):
                                  backref=db.backref('expense', lazy=True))
 
     def __repr__(self):
-        return f'<Expense: {self.category}({self.type_cost}) - {self.money}>'
+        return f'<Expense: {self.categories}({self.type_cost}) - {self.money}>'
 
 
 class Supply(db.Model):

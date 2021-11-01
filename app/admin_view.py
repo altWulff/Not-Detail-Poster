@@ -68,8 +68,15 @@ class ShopAdmin(ModelView):
         place_name='Название',
         address='Адрес',
         cash='Наличка',
-        cashless='Безнал'
+        cashless='Безнал',
+        storage='Склад',
+        shop_equipments='Оборудование',
+        reports='Отчеты',
+        expenses='Расходы',
+        baristas='Баристы'
     )
+    form_create_rules = ('place_name', 'address', 'cash', 'cashless', 'storage', 'shop_equipments', 'baristas')
+    form_edit_rules = ('place_name', 'address', 'cash', 'cashless', 'storage', 'shop_equipments', 'baristas')
 
 
 class ShopEquipmentAdmin(ModelView):
@@ -89,7 +96,10 @@ class StorageAdmin(ModelView):
         milk='Молоко',
         panini='Панини',
         hot_dogs='Хот-доги',
-        shop='Кофейня'
+        shop='Кофейня',
+        supplies='Поступления',
+        by_weights='Развес',
+        write_offs='Списания'
     )
     column_formatters = dict(
         coffee_arabika=lambda v, c, m, p: f'{m.coffee_arabika} кг',
@@ -99,6 +109,8 @@ class StorageAdmin(ModelView):
         hot_dogs=lambda v, c, m, p: f'{m.hot_dogs} шт.',
     )
     column_filters = ('shop', )
+    form_create_rules = ('coffee_arabika', 'coffee_blend', 'milk', 'panini', 'hot_dogs', 'shop')
+    form_edit_rules = ('coffee_arabika', 'coffee_blend', 'milk', 'panini', 'hot_dogs', 'shop', 'supplies', 'by_weights', 'write_offs')
 
 
 class BaristaAdmin(ModelView):
@@ -161,7 +173,13 @@ class ReportAdmin(ModelView):
         milk='Молоко/ост.',
         panini='Панини/ост.',
         hot_dogs='Хот-доги/ост.',
+        expenses='Расходы'
     )
+    # form_create_rules = (
+    #     'timestamp', 'shop', 'barista', 'expenses',
+    #     'cashless', 'actual_balance', 'coffee_arabika',
+    #     'coffee_blend', 'milk', 'panini', 'hot_dogs'
+    # )
     column_formatters = dict(timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"))
     list_template = 'admin/model/custom_list.html'
     

@@ -50,7 +50,6 @@ class EditProfileForm(FlaskForm):
 
 
 class LocalExpanseForm(FlaskForm):
-    category = StringField('Category', validators=[DataRequired()])
     type_cost = RadioField(
         'Type', choices=[('cash', 'Наличка'), ('cashless', 'Безнал')],
         validators=[Required()],
@@ -60,7 +59,7 @@ class LocalExpanseForm(FlaskForm):
 
  
 class ExpanseForm(LocalExpanseForm):
-    coffee_shop = SelectField('Coffee Shop')
+    shop = SelectField('Coffee Shop')
     submit = SubmitField('Submit')   
 
 
@@ -107,7 +106,7 @@ class TransferForm(FlaskForm):
 
 
 class ReportForm(FlaskForm):
-    shop = SelectField('Coffee Shop')
+    shop = SelectField('Кофейня')
     cashless = IntegerField('Безнал', default=0)
     actual_balance = IntegerField('Фактический остаток', default=0)
     milk = MyFloatField('Остаток молока', default=0.0)
