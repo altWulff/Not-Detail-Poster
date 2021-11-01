@@ -7,7 +7,7 @@
         </a>
         <ul class="dropdown-menu text-small" aria-labelledby="navbarDarkDropdownMenuLink">
             {% for coffee_shop in coffee_shop_list %}
-                <li><a class="dropdown-item" href="{{ url_for('report.on_address', coffee_shop_address=coffee_shop.address)}}">{{coffee_shop.place_name}} / {{coffee_shop.address}}</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('reports.on_address', shop_address=coffee_shop.address)}}">{{coffee_shop.place_name}} / {{coffee_shop.address}}</a></li>
             {% endfor %}
         </ul>
     </li>

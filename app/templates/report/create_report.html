@@ -2,7 +2,7 @@
 {% block content %}
 <form action="" method="post" novalidate>
     {{ form.csrf_token }}
-    {{ form.coffee_shop(class="form-select mb-3") }}
+    {{ form.shop(class="form-select mb-3") }}
     {{ render_field(form.cashless) }}
     {{ render_field(form.actual_balance) }}
     {% for entry in form.expanses %}

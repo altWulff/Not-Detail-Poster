@@ -39,7 +39,7 @@ def create():
             shop=shop
         )
         for expense_dict in form.expanses.data:
-            expense = Expense(category=expense_dict['category'], type_cost=expense_dict['type_cost'],
+            expense = Expense(type_cost=expense_dict['type_cost'],
                               money=expense_dict['money'], shop=shop)
             report.expenses.append(expense)
         expanses = sum([exp['money'] for exp in form.expanses.data])
@@ -76,19 +76,20 @@ def create():
 @login_required
 def on_address(shop_address):
     shop = Shop.query.filter_by(address=shop_address).first_or_404()
+    storage = Storage.query.filter_by(shop_id=shop.id).first_or_404()
     reports = Report.query.filter_by(shop_id=shop.id).order_by(Report.timestamp.desc())
     if not (current_user.has_role('admin') or current_user.has_role('moderator')):
         reports = reports.limit(app.config['REPORTS_USER_VIEW']).from_self()
         
     time = datetime(datetime.today().year, datetime.today().month, datetime.today().day)
-    global_expense = Expense.query.filter(Expense.timestamp >= time).filter_by(category='Global')
-    day_supply = Supply.query.filter(Supply.timestamp >= time).filter_by(shop_id=shop.id)
+    global_expense = Expense.query.filter(Expense.timestamp >= time).filter_by(is_global=True)
+    day_supply = Supply.query.filter(Supply.timestamp >= time).filter_by(storage_id=storage.id)
     page = request.args.get('page', 1, type=int)
     reports = reports.paginate(
         page, app.config['REPORTS_PER_PAGE'], False)
-    next_url = url_for('report.on_address', shop_address=shop.address, page=reports.next_num) \
+    next_url = url_for('reports.on_address', shop_address=shop.address, page=reports.next_num) \
         if reports.has_next else None
-    prev_url = url_for('report.on_address', shop_address=shop.address, page=reports.prev_num) \
+    prev_url = url_for('reports.on_address', shop_address=shop.address, page=reports.prev_num) \
         if reports.has_prev else None
     return render_template(
         "report/reports.html",

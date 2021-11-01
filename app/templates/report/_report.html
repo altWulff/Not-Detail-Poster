@@ -1,7 +1,7 @@
  <div class="col">
  <div class="card">
     <div class="card-header">
-        {{ day_report.coffee_shop.place_name }} / {{ day_report.coffee_shop.address }}
+        {{ day_report.shop.place_name }} / {{ day_report.shop.address }}
     </div>
     <div class="card-body">
         <table class="table table-borderless">
@@ -19,7 +19,7 @@
                         <p data-bs-toggle="tooltip" data-bs-html="true" title="Расходы за день">Расходы:</p>
                         <ul class="list-group list-group-flush">
                             {% for expanse in day_report.expenses %}
-                                <li class="list-group-item">{{  expanse.money }} грн.({{ expanse.category }})/{{ expanse.type_cost }}</li>
+                                <li class="list-group-item">{{  expanse.money }} грн./{{ expanse.type_cost }}</li>
                             {% endfor %}
                         </ul>
                         <br>
