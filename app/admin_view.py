@@ -1,3 +1,4 @@
+from statistics import median
 from sqlalchemy import func
 from flask import abort, redirect, request, url_for
 from flask_security import current_user
@@ -63,6 +64,7 @@ class ModelView(sqla.ModelView):
 
 
 class ShopAdmin(ModelView):
+    can_view_details = True
     column_searchable_list = ('place_name', 'address')
     column_labels = dict(
         place_name='Название',
@@ -183,40 +185,23 @@ class ReportAdmin(ModelView):
     column_formatters = dict(timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"))
     list_template = 'admin/model/custom_list.html'
     
-    def page_cashbox(self):
+    def sum_page(self, attr: str) -> int:
         _query = self.get_model_data()
-        return sum([p.cashbox for p in _query])
+        return sum([p.__dict__[attr] for p in _query])
 
-    def total_cashbox(self):
-        return self.session.query(func.sum(Report.cashbox)).scalar()
+    def sum_total(self, attr: str) -> int:
+        return self.session.query(func.sum(Report.__dict__[attr])).scalar()
 
-    def page_cash_balance(self):
+    def median_page(self, attr: str) -> int:
         _query = self.get_model_data()
-        return sum([p.cash_balance for p in _query])
-
-    def total_cash_balance(self):
-        return self.session.query(func.sum(Report.cash_balance)).scalar()
-
-    def page_remainder_of_day(self):
-        _query = self.get_model_data()
-        return sum([p.remainder_of_day for p in _query])
-
-    def total_remainder_of_day(self):
-        return self.session.query(func.sum(Report.remainder_of_day)).scalar()
-
-    def page_cashless(self):
-        _query = self.get_model_data()
-        return sum([p.cashless for p in _query])
-
-    def total_cashless(self):
-        return self.session.query(func.sum(Report.cashless)).scalar()
-
-    def page_actual_balance(self):
-        _query = self.get_model_data()
-        return sum([p.actual_balance for p in _query])
-
-    def total_actual_balance(self):
-        return self.session.query(func.sum(Report.actual_balance)).scalar()
+        data = [p.__dict__[attr] for p in _query]
+        if len(data) > 1:
+            return median(data)
+        return 0
+        
+    def median_total(self, attr: str) -> int:
+        _query = self.session.query(func.avg(Report.__dict__[attr])).scalar()
+        return round(_query)
 
     def render(self, template, **kwargs):
         # we are only interested in the list page
@@ -226,18 +211,26 @@ class ReportAdmin(ModelView):
             kwargs['column_labels'] = self.column_labels
             kwargs['summary_data'] = {
                 'on_page': {
-                    'cashbox': self.page_cashbox(),
-                    'cash_balance': self.page_cash_balance(),
-                    'remainder_of_day': self.page_remainder_of_day(),
-                    'cashless': self.page_cashless(),
-                    'actual_balance': self.page_actual_balance(),
+                    'cashbox': self.sum_page('cashbox'),
+                    'cash_balance': self.sum_page('cash_balance'),
+                    'remainder_of_day': self.sum_page('remainder_of_day'),
+                    'cashless': self.sum_page('cashless'),
+                    'actual_balance': self.sum_page('actual_balance'),
                 },
                 'total': {
-                    'cashbox': self.total_cashbox(),
-                    'cash_balance': self.total_cash_balance(),
-                    'remainder_of_day': self.total_remainder_of_day(),
-                    'cashless': self.total_cashless(),
-                    'actual_balance': self.total_actual_balance(),
+                    'cashbox': self.sum_total('cashbox'),
+                    'cash_balance': self.sum_total('cash_balance'),
+                    'remainder_of_day': self.sum_total('remainder_of_day'),
+                    'cashless': self.sum_total('cashless'),
+                    'actual_balance': self.sum_total('actual_balance'),
+                }
+            }
+            kwargs['median_data'] = {
+                'on_page': {
+                    'cashbox': self.median_page('cashbox'),
+                },
+                'total': {
+                    'cashbox': self.median_total('cashbox'),
                 }
             }
 

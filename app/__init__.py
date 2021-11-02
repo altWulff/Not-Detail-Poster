@@ -54,7 +54,6 @@ def security_context_processor():
         h=admin_helpers,
     )
 
-
 app.register_blueprint(user)
 app.register_blueprint(menu)
 app.register_blueprint(report)
@@ -70,6 +69,7 @@ admin.add_view(ExpenseAdmin(models.Expense, db.session, name='Расходы', c
 admin.add_view(BaristaAdmin(models.Barista, db.session, name='Сотрудники'))
 admin.add_view(CategoryAdmin(models.Category, db.session, name='Категории', category='Разное'))
 admin.add_view(RoleAdmin(models.Role, db.session, name='Доступ', category='Разное'))
+
 
 if not app.debug:
     if not os.path.exists('logs'):
