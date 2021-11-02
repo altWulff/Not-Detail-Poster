@@ -49,22 +49,20 @@ class EditProfileForm(FlaskForm):
     submit = SubmitField('Submit')
 
 
-class LocalExpanseForm(FlaskForm):
+class ExpanseForm(FlaskForm):
     type_cost = RadioField(
         'Type', choices=[('cash', 'Наличка'), ('cashless', 'Безнал')],
         validators=[Required()],
         default='cash'
     )
-    money = IntegerField('Money', validators=[Required(), NumberRange(min=0)])
-
- 
-class ExpanseForm(LocalExpanseForm):
-    shop = SelectField('Coffee Shop')
-    submit = SubmitField('Submit')   
+    money = IntegerField('Сумма траты', validators=[Required(), NumberRange(min=0)])
+    is_global = BooleanField('Глобальный?', default=False)
+    coffee_shop = SelectField('Кофейня')
+    submit = SubmitField('Отправить') 
 
 
 class ByWeightForm(FlaskForm):
-    coffee_shop = SelectField('Coffee Shop')
+    coffee_shop = SelectField('Кофейня')
     by_weight_choice = RadioField('Выбор товара', choices=[
         ('blend', 'Бленд'), ('arabica', 'Арабика')], validators=[Required()], default='blend')
     amount = MyFloatField('Количество', default=0.0)
@@ -114,7 +112,7 @@ class ReportForm(FlaskForm):
     arabica = MyFloatField('Остаток арабики', default=0.0)
     panini = IntegerField('Панини', default=0)
     hot_dogs = IntegerField('Хот-доги', default=0)
-    expanses = FieldList(FormField(LocalExpanseForm), min_entries=1, max_entries=5)
+    expanses = FieldList(FormField(ExpanseForm), min_entries=1, max_entries=5)
     submit = SubmitField('Submit')
 
 
