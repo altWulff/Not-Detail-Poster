@@ -1,9 +1,11 @@
-from datetime import datetime
+from datetime import datetime, date
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import func
 from flask_security import UserMixin, RoleMixin
 from app import db, login
 
+
+date_today = datetime(datetime.today().year, datetime.today().month, datetime.today().day)
 
 @login.user_loader
 def load_user(user_id):
@@ -192,6 +194,21 @@ class Expense(db.Model):
 
     def __repr__(self):
         return f'<Expense: {self.categories}({self.type_cost}) - {self.money}>'
+
+    @classmethod     
+    def get_global(cls, shop_id, today=False):
+        _query = cls.query.filter_by(shop_id=shop_id).filter(cls.is_global)
+        if today:
+            _query = _query.filter(cls.timestamp >= date_today)
+        return _query
+    
+    @classmethod
+    def get_local(cls, shop_id, today=False):
+        _query =cls.query.filter_by(shop_id=shop_id).filter(cls.is_global==False)
+        if today:
+            _query = _query.filter(cls.timestamp >= date_today)
+        return _query
+    
 
 
 class Supply(db.Model):

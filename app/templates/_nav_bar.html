@@ -1,16 +1,14 @@
- <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-    <span class="navbar-brand mb-0 h1"><a href="{{ url_for('home') }}" class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none">Not Detail Poster</a></span>
-    {% if current_user.has_role('admin') or current_user.has_role('moderator') %}
-    <li class="nav-item dropdown">
-        <a class="nav-link px-2 link-dark dropdown-toggle" href="#" id="navbarDarkDropdownMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-        Отчеты
-        </a>
-        <ul class="dropdown-menu text-small" aria-labelledby="navbarDarkDropdownMenuLink">
-            {% for coffee_shop in coffee_shop_list %}
-                <li><a class="dropdown-item" href="{{ url_for('reports.on_address', shop_address=coffee_shop.address)}}">{{coffee_shop.place_name}} / {{coffee_shop.address}}</a></li>
-            {% endfor %}
-        </ul>
-    </li>
-    <li><a href="{{ url_for('admin.index') }}" class="nav-link px-2 link-dark">Администрирование</a></li>
-    {% endif %}
-</ul>
+ <nav class="navbar navbar-light bg-light">
+  <div class="container-fluid">
+      <a href="{{ url_for('home') }}" class="navbar-brand">Not Detail Poster</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    {% include 'menu/_user_menu.html' %}
+</div>
+</nav>
+{% include 'menu/_supply_modal.html' %}
+{% include 'menu/_consumption_modal.html' %}
+{% include 'menu/_by_weight_modal.html' %}
+{% include 'menu/_write_off_modal.html' %}
+{% include 'menu/_transfer_modal.html' %}

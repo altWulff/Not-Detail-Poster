@@ -5,9 +5,10 @@ from flask_security import login_required, current_user
 from app import db, app
 from app.forms import ReportForm
 from app.models import Shop, Report, Storage, Expense, Supply
-
+from app.business_logic import transaction_count, date_today
 
 report = Blueprint('reports', __name__, url_prefix='/report')
+
 
 
 @report.route('/create', methods=['GET', 'POST'])
@@ -19,11 +20,9 @@ def create():
     if form.validate_on_submit():
         shop = Shop.query.filter_by(id=form.shop.data).first_or_404()
         storage = Storage.query.filter_by(shop_id=shop.id).first_or_404()
-        reports_on_coffee_shop = Report.query.filter_by(shop_id=shop.id)
-        day_reports = reports_on_coffee_shop.filter(func.date(Report.timestamp) == date.today()).all()
 
-        if len(day_reports) >= 1:
-            flash("Today report already exist")
+        if transaction_count(shop.id) >= app.config['REPORTS_PER_DAY']:
+            flash("Сегодняшний отчет уже был отправлен!")
             return redirect(url_for('home'))
 
         cash_balance = form.actual_balance.data - shop.cash
@@ -81,9 +80,9 @@ def on_address(shop_address):
     if not (current_user.has_role('admin') or current_user.has_role('moderator')):
         reports = reports.limit(app.config['REPORTS_USER_VIEW']).from_self()
         
-    time = datetime(datetime.today().year, datetime.today().month, datetime.today().day)
-    global_expense = Expense.query.filter(Expense.timestamp >= time).filter_by(is_global=True)
-    day_supply = Supply.query.filter(Supply.timestamp >= time).filter_by(storage_id=storage.id)
+    global_expense = Expense.get_global(shop.id, True)
+    local_expense = Expense.get_local(shop.id, True)
+    day_supply = Supply.query.filter(Supply.timestamp >= date_today).filter_by(storage_id=storage.id)
     page = request.args.get('page', 1, type=int)
     reports = reports.paginate(
         page, app.config['REPORTS_PER_PAGE'], False)
@@ -95,6 +94,7 @@ def on_address(shop_address):
         "report/reports.html",
         daily_reports=reports.items,
         global_expense=global_expense,
+        local_expense=local_expense,
         day_supply=day_supply,
         next_url=next_url,
         prev_url=prev_url

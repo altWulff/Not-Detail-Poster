@@ -1,9 +1,10 @@
 from datetime import datetime
 from flask import render_template, redirect, url_for, flash, Blueprint, request
 from flask_security import login_required
-from app import db
+from app import app, db
 from app.forms import ExpanseForm, ByWeightForm, WriteOffForm, SupplyForm, CoffeeShopForm, TransferForm
 from app.models import Shop, Storage, ShopEquipment, Expense, Supply, ByWeight, WriteOff
+from app.business_logic import transaction_count
 
 
 menu = Blueprint('menu', __name__, url_prefix='/menu')
@@ -14,11 +15,14 @@ menu = Blueprint('menu', __name__, url_prefix='/menu')
 def expense():
     form = ExpanseForm(request.form)
     if request.method == "POST":
+        shop = Shop.query.filter_by(place_name=form.coffee_shop.data).first_or_404()
+        if transaction_count(shop.id) >= app.config['REPORTS_PER_DAY']:
+            flash("Сегодняшний отчет уже был отправлен!")
+            return redirect(url_for('home'))
         type_cost = form.type_cost.data
         money = form.money.data
         expense = Expense(type_cost=type_cost, money=money, is_global=form.is_global.data)
         expense.timestamp = datetime.utcnow()
-        shop = Shop.query.filter_by(place_name=form.coffee_shop.data).first_or_404()
         if form.type_cost.data == 'cash':
             shop.cash -= form.money.data
         else:
@@ -39,6 +43,9 @@ def by_weight():
     if request.method == "POST":
         shop = Shop.query.filter_by(place_name=form.coffee_shop.data).first_or_404()
         storage = Storage.query.filter_by(shop_id=shop.id).first_or_404()
+        if transaction_count(shop.id) >= app.config['REPORTS_PER_DAY']:
+            flash("Сегодняшний отчет уже был отправлен!")
+            return redirect(url_for('home'))
         if form.by_weight_choice.data == 'blend':
             storage.coffee_blend -= form.amount.data
         else:
@@ -61,10 +68,13 @@ def by_weight():
 @menu.route('/write_off', methods=['POST'])
 @login_required
 def write_off():
-    form = WriteOffForm()
+    form = WriteOffForm(request.form)
     if request.method == "POST":
         shop = Shop.query.filter_by(place_name=form.coffee_shop.data).first_or_404()
         storage = Storage.query.filter_by(shop_id=shop.id).first_or_404()
+        if transaction_count(shop.id) >= app.config['REPORTS_PER_DAY']:
+            flash("Сегодняшний отчет уже был отправлен!")
+            return redirect(url_for('home'))
         if form.write_off_choice.data == 'blend':
             storage.coffee_blend -= form.amount.data
         elif form.write_off_choice.data == 'arabica':
@@ -87,10 +97,13 @@ def write_off():
 @menu.route('/supply', methods=['POST'])
 @login_required
 def supply():
-    form = SupplyForm()
+    form = SupplyForm(request.form)
     if request.method == "POST":
         shop = Shop.query.filter_by(place_name=form.coffee_shop.data).first_or_404()
         storage = Storage.query.filter_by(shop_id=shop.id).first_or_404()
+        if transaction_count(shop.id) >= app.config['REPORTS_PER_DAY']:
+            flash("Сегодняшний отчет уже был отправлен!")
+            return redirect(url_for('home'))
         if form.supply_choice.data == 'blend':
             storage.coffee_blend += form.amount.data
         elif form.supply_choice.data == 'arabica':
@@ -117,10 +130,11 @@ def supply():
     return render_template("index.html")
 
 
+#TODO доделать перемещение
 @menu.route('/transfer', methods=['POST'])
 @login_required
 def transfer():
-    form = TransferForm(data=request.form)
+    form = TransferForm(request.form)
     if request.method == "POST":
         # db.session.add()
         # db.session.commit()
@@ -159,6 +173,6 @@ def create_coffee_shop():
         db.session.add(shop)
         db.session.add(storage)
         db.session.commit()
-        flash('Congratulations, you are create a new coffee shop!')
+        flash('Создана новая кофейня!')
         return redirect(url_for('home'))
     return render_template('menu/new_coffee_shop.html', form=form)

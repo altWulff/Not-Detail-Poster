@@ -16,10 +16,10 @@ class MyFloatField(DecimalField):
 
 
 class LoginForm(FlaskForm):
-    name = StringField('Name', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    remember_me = BooleanField('Remember Me')
-    submit = SubmitField('Sign In')
+    name = StringField('Имя', validators=[DataRequired()])
+    password = PasswordField('Пароль', validators=[DataRequired()])
+    remember_me = BooleanField('Запомнить меня')
+    submit = SubmitField('Войдти')
 
 
 class RegistrationForm(FlaskForm):

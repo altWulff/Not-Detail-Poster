@@ -24,22 +24,22 @@
 {% endfor %}
 <form action="" method="post" novalidate>
     {{ form.csrf_token }}
-    <h1 class="h3 mb-3 fw-normal">Log-in to your account</h1>
+    <h1 class="h3 mb-3 fw-normal">Войдти в аккаунт</h1>
 
     <div class="form-floating">
-        {{ form.name(class="form-control", id="floatingInput", placeholder='Name') }}
-        <label for="floatingInput">Name</label>
+        {{ form.name(class="form-control", id="floatingInput", placeholder=' ') }}
+        <label for="floatingInput">Имя</label>
     </div>
     <div class="form-floating">
-        {{ form.password(class="form-control", id="floatingPassword", placeholder='Password')}}
-        <label for="floatingPassword">Password</label>
+        {{ form.password(class="form-control", id="floatingPassword", placeholder=' ')}}
+        <label for="floatingPassword">Пароль</label>
     </div>
     <div class="checkbox mb-3">
         <label>
-            <input type="checkbox" value="remember-me"> Remember me
+            <input type="checkbox" value="remember-me"> Запомнить меня
         </label>
     </div>
-    <button class="w-100 btn btn-lg btn-primary" type="submit">Login</button>
+    <button class="w-100 btn btn-lg btn-primary" type="submit">Вход</button>
     <p class="mt-5 mb-3 text-muted">&copy; 2021</p>
   </form>
 </main>
