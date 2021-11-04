@@ -30,3 +30,40 @@
     {% endif %}
 </ul>
 {% endmacro %}
+{% macro render_expansion(expansion, report) %}
+    <ul class="list-group">
+        {% for expanse in expansion %}
+        {% if expanse.timestamp.date() == report.timestamp.date() %}
+        <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div class="ms-2 me-auto">
+                <div class="fw-bold">
+                    {{expanse.money}} грн.
+                </div>
+                {% for c in expanse.categories %}
+                <span class="badge bg-secondary">{{ c.name }}</span>
+                {% endfor %}
+            </div>
+            <span class="badge bg-primary rounded-pill"> {{expanse.type_cost}}</span>
+        </li>
+        {% endif %}
+        {% endfor %}
+    </ul>
+{% endmacro %}
+
+{% macro render_supply(supply, report) %}
+   <ul class="list-group">
+        {% for s in supply %}
+        {% if s.timestamp.date() == report.timestamp.date() %}
+        <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div class="ms-2 me-auto">
+                <div class="fw-bold">
+                    {{s.money}} грн.
+                </div>
+                <span class="badge bg-secondary">{{ s.product_name }}</span>
+            </div>
+            <span class="badge bg-primary rounded-pill"> {{s.type_cost}}</span>
+        </li>
+        {% endif %}
+        {% endfor %}
+    </ul>
+{% endmacro %}

@@ -2,14 +2,12 @@
 {% block content %}
 <form action="" method="post" novalidate>
     {{ form.csrf_token }}
-    {{ form.shop(class="form-select mb-3") }}
+    <div class="mb-3">
+        {{ form.shop.label }}
+        {{ form.shop(class="form-select mb-3") }}
+    </div>
     {{ render_field(form.cashless) }}
     {{ render_field(form.actual_balance) }}
-    {% for entry in form.expanses %}
-        <p>Expanse</p>
-        {{ entry() }}
-        <br />
-    {% endfor %}
     {{ render_field(form.milk) }}
     {{ render_field(form.blend) }}
     {{ render_field(form.arabica) }}
