@@ -8,7 +8,7 @@ from app.models import (
     Report,
     Shop,
     ShopEquipment,
-    Storage
+    Storage,
     Expense,
     Supply,
     ByWeight,
