@@ -26,6 +26,8 @@
                 {% endfor %}
                 </div>
                 {{ render_field(expense_form.money) }}
+                {{expense_form.categories.label}}
+                {{ expense_form.categories(multiple=True, class="form-select") }}
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>

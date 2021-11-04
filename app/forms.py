@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, \
-    SelectField, FormField, FieldList, DecimalField, RadioField
+    SelectField, FormField, FieldList, DecimalField, RadioField, SelectMultipleField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, NumberRange, Required
 from app.models import Barista
 
@@ -58,6 +58,8 @@ class ExpanseForm(FlaskForm):
     money = IntegerField('Сумма траты', validators=[Required(), NumberRange(min=0)])
     is_global = BooleanField('Глобальный?', default=False)
     coffee_shop = SelectField('Кофейня')
+    categories = SelectMultipleField('Категории')
+
     submit = SubmitField('Отправить') 
 
 
@@ -112,8 +114,7 @@ class ReportForm(FlaskForm):
     arabica = MyFloatField('Остаток арабики', default=0.0)
     panini = IntegerField('Панини', default=0)
     hot_dogs = IntegerField('Хот-доги', default=0)
-    expanses = FieldList(FormField(ExpanseForm), min_entries=1, max_entries=5)
-    submit = SubmitField('Submit')
+    submit = SubmitField('Подтвердить')
 
 
 class CoffeeShopForm(FlaskForm):

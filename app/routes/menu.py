@@ -3,7 +3,7 @@ from flask import render_template, redirect, url_for, flash, Blueprint, request
 from flask_security import login_required
 from app import app, db
 from app.forms import ExpanseForm, ByWeightForm, WriteOffForm, SupplyForm, CoffeeShopForm, TransferForm
-from app.models import Shop, Storage, ShopEquipment, Expense, Supply, ByWeight, WriteOff
+from app.models import Shop, Storage, ShopEquipment, Expense, Supply, ByWeight, WriteOff, Category
 from app.business_logic import transaction_count
 
 
@@ -27,6 +27,10 @@ def expense():
             shop.cash -= form.money.data
         else:
             shop.cashless -= form.money.data
+        flash(form.categories.data)
+        for c_id in form.categories.data:
+            category = Category.query.filter_by(id=c_id).first_or_404()
+            expense.categories.append(category)
         shop.expenses.append(expense)
         db.session.add(expense)
         db.session.commit()
