@@ -355,6 +355,7 @@ class ByWeightAdmin(ModelView):
         money='Сумма',
         storage='Склад'
     )
+    column_filters = ('timestamp', 'product_name')
     column_formatters = dict(
         timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"),
         type_cost=lambda v, c, m, p: 'Наличка' if m.type_cost == 'cash' else 'Безнал'
@@ -387,6 +388,7 @@ class WriteOffAdmin(ModelView):
         amount='Количество',
         storage='Склад'
     )
+    column_filters = ('timestamp', 'product_name')
     column_formatters = dict(timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"))
 
 
