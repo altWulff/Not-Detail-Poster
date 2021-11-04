@@ -12,6 +12,7 @@ class Config:
     DEBUG_TB_INTERCEPT_REDIRECTS = False
     REPORTS_USER_VIEW = 3
     REPORTS_PER_PAGE = 3
+    REPORTS_PER_DAY = 1
 
 
 class ProductionConfig(Config):

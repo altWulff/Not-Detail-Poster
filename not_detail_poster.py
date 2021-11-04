@@ -2,7 +2,19 @@ import click
 from datetime import datetime
 from werkzeug.security import generate_password_hash
 from app import app, db, user_datastore
-from app.models import Barista, Report, Role, Shop, ShopEquipment, Expense, Category
+from app.models import (
+    Role,
+    Barista,
+    Report,
+    Shop,
+    ShopEquipment,
+    Storage
+    Expense,
+    Supply,
+    ByWeight,
+    WriteOff,
+    Category
+)
 
 
 @app.shell_context_processor
@@ -12,10 +24,13 @@ def make_shell_context():
         'Barista': Barista,
         'Report': Report,
         'Role': Role,
-        'CoffeeShop': Shop,
+        'Shop': Shop,
         'ShopEquipment': ShopEquipment,
+        'Storage': Storage,
         'Expense': Expense,
         'Category': Category,
+        'Supply': Supply,
+        'WriteOff': WriteOff,
     }
 
 
@@ -34,8 +49,8 @@ def create_categories():
     for name in categories_names:
         category = Category(name=name)
         db.session.add(category)
-    print(f'Create categories:  {categories_names}')
     db.session.commit()
+    print(f'Create categories:  {categories_names}')
 
 @app.cli.command("createsuperuser")
 @click.argument("username")
