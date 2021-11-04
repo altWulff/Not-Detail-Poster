@@ -219,6 +219,11 @@ class Supply(db.Model):
     amount = db.Column(db.Float(50))
     type_cost = db.Column(db.String(64), index=True)
     money = db.Column(db.Integer)
+    
+    @classmethod
+    def get_local(cls, storage_id):
+        _query =cls.query.filter_by(storage_id=storage_id).filter(cls.timestamp >= date_today)
+        return _query
 
 
 class ByWeight(db.Model):
@@ -237,3 +242,15 @@ class WriteOff(db.Model):
     storage_id = db.Column(db.Integer, db.ForeignKey('storage.id'))
     amount = db.Column(db.Float(50))
     product_name = db.Column(db.String(80))
+
+
+#Товар:
+    #ид
+    #наименование
+    #количество
+    #единица измерения (кг, л, шт в форме)
+    #описание (необязательно)
+    #в продаже(дефолт=Нет)
+    #отношение к складу
+
+    

@@ -14,13 +14,12 @@ report = Blueprint('reports', __name__, url_prefix='/report')
 @report.route('/create', methods=['GET', 'POST'])
 @login_required
 def create():
-    form = ReportForm()
-    form.shop.choices = [(g.id, g.place_name + '/' + g.address) for g in Shop.query.order_by('place_name')]
-  
+    form = ReportForm(request.form)
+    form.shop.choices = [(shop.id, shop) for shop in Shop.query.order_by('place_name')]
     if form.validate_on_submit():
         shop = Shop.query.filter_by(id=form.shop.data).first_or_404()
         storage = Storage.query.filter_by(shop_id=shop.id).first_or_404()
-
+        expanses = Expense.get_local(shop.id, True)
         if transaction_count(shop.id) >= app.config['REPORTS_PER_DAY']:
             flash("Сегодняшний отчет уже был отправлен!")
             return redirect(url_for('home'))
@@ -37,12 +36,7 @@ def create():
             barista=current_user,
             shop=shop
         )
-        for expense_dict in form.expanses.data:
-            expense = Expense(type_cost=expense_dict['type_cost'],
-                              money=expense_dict['money'], shop=shop)
-            report.expenses.append(expense)
-        expanses = sum([exp['money'] for exp in form.expanses.data])
-        report.cashbox = remainder_of_day + expanses
+        report.cashbox = remainder_of_day + sum([e.money for e in expanses if e.type_cost == 'cash'])
         # consumption
         report.consumption_coffee_arabika = storage.coffee_arabika - form.arabica.data
         report.coffee_arabika = form.arabica.data
@@ -82,7 +76,7 @@ def on_address(shop_address):
         
     global_expense = Expense.get_global(shop.id, True)
     local_expense = Expense.get_local(shop.id, True)
-    day_supply = Supply.query.filter(Supply.timestamp >= date_today).filter_by(storage_id=storage.id)
+    supply = Supply.get_local(storage.id)
     page = request.args.get('page', 1, type=int)
     reports = reports.paginate(
         page, app.config['REPORTS_PER_PAGE'], False)
@@ -95,7 +89,7 @@ def on_address(shop_address):
         daily_reports=reports.items,
         global_expense=global_expense,
         local_expense=local_expense,
-        day_supply=day_supply,
+        supply=supply,
         next_url=next_url,
         prev_url=prev_url
     )
