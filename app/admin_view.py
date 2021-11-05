@@ -5,7 +5,10 @@ from flask_security import current_user
 from flask_admin.contrib import sqla
 from app.models import Report
 from wtforms import RadioField
-from wtforms.validators import Required
+from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, NumberRange, Required
+from flask_wtf import FlaskForm
+from wtforms import StringField
+from app.forms import MyFloatField
 
 
 class ModelView(sqla.ModelView):
@@ -182,6 +185,29 @@ class ReportAdmin(ModelView):
     #     'cashless', 'actual_balance', 'coffee_arabika',
     #     'coffee_blend', 'milk', 'panini', 'hot_dogs'
     # )
+    form_args = dict(
+        #coffee_arabika='Арабика/ост.',
+        #coffee_blend='Бленд/ост.',
+        panini=dict(
+            validators=[
+                DataRequired(),
+                NumberRange(min=-1, message='Остаток панини должен быть нулевым, либо больше нуля')
+                ]
+            ),
+        hot_dogs=dict(
+            validators=[
+                DataRequired(),
+                NumberRange(min=-1, message='Остаток хот-догов должен быть нулевым, либо больше нуля')
+                ]
+            ),
+        milk=dict(
+            validators=[
+                DataRequired(),
+                NumberRange(min=-0.01, message='Остаток молока должен быть нулевым, либо больше нуля')
+                ]
+            ),
+        )
+    #form_overrides = dict(milk=MyFloatField('Количество', default=0.0))
     column_formatters = dict(timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"))
     list_template = 'admin/model/custom_list.html'
     
@@ -238,12 +264,19 @@ class ReportAdmin(ModelView):
 
 
 class RoleAdmin(ModelView):
+    can_delete = False
+    can_create = False
     column_labels = dict(
         name='Название',
         description='Описание',
         barista='Бариста'
     )
     column_formatters = dict(name=lambda v, c, m, p: m.name.title())
+    form_args = dict(
+        name=dict(
+            validators=[DataRequired()]
+        ),
+    )
     
     @property
     def can_edit(self):
@@ -290,7 +323,6 @@ class ExpenseAdmin(ModelView):
             'class': 'form-check'
         }
     }
-
     form_ajax_refs = {
         'categories': {
             'fields': ('name',),
@@ -305,6 +337,30 @@ class ExpenseAdmin(ModelView):
             'minimum_input_length': 0,
         }
     }
+    form_args = dict(
+        timestamp=dict(
+            validators=[DataRequired()]
+        ),
+        money=dict(
+            validators=[
+                DataRequired(),
+                NumberRange(
+                    min=1,
+                    message='Сумма не может быть нулевой, либо ниже нуля'
+                )
+            ]
+        ),
+        categories=dict(
+            validators=[
+                DataRequired(
+                    message="Добавьте минимум одну категорию"
+                )
+            ]
+        ),
+        shop=dict(
+            validators=[DataRequired(message="Выберите кофейню")]
+        )
+    )
 
 
 class SupplyAdmin(ModelView):
@@ -342,6 +398,35 @@ class SupplyAdmin(ModelView):
             'class': 'form-check'
         }
     }
+    form_args = dict(
+        timestamp=dict(
+            validators=[DataRequired()]
+        ),
+        product_name=dict(
+            validators=[DataRequired()]
+        ),
+        amount=dict(
+            validators=[
+                DataRequired(),
+                NumberRange(
+                    min=0.0001,
+                    message='Количество не может быть нулевым, либо ниже нуля'
+                )
+            ]
+        ),
+        money=dict(
+            validators=[
+                DataRequired(),
+                NumberRange(
+                    min=1,
+                    message='Сумма не может быть нулевой, либо ниже нуля'
+                )
+            ]
+        ),
+        storage=dict(
+            validators=[DataRequired(message="Выберите склад")]
+        )
+    )
 
 
 class ByWeightAdmin(ModelView):
@@ -378,6 +463,35 @@ class ByWeightAdmin(ModelView):
             'class': 'form-check'
         }
     }
+    form_args = dict(
+        timestamp=dict(
+            validators=[DataRequired()]
+        ),
+        product_name=dict(
+            validators=[DataRequired()]
+        ),
+        amount=dict(
+            validators=[
+                DataRequired(),
+                NumberRange(
+                    min=0.0001,
+                    message='Количество не может быть нулевым, либо ниже нуля'
+                )
+            ]
+        ),
+        money=dict(
+            validators=[
+                DataRequired(),
+                NumberRange(
+                    min=1,
+                    message='Сумма не может быть нулевой, либо ниже нуля'
+                )
+            ]
+        ),
+        storage=dict(
+            validators=[DataRequired(message="Выберите склад")]
+        )
+    )
 
 
 class WriteOffAdmin(ModelView):
@@ -390,6 +504,26 @@ class WriteOffAdmin(ModelView):
     )
     column_filters = ('timestamp', 'product_name')
     column_formatters = dict(timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"))
+    form_args = dict(
+        timestamp=dict(
+            validators=[DataRequired()]
+        ),
+        product_name=dict(
+            validators=[DataRequired()]
+        ),
+        amount=dict(
+            validators=[
+                DataRequired(),
+                NumberRange(
+                    min=0.0001,
+                    message='Количество не может быть нулевым, либо ниже нуля'
+                )
+            ]
+        ),
+        storage=dict(
+            validators=[DataRequired(message="Выберите склад")]
+        )
+    )
 
 
 class CategoryAdmin(ModelView):
@@ -399,4 +533,10 @@ class CategoryAdmin(ModelView):
         expense='Расходы'
     )
     form_create_rules = ('name', )
+    form_args = dict(
+        name=dict(
+            validators=[DataRequired()]
+        )
+    )
+    column_editable_list = ('name', )
     
