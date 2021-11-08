@@ -1,6 +1,8 @@
 from datetime import datetime, date
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import func
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from flask_security import UserMixin, RoleMixin
 from app import db, login
 
@@ -85,6 +87,7 @@ class Barista(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     phone_number = db.Column(db.String(120), unique=True)
+    # TODO удалить поле salary_rate
     salary_rate = db.Column(db.Integer)
     shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'))
     reports = db.relationship('Report', backref='barista', lazy=True)
@@ -94,6 +97,7 @@ class Barista(db.Model, UserMixin):
     confirmed_at = db.Column(db.DateTime())
     roles = db.relationship('Role', secondary=roles, backref=db.backref('barista', lazy='dynamic'))
 
+
     def __repr__(self):
         return f'<Barista: {self.name}>'
 
@@ -102,9 +106,16 @@ class Barista(db.Model, UserMixin):
 
     def check_phone_number(self, phone_number):
         return self.phone_number == phone_number
+    
+    @hybrid_property
+    def password(self):
+        return self.password_hash
 
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
+    @password.setter
+    def password(self, new_pass):
+        """Salt/Hash and save the user's new password."""
+        _password_hash = generate_password_hash(new_pass)
+        self.password_hash = _password_hash
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)

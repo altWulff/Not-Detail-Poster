@@ -35,15 +35,15 @@ def create_new_staff():
         user = Barista(
             name=form.name.data,
             phone_number=form.phone_number.data,
-            email=form.email.data
+            email=form.email.data,
+            password=form.password.data,
+            confirmed_at=datetime.now(),
+            active=True
         )
-        user.set_password(form.password.data)
-        user.confirmed_at = datetime.utcnow()
-        user.active = True
         db.session.add(user)
         db.session.commit()
-        flash('Congratulations, you are now a registered user!')
-        return redirect(url_for('login'))
+        flash('Вы добавили нового ссотрудника!')
+        return redirect(url_for('home'))
     return render_template('auth/new_staff.html', form=form)
 
 
