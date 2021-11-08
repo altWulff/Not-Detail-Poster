@@ -1,10 +1,12 @@
 from statistics import median
+from datetime import datetime, date
 from sqlalchemy import func
 from flask import abort, redirect, request, url_for
 from flask_security import current_user
 from flask_admin.contrib import sqla
+from flask_admin.base import expose
 from app.models import Report
-from wtforms import RadioField
+from wtforms import RadioField, PasswordField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, NumberRange, Required
 from flask_wtf import FlaskForm
 from wtforms import StringField
@@ -82,6 +84,27 @@ class ShopAdmin(ModelView):
     )
     form_create_rules = ('place_name', 'address', 'cash', 'cashless', 'storage', 'shop_equipments', 'baristas')
     form_edit_rules = ('place_name', 'address', 'cash', 'cashless', 'storage', 'shop_equipments', 'baristas')
+    form_args = dict(
+        place_name=dict(
+            validators=[DataRequired()]
+        ),
+        address=dict(
+            validators=[DataRequired()]
+        ),
+        cash=dict(
+            validators=[
+                DataRequired(),
+                NumberRange(min=0, message='Сумма должна быть нулевой, либо больше нуля')
+            ]
+        ),
+        cashless=dict(
+            validators=[
+                DataRequired(),
+                NumberRange(min=0, message='Сумма должна быть нулевой, либо больше нуля')
+            ]
+        ),
+        
+    )
 
 
 class ShopEquipmentAdmin(ModelView):
@@ -116,21 +139,104 @@ class StorageAdmin(ModelView):
     column_filters = ('shop', )
     form_create_rules = ('coffee_arabika', 'coffee_blend', 'milk', 'panini', 'hot_dogs', 'shop')
     form_edit_rules = ('coffee_arabika', 'coffee_blend', 'milk', 'panini', 'hot_dogs', 'shop', 'supplies', 'by_weights', 'write_offs')
+    form_args = dict(
+        coffee_arabika=dict(
+            validators=[
+                DataRequired(),
+                NumberRange(min=0, message='Количество арабики должно быть нулевым, либо больше нуля')
+                ]
+        ),
+        coffee_blend=dict(
+            validators=[
+                DataRequired(),
+                NumberRange(
+                    min=0, 
+                    message='Количество арабики должно быть нулевым, либо больше нуля'
+                )
+            ]
+        ),
+        milk=dict(
+            validators=[
+                DataRequired(),
+                NumberRange(
+                    min=0, 
+                    message='Количество молока должно быть нулевым, либо больше нуля'
+                )
+            ]
+        ),
+        panini=dict(
+            validators=[
+                DataRequired(),
+                NumberRange(
+                    min=0, 
+                    message='Количество панини должно быть нулевым, либо больше нуля'
+                )
+            ]
+        ),
+        hot_dogs=dict(
+            validators=[
+                DataRequired(),
+                NumberRange(
+                    min=0, 
+                    message='Количество хот-догов должно быть нулевым, либо больше нуля'
+                )
+            ]
+        ),
+        shop=dict(
+            validators=[
+                DataRequired(
+                    message='Выберите кофейню')
+            ]
+        )
+    )
 
 
 class BaristaAdmin(ModelView):
-    column_filters = ('name', 'phone_number', 'email')
+    column_filters = ('name', 'phone_number', 'email', 'shop')
     column_searchable_list = ('name', 'phone_number', 'email')
-    column_exclude_list = ('password_hash', 'roles', 'daily_reports', 'id', 'salary_rate')
+    column_exclude_list = ('password_hash', 'roles', 'reports', 'salary_rate')
     column_labels = dict(
         name='Имя',
         phone_number='Тел.',
         email='Емейл',
         shop='Кофейня',
-        daily_reports='Отчеты',
+        reports='Отчеты',
         roles='Доступ',
+        active='Активный',
+        confirmed_at='Дата найма',
+        password='Пароль'
     )
+    form_columns = ('name','phone_number', 'email', 'password', 'shop', 'confirmed_at', 'active', 'reports')
+    form_create_rules = ('name', 'phone_number', 'email', 'password', 'shop', 'confirmed_at', 'active')
+    form_edit_rules = ('name', 'phone_number', 'email', 'password', 'shop', 'confirmed_at', 'active', 'reports')
     column_formatters = dict(confirmed_at=lambda v, c, m, p: m.confirmed_at.date().strftime("%d.%m.%Y"))
+    form_args = dict(
+        name=dict(
+            validators=[DataRequired()]
+        ),
+        confirmed_at=dict(
+            default=datetime.now(),
+            validators=[DataRequired()]
+        ),
+        active=dict(default=True),
+        shop=dict(
+            validators=[
+                DataRequired(
+                    message='Выберите место работы сотрудника'
+                )
+            ]
+        ),
+        roles=dict(
+            validators=[
+                DataRequired(
+                    message='Выберите уровень доступа сотрудника'
+                )
+            ]
+        ),
+        password=dict(
+            validators=[DataRequired()]
+        )
+    )
     
     @property
     def can_edit(self):
@@ -140,6 +246,9 @@ class BaristaAdmin(ModelView):
         if is_active and is_admin:
             return True
         return False
+
+    
+        
 
 
 class ReportAdmin(ModelView):
@@ -186,27 +295,128 @@ class ReportAdmin(ModelView):
     #     'coffee_blend', 'milk', 'panini', 'hot_dogs'
     # )
     form_args = dict(
-        #coffee_arabika='Арабика/ост.',
-        #coffee_blend='Бленд/ост.',
-        panini=dict(
+        timestamp=dict(
+            validators=[DataRequired()]
+        ),
+        shop=dict(
+            validators=[
+                DataRequired(
+                    message='Выберите кофейню')
+            ]
+        ),
+        barista=dict(
+            validators=[
+                DataRequired(
+                    message='Выберите сотрудника')
+                ]
+        ),
+ 
+        cashbox=dict(
             validators=[
                 DataRequired(),
-                NumberRange(min=-1, message='Остаток панини должен быть нулевым, либо больше нуля')
-                ]
-            ),
-        hot_dogs=dict(
+                NumberRange(
+                    min=1,
+                    message='Сумма не может быть нулевой, либо ниже нуля'
+                )
+            ]
+        ),
+        remainder_of_day=dict(
             validators=[
                 DataRequired(),
-                NumberRange(min=-1, message='Остаток хот-догов должен быть нулевым, либо больше нуля')
+                NumberRange(
+                    min=1,
+                    message='Сумма не может быть нулевой, либо ниже нуля'
+                )
+            ]
+        ),
+        cashless=dict(
+            validators=[
+                DataRequired(),
+                NumberRange(
+                    min=1,
+                    message='Сумма не может быть нулевой, либо ниже нуля'
+                )
+            ]
+        ),
+        cash_balance=dict(
+            validators=[
+                DataRequired(),
+                NumberRange(
+                    min=1,
+                    message='Сумма не может быть нулевой, либо ниже нуля'
+                )
+            ]
+        ),
+        actual_balance=dict(
+            validators=[
+                DataRequired(),
+                NumberRange(
+                    min=1,
+                    message='Сумма не может быть нулевой, либо ниже нуля'
+                )
+            ]
+        ),
+        consumption_coffee_arabika=dict(
+            validators=[
+                DataRequired(),
+                NumberRange(min=0, message='Расход за день не может быть ниже нуля')
                 ]
-            ),
+        ),
+        consumption_coffee_blend=dict(
+            validators=[
+                DataRequired(),
+                NumberRange(min=0, message='Расход за день не может быть ниже нуля')
+                ]
+        ),
+        consumption_milk=dict(
+            validators=[
+                DataRequired(),
+                NumberRange(min=0, message='Расход за день не может быть ниже нуля')
+                ]
+        ),
+        consumption_panini=dict(
+            validators=[
+                DataRequired(),
+                NumberRange(min=0, message='Расход за день не может быть ниже нуля')
+                ]
+        ),
+        consumption_hot_dogs=dict(
+            validators=[
+                DataRequired(),
+                NumberRange(min=0, message='Расход за день не может быть ниже нуля')
+                ]
+        ),
+        coffee_arabika=dict(
+            validators=[
+                DataRequired(),
+                NumberRange(min=-0.01, message='Остаток арабики должен быть нулевым, либо больше нуля')
+                ]
+        ),
+        coffee_blend=dict(
+            validators=[
+                DataRequired(),
+                NumberRange(min=-0.01, message='Остаток купажа должен быть нулевым, либо больше нуля')
+                ]
+        ),
         milk=dict(
             validators=[
                 DataRequired(),
                 NumberRange(min=-0.01, message='Остаток молока должен быть нулевым, либо больше нуля')
                 ]
-            ),
-        )
+        ),
+        panini=dict(
+            validators=[
+                DataRequired(),
+                NumberRange(min=-1, message='Остаток панини должен быть нулевым, либо больше нуля')
+                ]
+        ),
+        hot_dogs=dict(
+            validators=[
+                DataRequired(),
+                NumberRange(min=-1, message='Остаток хот-догов должен быть нулевым, либо больше нуля')
+                ]
+        ),
+    )
     #form_overrides = dict(milk=MyFloatField('Количество', default=0.0))
     column_formatters = dict(timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"))
     list_template = 'admin/model/custom_list.html'

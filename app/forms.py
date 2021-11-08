@@ -95,7 +95,7 @@ class SupplyForm(FlaskForm):
         validators=[Required()],
         default='cash'
     )
-    money = IntegerField('Сумма', validators=[Required(), NumberRange(min=0)])
+    money = IntegerField('Сумма', validators=[Required(), NumberRange(min=0, message='Сумма должна быть больше нуля')])
     submit = SubmitField('Отправить')
 
 
