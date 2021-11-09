@@ -67,3 +67,57 @@
         {% endfor %}
     </ul>
 {% endmacro %}
+
+{% macro render_expansion_by_day(expansion) %}
+    <ul class="list-group">
+        {% for expanse in expansion %}
+        <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div class="ms-2 me-auto">
+                <div class="fw-bold">
+                    {{expanse.money}} грн.
+                </div>
+                {% for c in expanse.categories %}
+                <span class="badge bg-secondary">{{ c.name }}</span>
+                {% endfor %}
+            </div>
+            <span class="badge bg-primary rounded-pill"> {{expanse.type_cost}}</span>
+        </li>
+        {% else %}
+        <p>Расходы за день отсутствуют</p>
+        {% endfor %}
+    </ul>
+{% endmacro %}
+
+{% macro render_supply_by_day(supply) %}
+    <ul class="list-group">
+        {% for s in supply %}
+        <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div class="ms-2 me-auto">
+                <div class="fw-bold">
+                    {{s.money}} грн.
+                </div>
+                <span class="badge bg-secondary">{{ s.product_name }}</span>
+                <span class="badge bg-secondary">{{ s.amount }}</span>
+            </div>
+            <span class="badge bg-primary rounded-pill"> {{s.type_cost}}</span>
+        </li>
+        {% else %}
+        <p>Поступления за день отсутствуют</p>
+        {% endfor %}
+    </ul>
+{% endmacro %}
+
+{% macro render_write_off_on_day(write_off) %}
+    <ul class="list-group">
+        {% for s in write_off %}
+        <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div class="ms-2 me-auto">
+                <span class="badge bg-secondary">{{ s.product_name }}</span>
+                <span class="badge bg-secondary">{{ s.amount }}</span>
+            </div>
+        </li>
+        {% else %}
+        <p>Списания за день отсутствуют</p>
+        {% endfor %}
+    </ul>
+{% endmacro %}

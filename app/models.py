@@ -39,6 +39,12 @@ class Shop(db.Model):
 
     def __str__(self):
         return f'{self.place_name} / {self.address}'
+        
+    @classmethod
+    def get_barista_work(cls, barista_id):
+        _query = cls.query.filter(cls.baristas.any(id=barista_id))
+        _query = _query.order_by('place_name')
+        return _query
 
 
 class ShopEquipment(db.Model):
@@ -235,6 +241,12 @@ class Supply(db.Model):
     def get_local(cls, storage_id):
         _query =cls.query.filter_by(storage_id=storage_id).filter(cls.timestamp >= date_today)
         return _query
+        
+    @classmethod
+    def get_local_by_shop(cls, shop_id):
+        storage = Storage.query.filter_by(shop_id=shop_id).first_or_404()
+        _query =cls.query.filter_by(storage_id=storage.id).filter(cls.timestamp >= date_today)
+        return _query
 
 
 class ByWeight(db.Model):
@@ -254,6 +266,12 @@ class WriteOff(db.Model):
     amount = db.Column(db.Float(50))
     product_name = db.Column(db.String(80))
 
+
+    @classmethod
+    def get_local_by_shop(cls, shop_id):
+        storage = Storage.query.filter_by(shop_id=shop_id).first_or_404()
+        _query =cls.query.filter_by(storage_id=storage.id).filter(cls.timestamp >= date_today)
+        return _query
 
 #Товар:
     #ид

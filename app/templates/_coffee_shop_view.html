@@ -1,8 +1,10 @@
 <div class="col-md-10">
     <div class="h-150 p-4 bg-light border rounded-3">
         <h2>{{coffee_shop.place_name}} / {{coffee_shop.address}}</h2>
+        {% if current_user.has_role('admin') or current_user.has_role('moderator') %}
         <h6>Наличка: {{coffee_shop.cash}} грн.</h6>
         <h6>Безнал: {{coffee_shop.cashless}} грн.</h6>
+        {% endif %}
             <h6>Сотрудники:</h6>
             <div class="container">
                 <ul>
@@ -37,8 +39,26 @@
             </div>
             <br/>
         </div>
-        <a href="{{ url_for('reports.on_address', shop_address=coffee_shop.address)}}" class="btn btn-primary">Отчеты</a>
+        
+        {% if is_report_send(coffee_shop.id) %}
+        <p><a href="#" class="btn btn-primary disabled" tabindex="-1" aria-disabled="true" role="button" data-bs-toggle="button">Текущие транзакции</a></p>
+        <p>Отчет за день отправлен</p>
+        {% else %}
+        <p><a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseTransactions_{{coffee_shop.id}}" role="button" aria-expanded="false" aria-controls="collapseTransactions_{{coffee_shop.id}}">Текущие транзакции</a></p>
+        {% endif %}
+        <div class="collapse" id="collapseTransactions_{{coffee_shop.id}}">
+            <div class="card card-body">
+                <h4>Расходы</h4>
+                {{ render_expansion_by_day(expense.get_local(coffee_shop.id, True)) }}
+                <h4>Поступления</h4>
+                {{ render_supply_by_day(supply.get_local_by_shop(coffee_shop.id)) }}
+                <h4>Списания</h4>
+                {{ render_write_off_on_day(write_off.get_local_by_shop(coffee_shop.id)) }}
+                
+            <br/>
+        </div>
     </div>
+    <a href="{{ url_for('reports.on_address', shop_address=coffee_shop.address)}}" class="btn btn-primary">Отчеты</a>
 </div>
 <div>
     <br />

@@ -4,7 +4,7 @@ from flask import render_template, redirect, url_for, flash, Blueprint, request
 from flask_security import login_required, current_user
 from app import db, app
 from app.forms import ReportForm
-from app.models import Shop, Report, Storage, Expense, Supply
+from app.models import Shop, Report, Storage, Expense, Supply, baristas, Barista
 from app.business_logic import transaction_count, date_today
 
 report = Blueprint('reports', __name__, url_prefix='/report')
@@ -15,7 +15,8 @@ report = Blueprint('reports', __name__, url_prefix='/report')
 @login_required
 def create():
     form = ReportForm(request.form)
-    form.shop.choices = [(shop.id, shop) for shop in Shop.query.order_by('place_name')]
+    shop_query = Shop.get_barista_work(current_user.id)
+    form.shop.choices = [(shop.id, shop) for shop in shop_query]
     if form.validate_on_submit():
         shop = Shop.query.filter_by(id=form.shop.data).first_or_404()
         storage = Storage.query.filter_by(shop_id=shop.id).first_or_404()
@@ -57,12 +58,12 @@ def create():
         report.consumption_hot_dogs = storage.hot_dogs - form.hot_dogs.data
         report.hot_dogs = form.hot_dogs.data
         storage.hot_dogs -= report.consumption_hot_dogs
-        report.timestamp = datetime.utcnow()
+        report.timestamp = datetime.now()
         db.session.add(report)
         db.session.commit()
-        flash('Your daily report is now live!')
+        flash('Отчет за день отправлен!')
         return redirect(url_for('home'))
-    return render_template('report/create_report.html', title='Create daily report', form=form)
+    return render_template('report/create_report.html', title='Создание отчёта', form=form)
 
 
 @report.route('/<shop_address>')
