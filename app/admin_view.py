@@ -7,7 +7,7 @@ from flask_admin.contrib import sqla
 from flask_admin.base import expose
 from app.models import Report
 from wtforms import RadioField, PasswordField
-from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, NumberRange, Required
+from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, NumberRange, Required, InputRequired
 from flask_wtf import FlaskForm
 from wtforms import StringField
 from app.forms import MyFloatField
@@ -93,14 +93,14 @@ class ShopAdmin(ModelView):
         ),
         cash=dict(
             validators=[
-                DataRequired(),
-                NumberRange(min=0, message='Сумма должна быть нулевой, либо больше нуля')
+                InputRequired(),
+                NumberRange(min=-1, message='Сумма должна быть нулевой, либо больше нуля')
             ]
         ),
         cashless=dict(
             validators=[
-                DataRequired(),
-                NumberRange(min=0, message='Сумма должна быть нулевой, либо больше нуля')
+                InputRequired(),
+                NumberRange(min=-1, message='Сумма должна быть нулевой, либо больше нуля')
             ]
         ),
         
@@ -142,42 +142,44 @@ class StorageAdmin(ModelView):
     form_args = dict(
         coffee_arabika=dict(
             validators=[
-                DataRequired(),
-                NumberRange(min=0, message='Количество арабики должно быть нулевым, либо больше нуля')
+                InputRequired(),
+                NumberRange(
+                    min=-0.0001, 
+                    message='Количество арабики должно быть нулевым, либо больше нуля')
                 ]
         ),
         coffee_blend=dict(
             validators=[
-                DataRequired(),
+                InputRequired(),
                 NumberRange(
-                    min=0, 
-                    message='Количество арабики должно быть нулевым, либо больше нуля'
+                    min=-0.0001, 
+                    message='Количество бленда должно быть нулевым, либо больше нуля'
                 )
             ]
         ),
         milk=dict(
             validators=[
-                DataRequired(),
+                InputRequired(),
                 NumberRange(
-                    min=0, 
+                    min=-0.0001, 
                     message='Количество молока должно быть нулевым, либо больше нуля'
                 )
             ]
         ),
         panini=dict(
             validators=[
-                DataRequired(),
+                InputRequired(),
                 NumberRange(
-                    min=0, 
+                    min=-1, 
                     message='Количество панини должно быть нулевым, либо больше нуля'
                 )
             ]
         ),
         hot_dogs=dict(
             validators=[
-                DataRequired(),
+                InputRequired(),
                 NumberRange(
-                    min=0, 
+                    min=-1, 
                     message='Количество хот-догов должно быть нулевым, либо больше нуля'
                 )
             ]
@@ -247,9 +249,6 @@ class BaristaAdmin(ModelView):
             return True
         return False
 
-    
-        
-
 
 class ReportAdmin(ModelView):
     can_view_details = True
@@ -313,106 +312,106 @@ class ReportAdmin(ModelView):
  
         cashbox=dict(
             validators=[
-                DataRequired(),
+                InputRequired(),
                 NumberRange(
-                    min=1,
+                    min=0,
                     message='Сумма не может быть нулевой, либо ниже нуля'
                 )
             ]
         ),
         remainder_of_day=dict(
             validators=[
-                DataRequired(),
+                InputRequired(),
                 NumberRange(
-                    min=1,
+                    min=0,
                     message='Сумма не может быть нулевой, либо ниже нуля'
                 )
             ]
         ),
         cashless=dict(
             validators=[
-                DataRequired(),
+                InputRequired(),
                 NumberRange(
-                    min=1,
+                    min=0,
                     message='Сумма не может быть нулевой, либо ниже нуля'
                 )
             ]
         ),
         cash_balance=dict(
             validators=[
-                DataRequired(),
+                InputRequired(),
                 NumberRange(
-                    min=1,
+                    min=0,
                     message='Сумма не может быть нулевой, либо ниже нуля'
                 )
             ]
         ),
         actual_balance=dict(
             validators=[
-                DataRequired(),
+                InputRequired(),
                 NumberRange(
-                    min=1,
+                    min=0,
                     message='Сумма не может быть нулевой, либо ниже нуля'
                 )
             ]
         ),
         consumption_coffee_arabika=dict(
             validators=[
-                DataRequired(),
-                NumberRange(min=0, message='Расход за день не может быть ниже нуля')
+                InputRequired(),
+                NumberRange(min=-0.0001, message='Расход за день не может быть ниже нуля')
                 ]
         ),
         consumption_coffee_blend=dict(
             validators=[
-                DataRequired(),
-                NumberRange(min=0, message='Расход за день не может быть ниже нуля')
+                InputRequired(),
+                NumberRange(min=-0.0001, message='Расход за день не может быть ниже нуля')
                 ]
         ),
         consumption_milk=dict(
             validators=[
-                DataRequired(),
-                NumberRange(min=0, message='Расход за день не может быть ниже нуля')
+                InputRequired(),
+                NumberRange(min=-0.0001, message='Расход за день не может быть ниже нуля')
                 ]
         ),
         consumption_panini=dict(
             validators=[
-                DataRequired(),
-                NumberRange(min=0, message='Расход за день не может быть ниже нуля')
+                InputRequired(),
+                NumberRange(min=-1, message='Расход за день не может быть ниже нуля')
                 ]
         ),
         consumption_hot_dogs=dict(
             validators=[
-                DataRequired(),
-                NumberRange(min=0, message='Расход за день не может быть ниже нуля')
+                InputRequired(),
+                NumberRange(min=-1, message='Расход за день не может быть ниже нуля')
                 ]
         ),
         coffee_arabika=dict(
             validators=[
-                DataRequired(),
-                NumberRange(min=-0.01, message='Остаток арабики должен быть нулевым, либо больше нуля')
+                InputRequired(),
+                NumberRange(min=-0.0001, message='Остаток арабики должен быть нулевым, либо больше нуля')
                 ]
         ),
         coffee_blend=dict(
             validators=[
-                DataRequired(),
-                NumberRange(min=-0.01, message='Остаток купажа должен быть нулевым, либо больше нуля')
+                InputRequired(),
+                NumberRange(min=-0.0001, message='Остаток купажа должен быть нулевым, либо больше нуля')
                 ]
         ),
         milk=dict(
             validators=[
-                DataRequired(),
-                NumberRange(min=-0.01, message='Остаток молока должен быть нулевым, либо больше нуля')
+                InputRequired(),
+                NumberRange(min=-0.0001, message='Остаток молока должен быть нулевым, либо больше нуля')
                 ]
         ),
         panini=dict(
             validators=[
-                DataRequired(),
+                InputRequired(),
                 NumberRange(min=-1, message='Остаток панини должен быть нулевым, либо больше нуля')
                 ]
         ),
         hot_dogs=dict(
             validators=[
-                DataRequired(),
+                InputRequired(),
                 NumberRange(min=-1, message='Остаток хот-догов должен быть нулевым, либо больше нуля')
                 ]
         ),
@@ -626,9 +625,9 @@ class SupplyAdmin(ModelView):
         ),
         money=dict(
             validators=[
-                DataRequired(),
+                InputRequired(),
                 NumberRange(
-                    min=1,
+                    min=-1,
                     message='Сумма не может быть нулевой, либо ниже нуля'
                 )
             ]
@@ -691,9 +690,9 @@ class ByWeightAdmin(ModelView):
         ),
         money=dict(
             validators=[
-                DataRequired(),
+                InputRequired(),
                 NumberRange(
-                    min=1,
+                    min=-1,
                     message='Сумма не может быть нулевой, либо ниже нуля'
                 )
             ]
