@@ -65,7 +65,7 @@ class ExpanseForm(FlaskForm):
 
 class ByWeightForm(FlaskForm):
     coffee_shop = SelectField('Кофейня')
-    by_weight_choice = RadioField('Выбор товара', choices=[
+    by_weight_choice = SelectField('Выбор товара', choices=[
         ('blend', 'Бленд'), ('arabica', 'Арабика')], validators=[Required()], default='blend')
     amount = MyFloatField('Количество', default=0.0)
     money = IntegerField('Сумма', validators=[Required(), NumberRange(min=0)])
@@ -76,7 +76,7 @@ class ByWeightForm(FlaskForm):
 
 class WriteOffForm(FlaskForm):
     coffee_shop = SelectField('Coffee Shop')
-    write_off_choice = RadioField('Выбор товара', choices=[
+    write_off_choice = SelectField('Выбор товара', choices=[
         ('blend', 'Бленд'), ('arabica', 'Арабика'), ('milk', 'Молоко'),
         ('panini', 'Панини'), ('hot_dogs', 'Хот-доги')], validators=[Required()], default='blend')
     amount = MyFloatField('Количество', default=0.0)
@@ -85,7 +85,7 @@ class WriteOffForm(FlaskForm):
 
 class SupplyForm(FlaskForm):
     coffee_shop = SelectField('Coffee Shop')
-    supply_choice = RadioField('Выбор товара', choices=[
+    supply_choice = SelectField('Выбор товара', choices=[
         ('blend', 'Бленд'), ('arabica', 'Арабика'), ('milk', 'Молоко'),
         ('panini', 'Панини'), ('hot_dogs', 'Хот-доги')], validators=[Required()], default='blend')
     amount = MyFloatField('Количество', default=0.0)
