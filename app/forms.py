@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, \
     SelectField, FormField, FieldList, DecimalField, RadioField, SelectMultipleField
-from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, NumberRange, Required
+from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, NumberRange, Required, InputRequired
 from app.models import Barista
 
 
@@ -55,9 +55,18 @@ class ExpanseForm(FlaskForm):
         validators=[Required()],
         default='cash'
     )
-    money = IntegerField('Сумма траты', validators=[Required(), NumberRange(min=0)])
+    money = IntegerField(
+        'Сумма траты',
+        validators=[
+            InputRequired(),
+            NumberRange(
+                min=0,
+                message='Сумма не может быть нулевой, либо ниже нуля'
+            )
+        ]
+    )
     is_global = BooleanField('Глобальный?', default=False)
-    coffee_shop = SelectField('Кофейня')
+    coffee_shop = SelectField('Кофейня', validators=[DataRequired(message="Выберите кофейню")])
     categories = SelectMultipleField('Категории')
 
     submit = SubmitField('Отправить') 
@@ -67,8 +76,25 @@ class ByWeightForm(FlaskForm):
     coffee_shop = SelectField('Кофейня')
     by_weight_choice = SelectField('Выбор товара', choices=[
         ('blend', 'Бленд'), ('arabica', 'Арабика')], validators=[Required()], default='blend')
-    amount = MyFloatField('Количество', default=0.0)
-    money = IntegerField('Сумма', validators=[Required(), NumberRange(min=0)])
+    amount = MyFloatField(
+        'Количество',
+        default=0.0,
+        validators=[
+            DataRequired(),
+            NumberRange(
+                min=0.0001,
+                message='Количество не может быть нулевым, либо ниже нуля'
+            )
+        ]
+    )
+    money = IntegerField(
+        'Сумма', validators=[
+            InputRequired(),
+            NumberRange(
+                min=0,
+                message='Сумма не может быть нулевой, либо ниже нуля'
+            )
+        ])
     cash_type = RadioField('Тип денег', choices=[('cash', 'Наличка'), ('cashless', 'Безнал')],
                            validators=[Required()], default='cash')
     submit = SubmitField('Отправить')
@@ -79,7 +105,17 @@ class WriteOffForm(FlaskForm):
     write_off_choice = SelectField('Выбор товара', choices=[
         ('blend', 'Бленд'), ('arabica', 'Арабика'), ('milk', 'Молоко'),
         ('panini', 'Панини'), ('hot_dogs', 'Хот-доги')], validators=[Required()], default='blend')
-    amount = MyFloatField('Количество', default=0.0)
+    amount = MyFloatField(
+        'Количество',
+        default=0.0,
+        validators=[
+            DataRequired(),
+            NumberRange(
+                min=0.0001,
+                message='Количество не может быть нулевым, либо ниже нуля'
+            )
+        ]
+    )
     submit = SubmitField('Отправить')
 
 
@@ -107,29 +143,169 @@ class TransferForm(FlaskForm):
 
 class ReportForm(FlaskForm):
     shop = SelectField('Кофейня')
-    cashless = IntegerField('Безнал', default=0)
-    actual_balance = IntegerField('Фактический остаток', default=0)
-    milk = MyFloatField('Остаток молока', default=0.0)
-    blend = MyFloatField('Остаток купажа', default=0.0)
-    arabica = MyFloatField('Остаток арабики', default=0.0)
-    panini = IntegerField('Панини', default=0)
-    hot_dogs = IntegerField('Хот-доги', default=0)
+    cashless = IntegerField(
+        'Безнал',
+        default=0,
+        validators=[
+            InputRequired(),
+            NumberRange(
+                min=0,
+                message='Сумма не может быть нулевой, либо ниже нуля'
+            )
+        ]
+    )
+    actual_balance = IntegerField(
+        'Фактический остаток',
+        default=0,
+        validators=[
+            InputRequired(),
+            NumberRange(
+                min=0,
+                message='Сумма не может быть нулевой, либо ниже нуля'
+            )
+        ]
+    )
+    milk = MyFloatField(
+        'Остаток молока',
+        default=0.0,
+        validators=[
+            InputRequired(),
+            NumberRange(
+                min=-0.0001,
+                message='Остаток молока должен быть нулевым, либо больше нуля'
+            )
+        ]
+    )
+    blend = MyFloatField(
+        'Остаток купажа',
+        default=0.0,
+        validators=[
+            InputRequired(),
+            NumberRange(
+                min=-0.0001,
+                message='Остаток купажа должен быть нулевым, либо больше нуля'
+            )
+        ]
+    )
+    arabica = MyFloatField(
+        'Остаток арабики',
+        default=0.0,
+        validators=[
+            InputRequired(),
+            NumberRange(
+                min=-0.0001,
+                message='Остаток арабики должен быть нулевым, либо больше нуля'
+            )
+        ]
+    )
+    panini = IntegerField(
+        'Панини',
+        default=0,
+        validators=[
+            InputRequired(),
+            NumberRange(
+                min=-1,
+                message='Остаток хот-догов должен быть нулевым, либо больше нуля'
+            )
+        ]
+    )
+    hot_dogs = IntegerField(
+        'Хот-доги',
+        default=0,
+        validators=[
+            InputRequired(),
+            NumberRange(
+                min=-1,
+                message='Остаток хот-догов должен быть нулевым, либо больше нуля'
+            )
+        ]
+    )
     submit = SubmitField('Подтвердить')
 
 
 class CoffeeShopForm(FlaskForm):
     place_name = StringField('Название кофейни', validators=[DataRequired()])
     address = StringField('Адрес', validators=[DataRequired()])
-    cash = IntegerField('Наличка', default=0)
-    cashless = IntegerField('Безнал', default=0)
+    cash = IntegerField(
+        'Наличка',
+        default=0,
+        validators=[
+            InputRequired(),
+            NumberRange(
+                min=-1,
+                message='Сумма должна быть нулевой, либо больше нуля'
+            )
+        ]
+    )
+    cashless = IntegerField(
+        'Безнал',
+        default=0,
+        validators=[
+            InputRequired(),
+            NumberRange(
+                min=-1,
+                message='Сумма должна быть нулевой, либо больше нуля'
+            )
+        ]
+    )
 
     coffee_machine = StringField('Кофе машина', default='')
     grinder_1 = StringField('Кофемолка 1', default='')
     grinder_2 = StringField('Кофемолка 2', default='')
 
-    milk = MyFloatField('Молоко', default=0.0)
-    blend = MyFloatField('Купаж', default=0.0)
-    arabica = MyFloatField('Бленд', default=0.0)
-    panini = IntegerField('Панини', default=0)
-    hot_dogs = IntegerField('Хот-доги', default=0)
+    milk = MyFloatField(
+        'Молоко',
+        default=0.0,
+        validators=[
+            InputRequired(),
+            NumberRange(
+                min=-0.0001,
+                message='Количество молока должно быть нулевым, либо больше нуля'
+            )
+        ]
+    )
+    blend = MyFloatField(
+        'Купаж',
+        default=0.0,
+        validators=[
+            InputRequired(),
+            NumberRange(
+                min=-0.0001,
+                message='Количество бленда должно быть нулевым, либо больше нуля'
+            )
+        ]
+    )
+    arabica = MyFloatField(
+        'Арабика',
+        default=0.0,
+        validators=[
+            InputRequired(),
+            NumberRange(
+                min=-0.0001,
+                message='Количество арабики должно быть нулевым, либо больше нуля'
+            )
+        ]
+    )
+    panini = IntegerField(
+        'Панини',
+        default=0,
+        validators=[
+            InputRequired(),
+            NumberRange(
+                min=-1,
+                message='Количество панини должно быть нулевым, либо больше нуля'
+            )
+        ]
+    )
+    hot_dogs = IntegerField(
+        'Хот-доги',
+        default=0,
+        validators=[
+            InputRequired(),
+            NumberRange(
+                min=-1,
+                message='Количество хот-догов должно быть нулевым, либо больше нуля'
+            )
+        ]
+    )
     submit = SubmitField('Создать')

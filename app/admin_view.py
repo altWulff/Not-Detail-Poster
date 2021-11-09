@@ -552,9 +552,9 @@ class ExpenseAdmin(ModelView):
         ),
         money=dict(
             validators=[
-                DataRequired(),
+                InputRequired(),
                 NumberRange(
-                    min=1,
+                    min=0,
                     message='Сумма не может быть нулевой, либо ниже нуля'
                 )
             ]
