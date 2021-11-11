@@ -2,7 +2,8 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, \
     SelectField, FormField, FieldList, DecimalField, RadioField, SelectMultipleField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, NumberRange, Required, InputRequired
-from app.models import Barista
+from flask_security import current_user
+from app.models import Barista, Shop, Category
 
 
 class MyFloatField(DecimalField):
@@ -13,6 +14,11 @@ class MyFloatField(DecimalField):
             except ValueError:
                 self.data = None
                 raise ValueError(self.gettext('Not a valid float value'))
+
+
+class NonValidatingSelectMultipleField(SelectMultipleField):
+    def pre_validate(self, form):
+        pass 
 
 
 class LoginForm(FlaskForm):
@@ -67,9 +73,14 @@ class ExpanseForm(FlaskForm):
     )
     is_global = BooleanField('Глобальный?', default=False)
     coffee_shop = SelectField('Кофейня', validators=[DataRequired(message="Выберите кофейню")])
-    categories = SelectMultipleField('Категории')
+    categories = NonValidatingSelectMultipleField('Категории')
 
     submit = SubmitField('Отправить') 
+    
+    def __init__(self, *args, **kwargs):
+        super(ExpanseForm, self).__init__(*args, **kwargs)
+        self.coffee_shop.choices = [(c.id, c) for c in Shop.get_barista_work(current_user.id).all()]
+        self.categories.choices = [(c.id, c) for c in Category.query.all()]
 
 
 class ByWeightForm(FlaskForm):
@@ -98,6 +109,10 @@ class ByWeightForm(FlaskForm):
     cash_type = RadioField('Тип денег', choices=[('cash', 'Наличка'), ('cashless', 'Безнал')],
                            validators=[Required()], default='cash')
     submit = SubmitField('Отправить')
+    
+    def __init__(self, *args, **kwargs):
+        super(ByWeightForm, self).__init__(*args, **kwargs)
+        self.coffee_shop.choices = [(c.id, c) for c in Shop.get_barista_work(current_user.id).all()]
 
 
 class WriteOffForm(FlaskForm):
@@ -117,6 +132,10 @@ class WriteOffForm(FlaskForm):
         ]
     )
     submit = SubmitField('Отправить')
+    
+    def __init__(self, *args, **kwargs):
+        super(WriteOffForm, self).__init__(*args, **kwargs)
+        self.coffee_shop.choices = [(c.id, c) for c in Shop.get_barista_work(current_user.id).all()]
 
 
 class SupplyForm(FlaskForm):
@@ -133,6 +152,10 @@ class SupplyForm(FlaskForm):
     )
     money = IntegerField('Сумма', validators=[Required(), NumberRange(min=0, message='Сумма должна быть больше нуля')])
     submit = SubmitField('Отправить')
+    
+    def __init__(self, *args, **kwargs):
+        super(SupplyForm, self).__init__(*args, **kwargs)
+        self.coffee_shop.choices = [(c.id, c) for c in Shop.get_barista_work(current_user.id).all()]
 
 
 class TransferForm(FlaskForm):
@@ -221,6 +244,10 @@ class ReportForm(FlaskForm):
         ]
     )
     submit = SubmitField('Подтвердить')
+    
+    def __init__(self, *args, **kwargs):
+        super(ReportForm, self).__init__(*args, **kwargs)
+        self.shop.choices = [(c.id, c) for c in Shop.get_barista_work(current_user.id).all()]
 
 
 class CoffeeShopForm(FlaskForm):

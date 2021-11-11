@@ -1,6 +1,6 @@
 from datetime import datetime
 from flask import render_template, redirect, url_for, flash, Blueprint, request
-from flask_security import login_required
+from flask_security import current_user, login_required
 from app import app, db
 from app.forms import ExpanseForm, ByWeightForm, WriteOffForm, SupplyForm, CoffeeShopForm, TransferForm
 from app.models import Shop, Storage, ShopEquipment, Expense, Supply, ByWeight, WriteOff, Category
@@ -9,20 +9,20 @@ from app.business_logic import transaction_count
 
 menu = Blueprint('menu', __name__, url_prefix='/menu')
 
-
+    
 @menu.route('/expense', methods=['POST'])
 @login_required
 def expense():
-    form = ExpanseForm(request.form)
-    if request.method == "POST":
-        shop = Shop.query.filter_by(place_name=form.coffee_shop.data).first_or_404()
+    form = ExpanseForm()
+    if form.validate_on_submit():
+        shop = Shop.query.filter_by(id=form.coffee_shop.data).first_or_404()
         if transaction_count(shop.id) >= app.config['REPORTS_PER_DAY']:
             flash("Сегодняшний отчет уже был отправлен!")
             return redirect(url_for('home'))
         type_cost = form.type_cost.data
         money = form.money.data
         expense = Expense(type_cost=type_cost, money=money, is_global=form.is_global.data)
-        expense.timestamp = datetime.utcnow()
+        expense.timestamp = datetime.now()
         if form.type_cost.data == 'cash':
             shop.cash -= form.money.data
         else:
@@ -36,7 +36,8 @@ def expense():
         db.session.commit()
         flash('New expense')
         return redirect(url_for("home"))
-
+    flash(form.data)
+    flash(form.validate())
     return render_template("index.html")
 
 
@@ -44,8 +45,8 @@ def expense():
 @login_required
 def by_weight():
     form = ByWeightForm(request.form)
-    if request.method == "POST":
-        shop = Shop.query.filter_by(place_name=form.coffee_shop.data).first_or_404()
+    if form.validate_on_submit():
+        shop = Shop.query.filter_by(id=form.coffee_shop.data).first_or_404()
         storage = Storage.query.filter_by(shop_id=shop.id).first_or_404()
         if transaction_count(shop.id) >= app.config['REPORTS_PER_DAY']:
             flash("Сегодняшний отчет уже был отправлен!")
@@ -61,7 +62,7 @@ def by_weight():
             shop.cashless += form.money.data
         by_weight = ByWeight(storage=storage, amount=form.amount.data, product_name=form.by_weight_choice.data,
                              type_cost=form.cash_type.data, money=form.money.data)
-        by_weight.timestamp = datetime.utcnow()
+        by_weight.timestamp = datetime.now()
         db.session.add(by_weight)
         db.session.commit()
         flash(f'New trade by weight {form.by_weight_choice.data} on amount {form.amount.data} kg')
@@ -73,8 +74,8 @@ def by_weight():
 @login_required
 def write_off():
     form = WriteOffForm(request.form)
-    if request.method == "POST":
-        shop = Shop.query.filter_by(place_name=form.coffee_shop.data).first_or_404()
+    if form.validate_on_submit():
+        shop = Shop.query.filter_by(id=form.coffee_shop.data).first_or_404()
         storage = Storage.query.filter_by(shop_id=shop.id).first_or_404()
         if transaction_count(shop.id) >= app.config['REPORTS_PER_DAY']:
             flash("Сегодняшний отчет уже был отправлен!")
@@ -90,7 +91,7 @@ def write_off():
         else:
             storage.hot_dogs -= int(form.amount.data)
         write_off = WriteOff(storage=storage, amount=form.amount.data, product_name=form.write_off_choice.data)
-        write_off.timestamp = datetime.utcnow()
+        write_off.timestamp = datetime.now()
         db.session.add(write_off)
         db.session.commit()
         flash(f'New write off {form.write_off_choice.data} on amount {form.amount.data}')
@@ -102,8 +103,8 @@ def write_off():
 @login_required
 def supply():
     form = SupplyForm(request.form)
-    if request.method == "POST":
-        shop = Shop.query.filter_by(place_name=form.coffee_shop.data).first_or_404()
+    if form.validate_on_submit():
+        shop = Shop.query.filter_by(id=form.coffee_shop.data).first_or_404()
         storage = Storage.query.filter_by(shop_id=shop.id).first_or_404()
         if transaction_count(shop.id) >= app.config['REPORTS_PER_DAY']:
             flash("Сегодняшний отчет уже был отправлен!")
@@ -126,7 +127,7 @@ def supply():
 
         supply = Supply(storage=storage, product_name=form.supply_choice.data,
                         amount=form.amount.data, type_cost=form.cash_type.data, money=form.money.data)
-        supply.timestamp = datetime.utcnow()
+        supply.timestamp = datetime.now()
         db.session.add(supply)
         db.session.commit()
         flash(f'New Supply {form.supply_choice.data} on amount {form.amount.data}')

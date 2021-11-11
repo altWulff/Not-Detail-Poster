@@ -8,11 +8,10 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <select name="coffee_shop" class="form-select mb-3">
-                    {% for cs in barista_work_list %}
-                        <option>{{ cs.place_name }}</option>
-                    {% endfor%}
-                </select>
+                <div class="mb-3">
+                    {{ write_off_form.coffee_shop.label }}
+                    {{ write_off_form.coffee_shop(class="form-select mb-3") }}
+                </div>
                 <p>{{ write_off_form.write_off_choice.label }}{{ write_off_form.write_off_choice(class="form-select") }}</p>
                 {{ render_field(supply_form.amount) }}
             </div>

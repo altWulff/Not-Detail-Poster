@@ -8,11 +8,10 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <select name="coffee_shop" class="form-select mb-3">
-                    {% for cs in barista_work_list %}
-                        <option>{{ cs.place_name }}</option>
-                    {% endfor %}
-                </select>
+                <div class="mb-3">
+                    {{ expense_form.coffee_shop.label }}
+                    {{ expense_form.coffee_shop(class="form-select mb-3") }}
+                </div>
                 <div class="form-floating mb-3">
                   
                 </div>
@@ -27,7 +26,7 @@
                 </div>
                 {{ render_field(expense_form.money) }}
                 {{expense_form.categories.label}}
-                {{ expense_form.categories(multiple=True, class="form-select") }}
+                {{ expense_form.categories(class="form-select") }}
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
