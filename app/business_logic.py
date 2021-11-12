@@ -1,6 +1,7 @@
 from datetime import datetime, date
 from sqlalchemy import func
 from flask import flash, redirect, url_for
+from flask_security import current_user
 from app.models import Shop, Report, Expense, Storage, Category, WriteOff, Supply, ByWeight
 from app import app, db
 
@@ -20,6 +21,7 @@ class TransactionHandler:
     COMMIT_MESSAGE = 'Транзакция принята!'
     NON_VALID_MESSAGE = 'Транзакция не принята!  Попробуйте заново, с коректными значениями.'
     LIMIT_MESSAGE = 'Сегодняшний отчет уже был отправлен!'
+    COMMIT_REPORT_MESSAGE = 'Отчет за день отправлен!'
     
     def __init__(self, shop_id=None):
         self.shop = self.get_shop_from_id(shop_id)
@@ -38,12 +40,18 @@ class TransactionHandler:
             flash(self.LIMIT_MESSAGE)
             return redirect(url_for('home'))
             
-    def add_money(self, money, type_cost):
+    def funds_expenditure(self, money, type_cost):
         if type_cost == 'cash':
             self.shop.cash -= money
         else:
             self.shop.cashless -= money
 
+    def cash_flow(self, money, type_cost):
+        if type_cost == 'cash':
+            self.shop.cash += money
+        else:
+            self.shop.cashless += money
+        
     def write_to_db(self, record):
         db.session.add(record)
         db.session.commit()
@@ -56,7 +64,7 @@ class TransactionHandler:
             is_global=form.is_global.data,
             timestamp = datetime.now()
         )
-        self.add_money(form.money.data, form.type_cost.data)
+        self.funds_expenditure(form.money.data, form.type_cost.data)
         for c_id in form.categories.data:
             category = Category.query.filter_by(id=c_id).first_or_404()
             expense.categories.append(category)
@@ -70,7 +78,7 @@ class TransactionHandler:
         else:
             self.storage.coffee_arabika -= form.amount.data
 
-        self.add_money(form.money.data, form.type_cost.data)
+        self.funds_expenditure(form.money.data, form.type_cost.data)
         by_weight = ByWeight(
             storage=self.storage,
             amount=form.amount.data,
@@ -114,7 +122,7 @@ class TransactionHandler:
         else:
             self.storage.hot_dogs += int(form.amount.data)
             
-        self.add_money(form.money.data, form.type_cost.data)
+        self.funds_expenditure(form.money.data, form.type_cost.data)
         supply = Supply(
             storage=self.storage,
             product_name=form.supply_choice.data,
@@ -124,3 +132,41 @@ class TransactionHandler:
             timestamp = datetime.now()
         )
         self.write_to_db(supply)
+        
+    def create_report(self, form):
+        self.validate_report_limit()
+        expanses = Expense.get_local(self.shop.id, True)
+        expanses = sum([e.money for e in expanses if e.type_cost == 'cash'])
+        cash_balance = form.actual_balance.data - self.shop.cash
+        self.cash_flow(cash_balance, 'cash')
+        self.cash_flow(form.cashless.data, 'cashless')
+        remainder_of_day = form.cashless.data + cash_balance
+        report = Report(
+            cash_balance=cash_balance,
+            cashless=form.cashless.data,
+            actual_balance=form.actual_balance.data,
+            remainder_of_day=remainder_of_day,
+            barista=current_user,
+            shop=self.shop,
+            timestamp=datetime.now(),
+            coffee_arabika=form.arabica.data,
+            coffee_blend=form.blend.data,
+            milk=form.milk.data,
+            panini=form.panini.data,
+            hot_dogs=form.hot_dogs.data
+        )
+        report.cashbox = remainder_of_day + expanses
+ 
+        report.consumption_coffee_arabika = self.storage.coffee_arabika - form.arabica.data
+        report.consumption_coffee_blend = self.storage.coffee_blend - form.blend.data
+        report.consumption_milk = self.storage.milk - form.milk.data
+        report.consumption_panini = self.storage.panini - form.panini.data
+        report.consumption_hot_dogs = self.storage.hot_dogs - form.hot_dogs.data
+        
+        self.storage.coffee_arabika -= report.consumption_coffee_arabika
+        self.storage.coffee_blend -= report.consumption_coffee_blend
+        self.storage.milk -= report.consumption_milk
+        self.storage.panini -= report.consumption_panini
+        self.storage.hot_dogs -= report.consumption_hot_dogs
+        self.write_to_db(report) 
+

@@ -5,7 +5,8 @@ from flask_security import login_required, current_user
 from app import db, app
 from app.forms import ReportForm
 from app.models import Shop, Report, Storage, Expense, Supply, baristas, Barista
-from app.business_logic import transaction_count, date_today
+from app.business_logic import transaction_count, date_today, TransactionHandler
+
 
 report = Blueprint('reports', __name__, url_prefix='/report')
 
@@ -18,50 +19,9 @@ def create():
     shop_query = Shop.get_barista_work(current_user.id)
     form.shop.choices = [(shop.id, shop) for shop in shop_query]
     if form.validate_on_submit():
-        shop = Shop.query.filter_by(id=form.shop.data).first_or_404()
-        storage = Storage.query.filter_by(shop_id=shop.id).first_or_404()
-        expanses = Expense.get_local(shop.id, True)
-        if transaction_count(shop.id) >= app.config['REPORTS_PER_DAY']:
-            flash("Сегодняшний отчет уже был отправлен!")
-            return redirect(url_for('home'))
-
-        cash_balance = form.actual_balance.data - shop.cash
-        shop.cash += cash_balance
-        shop.cashless += form.cashless.data
-        remainder_of_day = form.cashless.data + cash_balance
-        report = Report(
-            cash_balance=cash_balance,
-            cashless=form.cashless.data,
-            actual_balance=form.actual_balance.data,
-            remainder_of_day=remainder_of_day,
-            barista=current_user,
-            shop=shop
-        )
-        report.cashbox = remainder_of_day + sum([e.money for e in expanses if e.type_cost == 'cash'])
-        # consumption
-        report.consumption_coffee_arabika = storage.coffee_arabika - form.arabica.data
-        report.coffee_arabika = form.arabica.data
-        storage.coffee_arabika -= report.consumption_coffee_arabika
-
-        report.consumption_coffee_blend = storage.coffee_blend - form.blend.data
-        report.coffee_blend = form.blend.data
-        storage.coffee_blend -= report.consumption_coffee_blend
-
-        report.consumption_milk = storage.milk - form.milk.data
-        report.milk = form.milk.data
-        storage.milk -= report.consumption_milk
-
-        report.consumption_panini = storage.panini - form.panini.data
-        report.panini = form.panini.data
-        storage.panini -= report.consumption_panini
-
-        report.consumption_hot_dogs = storage.hot_dogs - form.hot_dogs.data
-        report.hot_dogs = form.hot_dogs.data
-        storage.hot_dogs -= report.consumption_hot_dogs
-        report.timestamp = datetime.now()
-        db.session.add(report)
-        db.session.commit()
-        flash('Отчет за день отправлен!')
+        transaction = TransactionHandler(form.shop.data)
+        transaction.create_report(form)
+        flash(transaction.COMMIT_REPORT_MESSAGE)
         return redirect(url_for('home'))
     return render_template('report/create_report.html', title='Создание отчёта', form=form)
 
