@@ -79,7 +79,10 @@ class ExpanseForm(FlaskForm):
     
     def __init__(self, *args, **kwargs):
         super(ExpanseForm, self).__init__(*args, **kwargs)
-        self.coffee_shop.choices = [(c.id, c) for c in Shop.get_barista_work(current_user.id).all()]
+        if current_user.is_anonymous:
+            self.coffee_shop.choices = []
+        else:
+            self.coffee_shop.choices = [(c.id, c) for c in Shop.get_barista_work(current_user.id).all()]
         self.categories.choices = [(c.id, c) for c in Category.query.all()]
 
 
@@ -112,7 +115,10 @@ class ByWeightForm(FlaskForm):
     
     def __init__(self, *args, **kwargs):
         super(ByWeightForm, self).__init__(*args, **kwargs)
-        self.coffee_shop.choices = [(c.id, c) for c in Shop.get_barista_work(current_user.id).all()]
+        if current_user.is_anonymous:
+            self.coffee_shop.choices = []
+        else:
+            self.coffee_shop.choices = [(c.id, c) for c in Shop.get_barista_work(current_user.id).all()]
 
 
 class WriteOffForm(FlaskForm):
@@ -135,7 +141,10 @@ class WriteOffForm(FlaskForm):
     
     def __init__(self, *args, **kwargs):
         super(WriteOffForm, self).__init__(*args, **kwargs)
-        self.coffee_shop.choices = [(c.id, c) for c in Shop.get_barista_work(current_user.id).all()]
+        if current_user.is_anonymous:
+            self.coffee_shop.choices = []
+        else:
+            self.coffee_shop.choices = [(c.id, c) for c in Shop.get_barista_work(current_user.id).all()]
 
 
 class SupplyForm(FlaskForm):
@@ -155,7 +164,10 @@ class SupplyForm(FlaskForm):
     
     def __init__(self, *args, **kwargs):
         super(SupplyForm, self).__init__(*args, **kwargs)
-        self.coffee_shop.choices = [(c.id, c) for c in Shop.get_barista_work(current_user.id).all()]
+        if current_user.is_anonymous:
+            self.coffee_shop.choices = []
+        else:
+            self.coffee_shop.choices = [(c.id, c) for c in Shop.get_barista_work(current_user.id).all()]
 
 
 class TransferForm(FlaskForm):
@@ -247,7 +259,10 @@ class ReportForm(FlaskForm):
     
     def __init__(self, *args, **kwargs):
         super(ReportForm, self).__init__(*args, **kwargs)
-        self.shop.choices = [(c.id, c) for c in Shop.get_barista_work(current_user.id).all()]
+        if current_user.is_anonymous:
+            self.shop.choices = []
+        else:
+            self.shop.choices = [(c.id, c) for c in Shop.get_barista_work(current_user.id).all()]
 
 
 class CoffeeShopForm(FlaskForm):

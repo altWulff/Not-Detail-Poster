@@ -45,7 +45,7 @@ def create_roles():
 @app.cli.command('create-categories')
 def create_categories():
     db.create_all()
-    categories_names = ('Зарплата', 'Аренда', 'Запупка', 'Вода')
+    categories_names = ('Зарплата', 'Аренда помещения', 'Аренда оборудования', 'Запупка', 'Вода')
     for name in categories_names:
         category = Category(name=name)
         db.session.add(category)
