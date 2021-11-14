@@ -10,7 +10,7 @@ from app.business_logic import transaction_count, TransactionHandler
 menu = Blueprint('menu', __name__, url_prefix='/menu')
 
     
-@menu.route('/expense', methods=['POST'])
+@menu.route('/expense', methods=('POST', ))
 @login_required
 def expense():
     form = ExpanseForm()
@@ -24,7 +24,7 @@ def expense():
     return render_template("index.html")
 
 
-@menu.route('/by_weight', methods=['POST'])
+@menu.route('/by_weight', methods=['POST', ])
 @login_required
 def by_weight():
     form = ByWeightForm(request.form)
@@ -38,7 +38,7 @@ def by_weight():
     return render_template("index.html")
 
 
-@menu.route('/write_off', methods=['POST'])
+@menu.route('/write_off', methods=('POST', ))
 @login_required
 def write_off():
     form = WriteOffForm(request.form)
@@ -52,7 +52,7 @@ def write_off():
     return render_template("index.html")
 
 
-@menu.route('/supply', methods=['POST'])
+@menu.route('/supply', methods=('POST', ))
 @login_required
 def supply():
     form = SupplyForm(request.form)
@@ -66,8 +66,8 @@ def supply():
     return render_template("index.html")
 
 
-#TODO доделать перемещение
-@menu.route('/transfer', methods=['POST'])
+# TODO доделать перемещение
+@menu.route('/transfer', methods=('POST', ))
 @login_required
 def transfer():
     form = TransferForm(request.form)
@@ -81,7 +81,7 @@ def transfer():
     return render_template("index.html")
 
 
-@menu.route('/create_coffee_shop', methods=['GET', 'POST'])
+@menu.route('/create_coffee_shop', methods=('GET', 'POST'))
 @login_required
 def create_coffee_shop():
     form = CoffeeShopForm()
@@ -93,8 +93,8 @@ def create_coffee_shop():
             cashless=form.cashless.data
         )
         storage = Storage(
-            coffee_arabika=form.arabica.data,
-            coffee_blend=form.blend.data,
+            coffee_arabika=form.coffee_arabika.data,
+            coffee_blend=form.coffee_blend.data,
             milk=form.milk.data,
             panini=form.panini.data,
             hot_dogs=form.hot_dogs.data

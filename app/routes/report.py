@@ -11,7 +11,6 @@ from app.business_logic import transaction_count, date_today, TransactionHandler
 report = Blueprint('reports', __name__, url_prefix='/report')
 
 
-
 @report.route('/create', methods=['GET', 'POST'])
 @login_required
 def create():
@@ -40,11 +39,20 @@ def on_address(shop_address):
     supply = Supply.get_local(storage.id)
     page = request.args.get('page', 1, type=int)
     reports = reports.paginate(
-        page, app.config['REPORTS_PER_PAGE'], False)
-    next_url = url_for('reports.on_address', shop_address=shop.address, page=reports.next_num) \
-        if reports.has_next else None
-    prev_url = url_for('reports.on_address', shop_address=shop.address, page=reports.prev_num) \
-        if reports.has_prev else None
+        page,
+        app.config['REPORTS_PER_PAGE'],
+        False
+    )
+    next_url = url_for(
+        'reports.on_address',
+        shop_address=shop.address,
+        page=reports.next_num
+    ) if reports.has_next else None
+    prev_url = url_for(
+        'reports.on_address',
+        shop_address=shop.address,
+        page=reports.prev_num
+    ) if reports.has_prev else None
     return render_template(
         "report/reports.html",
         daily_reports=reports.items,

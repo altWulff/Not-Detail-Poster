@@ -1,16 +1,21 @@
 from statistics import median
-from datetime import datetime, date
+from datetime import datetime
 from sqlalchemy import func
-from flask import abort, redirect, request, url_for
+from flask import abort, redirect, request, url_for, Markup
 from flask_security import current_user
+from flask_admin import BaseView, expose
 from flask_admin.contrib import sqla
-from flask_admin.base import expose
-from app.models import Report
-from wtforms import RadioField, PasswordField
-from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, NumberRange, Required, InputRequired
-from flask_wtf import FlaskForm
-from wtforms import StringField
-from app.forms import MyFloatField
+from app.models import Report, Expense
+from wtforms import RadioField, SelectField
+from wtforms.validators import DataRequired, NumberRange, Required, InputRequired
+
+
+class IndexAdmin(BaseView):
+    @expose('/')
+    def index(self):
+        self._template_args['name'] = 'foobar'
+        self._template_args['code'] = '12345'
+        super(IndexAdmin, self).index()
 
 
 class ModelView(sqla.ModelView):
@@ -94,26 +99,55 @@ class ShopAdmin(ModelView):
         cash=dict(
             validators=[
                 InputRequired(),
-                NumberRange(min=-1, message='Сумма должна быть нулевой, либо больше нуля')
+                NumberRange(
+                    min=-1,
+                    message='Сумма должна быть нулевой, либо больше нуля'
+                )
             ]
         ),
         cashless=dict(
             validators=[
                 InputRequired(),
-                NumberRange(min=-1, message='Сумма должна быть нулевой, либо больше нуля')
+                NumberRange(
+                    min=-1,
+                    message='Сумма должна быть нулевой, либо больше нуля'
+                )
             ]
         ),
         
     )
+    form_widget_args = {
+        'place_name': {
+            'placeholder': 'Название кофейни'
+        },
+        'address': {
+            'placeholder': 'Адрес кофейни'
+        },
+        'cash': {
+            'placeholder': 'Наличка в гривне'
+        },
+        'cashless': {
+            'placeholder': 'Безнал в гривне'
+        }
+    }
 
 
 class ShopEquipmentAdmin(ModelView):
+    can_view_details = True
     column_searchable_list = ('coffee_machine', )
     column_labels = dict(
         coffee_machine='Кофе Машина',
         grinder_1='Кофемолка 1',
         grinder_2='Кофемолка 2',
         shop='Кофейня'
+    )
+    form_args = dict(
+        shop=dict(
+            validators=[
+                DataRequired(
+                    message='Выберите кофейню')
+            ]
+        )
     )
 
 
@@ -138,7 +172,14 @@ class StorageAdmin(ModelView):
     )
     column_filters = ('shop', )
     form_create_rules = ('coffee_arabika', 'coffee_blend', 'milk', 'panini', 'hot_dogs', 'shop')
-    form_edit_rules = ('coffee_arabika', 'coffee_blend', 'milk', 'panini', 'hot_dogs', 'shop', 'supplies', 'by_weights', 'write_offs')
+    form_edit_rules = (
+        'coffee_arabika',
+        'coffee_blend',
+        'milk',
+        'panini',
+        'hot_dogs',
+        'shop'
+    )
     form_args = dict(
         coffee_arabika=dict(
             validators=[
@@ -191,6 +232,23 @@ class StorageAdmin(ModelView):
             ]
         )
     )
+    form_widget_args = {
+        'coffee_arabika': {
+            'placeholder': 'Введите количество арабики в кг'
+        },
+        'coffee_blend': {
+            'placeholder': 'Введите количество купажа в кг'
+        },
+        'milk': {
+            'placeholder': 'Введите количество молока в л'
+        },
+        'panini': {
+            'placeholder': 'Введите количество панини'
+        },
+        'hot_dogs': {
+            'placeholder': 'Введите количество хот-догов (комплект булка-сосиска)'
+        }
+    }
 
 
 class BaristaAdmin(ModelView):
@@ -208,7 +266,7 @@ class BaristaAdmin(ModelView):
         confirmed_at='Дата найма',
         password='Пароль'
     )
-    form_columns = ('name','phone_number', 'email', 'password', 'shop', 'confirmed_at', 'active', 'reports')
+    form_columns = ('name', 'phone_number', 'email', 'password', 'shop', 'confirmed_at', 'active', 'reports')
     form_create_rules = ('name', 'phone_number', 'email', 'password', 'shop', 'confirmed_at', 'active')
     form_edit_rules = ('name', 'phone_number', 'email', 'password', 'shop', 'confirmed_at', 'active', 'reports')
     column_formatters = dict(confirmed_at=lambda v, c, m, p: m.confirmed_at.date().strftime("%d.%m.%Y"))
@@ -249,8 +307,21 @@ class BaristaAdmin(ModelView):
             return True
         return False
 
+    form_widget_args = {
+        'name': {
+            'placeholder': 'Имя сотрудника'
+        },
+        'phone_number': {
+            'placeholder': 'Мобильный телефон'
+        },
+        'email': {
+            'placeholder': 'Емейл'
+        }
+    }
+
 
 class ReportAdmin(ModelView):
+    list_template = 'admin/model/report_list.html'
     can_view_details = True
     column_default_sort = ('timestamp', True)
     column_searchable_list = ('timestamp', )
@@ -288,11 +359,41 @@ class ReportAdmin(ModelView):
         hot_dogs='Хот-доги/ост.',
         expenses='Расходы'
     )
-    # form_create_rules = (
-    #     'timestamp', 'shop', 'barista', 'expenses',
-    #     'cashless', 'actual_balance', 'coffee_arabika',
-    #     'coffee_blend', 'milk', 'panini', 'hot_dogs'
-    # )
+    column_formatters = dict(timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"))
+    form_create_rules = (
+        'timestamp',
+        'expenses',
+        'cashless',
+        'actual_balance',
+        'coffee_arabika',
+        'coffee_blend',
+        'milk',
+        'panini',
+        'hot_dogs',
+        'shop',
+        'barista'
+    )
+    form_edit_rules = (
+        'timestamp',
+        'cashbox',
+        'expenses',
+        'remainder_of_day',
+        'cashless',
+        'cash_balance',
+        'actual_balance',
+        'consumption_coffee_arabika',
+        'consumption_coffee_blend',
+        'consumption_milk',
+        'consumption_panini',
+        'consumption_hot_dogs',
+        'coffee_arabika',
+        'coffee_blend',
+        'milk',
+        'panini',
+        'hot_dogs',
+        'shop',
+        'barista'
+    )
     form_args = dict(
         timestamp=dict(
             validators=[DataRequired()]
@@ -306,8 +407,9 @@ class ReportAdmin(ModelView):
         barista=dict(
             validators=[
                 DataRequired(
-                    message='Выберите сотрудника')
-                ]
+                    message='Выберите сотрудника'
+                )
+            ]
         ),
  
         cashbox=dict(
@@ -358,74 +460,154 @@ class ReportAdmin(ModelView):
         consumption_coffee_arabika=dict(
             validators=[
                 InputRequired(),
-                NumberRange(min=-0.0001, message='Расход за день не может быть ниже нуля')
-                ]
+                NumberRange(
+                    min=-0.0001,
+                    message='Расход за день не может быть ниже нуля'
+                )
+            ]
         ),
         consumption_coffee_blend=dict(
             validators=[
                 InputRequired(),
-                NumberRange(min=-0.0001, message='Расход за день не может быть ниже нуля')
-                ]
+                NumberRange(
+                    min=-0.0001,
+                    message='Расход за день не может быть ниже нуля'
+                )
+            ]
         ),
         consumption_milk=dict(
             validators=[
                 InputRequired(),
-                NumberRange(min=-0.0001, message='Расход за день не может быть ниже нуля')
-                ]
+                NumberRange(
+                    min=-0.0001,
+                    message='Расход за день не может быть ниже нуля'
+                )
+            ]
         ),
         consumption_panini=dict(
             validators=[
                 InputRequired(),
-                NumberRange(min=-1, message='Расход за день не может быть ниже нуля')
-                ]
+                NumberRange(
+                    min=-1,
+                    message='Расход за день не может быть ниже нуля'
+                )
+            ]
         ),
         consumption_hot_dogs=dict(
             validators=[
                 InputRequired(),
-                NumberRange(min=-1, message='Расход за день не может быть ниже нуля')
-                ]
+                NumberRange(
+                    min=-1,
+                    message='Расход за день не может быть ниже нуля'
+                )
+            ]
         ),
         coffee_arabika=dict(
             validators=[
                 InputRequired(),
-                NumberRange(min=-0.0001, message='Остаток арабики должен быть нулевым, либо больше нуля')
-                ]
+                NumberRange(
+                    min=-0.0001,
+                    message='Остаток арабики должен быть нулевым, либо больше нуля'
+                )
+            ]
         ),
         coffee_blend=dict(
             validators=[
                 InputRequired(),
-                NumberRange(min=-0.0001, message='Остаток купажа должен быть нулевым, либо больше нуля')
-                ]
+                NumberRange(
+                    min=-0.0001,
+                    message='Остаток купажа должен быть нулевым, либо больше нуля'
+                )
+            ]
         ),
         milk=dict(
             validators=[
                 InputRequired(),
-                NumberRange(min=-0.0001, message='Остаток молока должен быть нулевым, либо больше нуля')
-                ]
+                NumberRange(
+                    min=-0.0001,
+                    message='Остаток молока должен быть нулевым, либо больше нуля'
+                )
+            ]
         ),
         panini=dict(
             validators=[
                 InputRequired(),
-                NumberRange(min=-1, message='Остаток панини должен быть нулевым, либо больше нуля')
-                ]
+                NumberRange(
+                    min=-1,
+                    message='Остаток панини должен быть нулевым, либо больше нуля'
+                )
+            ]
         ),
         hot_dogs=dict(
             validators=[
                 InputRequired(),
-                NumberRange(min=-1, message='Остаток хот-догов должен быть нулевым, либо больше нуля')
-                ]
+                NumberRange(
+                    min=-1,
+                    message='Остаток хот-догов должен быть нулевым, либо больше нуля'
+                )
+            ]
         ),
     )
-    #form_overrides = dict(milk=MyFloatField('Количество', default=0.0))
-    column_formatters = dict(timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"))
-    list_template = 'admin/model/custom_list.html'
-    
+    form_widget_args = {
+        'timestamp': {
+            'placeholder': 'Дата и время отправки отчета'
+        },
+        'cashbox': {
+            'placeholder': 'Касса'
+        },
+        'remainder_of_day': {
+            'placeholder': 'Остаток дня, сумма остатка наличности и безнала'
+        },
+        'cashless': {
+            'placeholder': 'Безнал'
+        },
+        'cash_balance': {
+            'placeholder': 'Разница между утренним фактическим остатком и вечерним'
+        },
+        'actual_balance': {
+            'placeholder': 'Фактический остаток наличности вечером'
+        },
+        'consumption_coffee_arabika': {
+            'placeholder': 'Расход арабики в кг за день'
+        },
+        'consumption_coffee_blend': {
+            'placeholder': 'Расход купажа в кг за день'
+        },
+        'consumption_milk': {
+            'placeholder': 'Расход молока в л за день'
+        },
+        'consumption_panini': {
+            'placeholder': 'Расход панини за день'
+        },
+        'consumption_hot_dogs': {
+            'placeholder': 'Расход хот-догов (комплект булка-сосиска) за день'
+        },
+        'coffee_arabika': {
+            'placeholder': 'Количество арабики в кг, остаток на следующий день'
+        },
+        'coffee_blend': {
+            'placeholder': 'Количество купажа в кг, остаток на следующий день'
+        },
+        'milk': {
+            'placeholder': 'Количество молока в л, остаток на следующий день'
+        },
+        'panini': {
+            'placeholder': 'Количество панини, остаток на следующий день'
+        },
+        'hot_dogs': {
+            'placeholder': 'Количество хот-догов (комплект булка-сосиска), остаток на следующий день'
+        }
+    }
+
     def sum_page(self, attr: str) -> int:
         _query = self.get_model_data()
         return sum([p.__dict__[attr] for p in _query])
 
     def sum_total(self, attr: str) -> int:
-        return self.session.query(func.sum(Report.__dict__[attr])).scalar()
+        _query = self.session.query(func.sum(Report.__dict__[attr])).scalar()
+        if not _query:
+            return 0
+        return _query
 
     def median_page(self, attr: str) -> int:
         _query = self.get_model_data()
@@ -436,11 +618,12 @@ class ReportAdmin(ModelView):
         
     def median_total(self, attr: str) -> int:
         _query = self.session.query(func.avg(Report.__dict__[attr])).scalar()
-        return round(_query)
+        if not _query:
+            return 0
+        return _query
 
     def render(self, template, **kwargs):
-        # we are only interested in the list page
-        if template == 'admin/model/custom_list.html':
+        if template == 'admin/model/report_list.html':
             # append a summary_data dictionary into kwargs
             _current_page = kwargs['page']
             kwargs['column_labels'] = self.column_labels
@@ -463,13 +646,56 @@ class ReportAdmin(ModelView):
             kwargs['median_data'] = {
                 'on_page': {
                     'cashbox': self.median_page('cashbox'),
+                    'cash_balance': self.median_page('cash_balance'),
+                    'remainder_of_day': self.median_page('remainder_of_day'),
+                    'cashless': self.median_page('cashless'),
+                    'actual_balance': self.median_page('actual_balance'),
                 },
                 'total': {
                     'cashbox': self.median_total('cashbox'),
+                    'cash_balance': self.median_total('cash_balance'),
+                    'remainder_of_day': self.median_total('remainder_of_day'),
+                    'cashless': self.median_total('cashless'),
+                    'actual_balance': self.median_total('actual_balance'),
                 }
             }
 
         return super(ReportAdmin, self).render(template, **kwargs)
+
+    def on_model_change(self, form, model, is_created):
+        if is_created:
+            expanses = sum([e.money for e in model.expenses if e.type_cost == 'cash'])
+            cash_balance = form.actual_balance.data - model.shop.cash
+            model.shop.cash += cash_balance
+            model.shop.cashless += model.cashless
+            model.cash_balance = cash_balance
+            model.remainder_of_day = model.cashless + form.actual_balance.data
+            model.cashbox = model.remainder_of_day + expanses
+            # TODO replace storage from list to one
+            print(model.shop.storage[0].coffee_arabika)
+
+            model.consumption_coffee_arabika = model.shop.storage[0].coffee_arabika - float(form.coffee_arabika.data)
+            model.consumption_coffee_blend = model.shop.storage[0].coffee_blend - float(form.coffee_blend.data)
+            model.consumption_milk = model.shop.storage[0].milk - float(form.milk.data)
+            model.consumption_panini = model.shop.storage[0].panini - model.panini
+            model.consumption_hot_dogs = model.shop.storage[0].hot_dogs - model.hot_dogs
+            model.shop.storage[0].coffee_arabika -= model.consumption_coffee_arabika
+            model.shop.storage[0].coffee_blend -= model.consumption_coffee_blend
+            model.shop.storage[0].milk -= model.consumption_milk
+            model.shop.storage[0].panini -= model.consumption_panini
+            model.shop.storage[0].hot_dogs -= model.consumption_hot_dogs
+        else:
+            # TODO update model ReportAdmin
+            pass
+
+    def on_model_delete(self, model):
+        model.shop.cash -= model.cash_balance
+        model.shop.cashless -= model.cashless
+        model.shop.storage[0].coffee_arabika += model.consumption_coffee_arabika
+        model.shop.storage[0].coffee_blend += model.consumption_coffee_blend
+        model.shop.storage[0].milk += model.consumption_milk
+        model.shop.storage[0].panini += model.consumption_panini
+        model.shop.storage[0].hot_dogs += model.consumption_hot_dogs
 
 
 class RoleAdmin(ModelView):
@@ -498,11 +724,32 @@ class RoleAdmin(ModelView):
 
 
 class ExpenseAdmin(ModelView):
+    def _list_money(view, context, model, name):
+        if not model.money:
+            return ''
+        type_cost = '' if model.type_cost == 'cash' else ' (Безнал)'
+        formatter = f'{model.money} грн.{type_cost}'
+        return Markup(f'{formatter}')
+
+    list_template = 'admin/model/expense_list.html'
     can_set_page_size = True
-    column_list = ('timestamp', 'money', 'type_cost', 'is_global', 'categories', 'shop')
-    form_create_rules = ('timestamp',
-                         'type_cost', 'money', 'is_global', 'categories', 'shop')
-    form_edit_rules = ('timestamp', 'type_cost', 'money', 'is_global', 'categories', 'shop')
+    column_list = ('timestamp', 'money', 'is_global', 'categories', 'shop')
+    form_create_rules = (
+        'timestamp',
+        'is_global',
+        'type_cost',
+        'money',
+        'categories',
+        'shop'
+    )
+    form_edit_rules = (
+        'timestamp',
+        'is_global',
+        'type_cost',
+        'money',
+        'categories',
+        'shop'
+    )
     column_filters = ('timestamp', 'is_global', 'type_cost', 'categories', 'shop')
     column_searchable_list = ('timestamp',)
     column_labels = dict(
@@ -518,11 +765,18 @@ class ExpenseAdmin(ModelView):
     column_formatters = dict(
         timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"),
         type_cost=lambda v, c, m, p: 'Наличка' if m.type_cost == 'cash' else 'Безнал',
-        is_global=lambda v, c, m, p: 'Да' if m.is_global else 'Нет'
+        is_global=lambda v, c, m, p: 'Да' if m.is_global else 'Нет',
+        money=_list_money
     )
     form_extra_fields = {
-        'type_cost': RadioField('Тип траты', choices=[('cash', 'Наличка'), ('cashless', 'Безнал')],
-                                validators=[Required()], default='cash')
+        'type_cost': RadioField(
+            'Тип траты',
+            choices=[
+                ('cash', 'Наличка'),
+                ('cashless', 'Безнал')
+            ],
+            validators=[Required()], default='cash'
+        )
     }
     form_widget_args = {
         'money': {
@@ -559,22 +813,97 @@ class ExpenseAdmin(ModelView):
                 )
             ]
         ),
-        categories=dict(
+        shop=dict(
             validators=[
                 DataRequired(
-                    message="Добавьте минимум одну категорию"
+                    message="Выберите кофейню"
                 )
             ]
-        ),
-        shop=dict(
-            validators=[DataRequired(message="Выберите кофейню")]
         )
     )
 
+    def sum_page(self, attr: str) -> int:
+        _query = self.get_model_data()
+        return sum([p.__dict__[attr] for p in _query])
+
+    def sum_total(self, attr: str) -> int:
+        return self.session.query(func.sum(ExpenseAdmin.__dict__[attr])).scalar()
+
+    def median_page(self, attr: str) -> int:
+        _query = self.get_model_data()
+        data = [p.__dict__[attr] for p in _query]
+        if len(data) > 1:
+            return median(data)
+        return 0
+
+    def median_total(self, attr: str) -> int:
+        _query = self.session.query(func.avg(ExpenseAdmin.__dict__[attr])).scalar()
+        return round(_query)
+
+    def render(self, template, **kwargs):
+        if template == 'admin/model/expense_list.html':
+            # append a summary_data dictionary into kwargs
+            _current_page = kwargs['page']
+            kwargs['column_labels'] = self.column_labels
+            kwargs['summary_data'] = {
+                'on_page': {
+                    'money': self.sum_page('money')
+                },
+                # TODO fix bug, key error 'money'
+                'total': {
+                    'money': 0
+                }
+            }
+            kwargs['median_data'] = {
+                'money': {
+                    'money': self.median_page('money')
+                },
+                # TODO fix bug, key error 'money'
+                'total': {
+                    'money': 0
+                }
+            }
+
+        return super(ExpenseAdmin, self).render(template, **kwargs)
+
+    def on_model_change(self, form, model, is_created):
+        if is_created:
+            if form.type_cost.data == 'cash':
+                model.shop.cash -= form.money.data
+            else:
+                model.shop.cashless -= form.money.data
+        else:
+            # TODO update model ExpenseAdmin
+            pass
+
+    def on_model_delete(self, model):
+        if model.type_cost == 'cash':
+            model.shop.cash += model.money
+        else:
+            model.shop.cashless += model.money
+
 
 class SupplyAdmin(ModelView):
+    def _list_amount(view, context, model, name):
+        if not model.amount:
+            return ''
+        if model.product_name == 'milk':
+            formatter = f'{model.amount} л'
+        elif model.product_name == 'coffee_arabika' or model.product_name == 'coffee_blend':
+            formatter = f'{model.amount} кг'
+        else:
+            formatter = f'{model.amount} шт.'
+        return Markup(f'{formatter}')
+
+    def _list_money(view, context, model, name):
+        if not model.money:
+            return ''
+        type_cost = '' if model.type_cost == 'cash' else ' (Безнал)'
+        formatter = f'{model.money} грн.{type_cost}'
+        return Markup(f'{formatter}')
+
     can_set_page_size = True
-    column_list = ('timestamp', 'product_name', 'amount', 'type_cost', 'money', 'storage')
+    column_list = ('timestamp', 'product_name', 'amount', 'money', 'storage')
     column_labels = dict(
         timestamp='Дата',
         product_name='Название товара',
@@ -589,29 +918,12 @@ class SupplyAdmin(ModelView):
     form_edit_rules = ('timestamp', 'product_name', 'amount', 'type_cost', 'money', 'storage')
     column_formatters = dict(
         timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"),
-        type_cost=lambda v, c, m, p: 'Наличка' if m.type_cost == 'cash' else 'Безнал'
+        type_cost=lambda v, c, m, p: 'Наличка' if m.type_cost == 'cash' else 'Безнал',
+        money=_list_money,
+        amount=_list_amount
     )
-    form_extra_fields = {
-        'type_cost':  RadioField(
-            'Тип траты',
-            choices=[('cash', 'Наличка'), ('cashless', 'Безнал')],
-            validators=[Required()],
-            default='cash'
-        )
-    }
-    form_widget_args = {
-        'money': {
-            'placeholder': 'В гривнях'
-        },
-        'type_cost': {
-            'class': 'form-check'
-        }
-    }
     form_args = dict(
         timestamp=dict(
-            validators=[DataRequired()]
-        ),
-        product_name=dict(
             validators=[DataRequired()]
         ),
         amount=dict(
@@ -633,14 +945,107 @@ class SupplyAdmin(ModelView):
             ]
         ),
         storage=dict(
-            validators=[DataRequired(message="Выберите склад")]
+            validators=[
+                DataRequired(
+                    message="Выберите склад"
+                )
+            ]
         )
     )
+    form_extra_fields = dict(
+        type_cost=RadioField(
+            'Тип траты',
+            choices=[
+                ('cash', 'Наличка'),
+                ('cashless', 'Безнал')
+            ],
+            validators=[Required()],
+            default='cash'
+        ),
+        product_name=SelectField(
+            'Название товара',
+            choices=[
+                ('coffee_arabika', 'Арабика'),
+                ('coffee_blend', 'Купаж'),
+                ('milk', 'Молоко'),
+                ('panini', 'Панини'),
+                ('hot_dogs', 'Хот-доги')
+            ],
+            validators=[Required()],
+        )
+    )
+    form_widget_args = {
+        'money': {
+            'placeholder': 'В гривнях'
+        },
+        'type_cost': {
+            'class': 'form-check'
+        },
+        'amount': {
+            'placeholder': 'Количество в кг, л, и поштучно'
+        }
+    }
+
+    def on_model_change(self, form, model, is_created):
+        if is_created:
+            if form.product_name.data == 'coffee_blend':
+                model.storage.coffee_blend += float(form.amount.data)
+            elif form.product_name.data == 'coffee_arabika':
+                model.storage.coffee_arabika += float(form.amount.data)
+            elif form.product_name.data == 'milk':
+                model.storage.milk += float(form.amount.data)
+            elif form.product_name.data == 'panini':
+                model.storage.panini += int(form.amount.data)
+            else:
+                model.storage.hot_dogs += int(form.amount.data)
+
+            if form.type_cost.data == 'cash':
+                model.storage.shop.cash -= form.money.data
+            else:
+                model.storage.shop.cashless -= form.money.data
+        else:
+            # TODO update model SupplyAdmin
+            pass
+
+    def on_model_delete(self, model):
+        if model.product_name == 'coffee_blend':
+            model.storage.coffee_blend -= model.amount
+        elif model.product_name == 'coffee_arabika':
+            model.storage.coffee_arabika -= model.amount
+        elif model.product_name == 'milk':
+            model.storage.milk -= model.amount
+        elif model.product_name == 'panini':
+            model.storage.panini -= model.amount
+        else:
+            model.storage.hot_dogs -= model.amount
+
+        if model.type_cost == 'cash':
+            model.storage.shop.cash += model.money
+        else:
+            model.storage.shop.cashless += model.money
 
 
 class ByWeightAdmin(ModelView):
+    def _list_amount(view, context, model, name):
+        if not model.amount:
+            return ''
+        if model.product_name == 'milk':
+            r = f'{model.amount} л'
+        elif model.product_name == 'coffee_arabika' or model.product_name == 'coffee_blend':
+            r = f'{model.amount} кг'
+        else:
+            r = f'{model.amount} шт.'
+        return Markup(f'{r}')
+
+    def _list_money(view, context, model, name):
+        if not model.money:
+            return ''
+        type_cost = '' if model.type_cost == 'cash' else ' (Безнал)'
+        formatter = f'{model.money} грн.{type_cost}'
+        return Markup(f'{formatter}')
+
     can_set_page_size = True
-    column_list = ('timestamp', 'product_name', 'amount', 'type_cost', 'money', 'storage')
+    column_list = ('timestamp', 'product_name', 'amount', 'money', 'storage')
     column_labels = dict(
         timestamp='Дата',
         product_name='Название товара',
@@ -649,34 +1054,17 @@ class ByWeightAdmin(ModelView):
         money='Сумма',
         storage='Склад'
     )
-    column_filters = ('timestamp', 'product_name')
+    column_filters = ('timestamp', 'product_name', 'type_cost')
     column_formatters = dict(
         timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"),
-        type_cost=lambda v, c, m, p: 'Наличка' if m.type_cost == 'cash' else 'Безнал'
+        type_cost=lambda v, c, m, p: 'Наличка' if m.type_cost == 'cash' else 'Безнал',
+        money=_list_money,
+        amount=_list_amount
     )
     form_create_rules = ('timestamp', 'product_name', 'amount', 'type_cost', 'money', 'storage')
     form_edit_rules = ('timestamp', 'product_name', 'amount', 'type_cost', 'money', 'storage')
-    form_extra_fields = {
-        'type_cost':  RadioField(
-            'Тип траты',
-            choices=[('cash', 'Наличка'), ('cashless', 'Безнал')],
-            validators=[Required()],
-            default='cash'
-        )
-    }
-    form_widget_args = {
-        'money': {
-            'placeholder': 'В гривнях'
-        },
-        'type_cost': {
-            'class': 'form-check'
-        }
-    }
     form_args = dict(
         timestamp=dict(
-            validators=[DataRequired()]
-        ),
-        product_name=dict(
             validators=[DataRequired()]
         ),
         amount=dict(
@@ -701,10 +1089,81 @@ class ByWeightAdmin(ModelView):
             validators=[DataRequired(message="Выберите склад")]
         )
     )
+    form_extra_fields = dict(
+        type_cost=RadioField(
+            'Тип траты',
+            choices=[
+                ('cash', 'Наличка'),
+                ('cashless', 'Безнал')
+            ],
+            validators=[Required()],
+            default='cash'
+        ),
+        product_name=SelectField(
+            'Название товара',
+            choices=[
+                ('coffee_arabika', 'Арабика'),
+                ('coffee_blend', 'Купаж'),
+                ('milk', 'Молоко'),
+                ('panini', 'Панини'),
+                ('hot_dogs', 'Хот-доги')
+            ],
+            validators=[Required()],
+        )
+    )
+    form_widget_args = {
+        'money': {
+            'placeholder': 'В гривнях'
+        },
+        'type_cost': {
+            'class': 'form-check'
+        },
+        'amount': {
+            'placeholder': 'Количество в кг, л, и поштучно'
+        }
+    }
+
+    def on_model_change(self, form, model, is_created):
+        if is_created:
+            if form.product_name.data == 'coffee_blend':
+                model.storage.coffee_blend -= float(form.amount.data)
+            else:
+                model.storage.coffee_arabika -= float(form.amount.data)
+
+            if form.type_cost.data == 'cash':
+                model.storage.shop.cash += form.money.data
+            else:
+                model.storage.shop.cashless += form.money.data
+        else:
+            # TODO update model ByWeightAdmin
+            pass
+
+    def on_model_delete(self, model):
+        if model.product_name == 'coffee_blend':
+            model.storage.coffee_blend += float(model.amount)
+        else:
+            model.storage.coffee_arabika += float(model.amount)
+
+        if model.type_cost == 'cash':
+            model.storage.shop.cash -= model.money
+        else:
+            model.storage.shop.cashless -= model.money
 
 
 class WriteOffAdmin(ModelView):
+    def _list_amount(view, context, model, name):
+        if not model.amount:
+            return ''
+        if model.product_name == 'milk':
+            formatter = f'{model.amount} л'
+        elif model.product_name == 'coffee_arabika' or model.product_name == 'coffee_blend':
+            formatter = f'{model.amount} кг'
+        else:
+            formatter = f'{model.amount} шт.'
+        return Markup(f'{formatter}')
+
     can_set_page_size = True
+    column_list = ('timestamp', 'product_name', 'amount', 'storage')
     column_labels = dict(
         timestamp='Дата',
         product_name='Название товара',
@@ -712,12 +1171,14 @@ class WriteOffAdmin(ModelView):
         storage='Склад'
     )
     column_filters = ('timestamp', 'product_name')
-    column_formatters = dict(timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"))
+    column_formatters = dict(
+        timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"),
+        amount=_list_amount
+    )
+    form_create_rules = ('timestamp', 'product_name', 'amount', 'storage')
+    form_edit_rules = ('timestamp', 'product_name', 'amount', 'storage')
     form_args = dict(
         timestamp=dict(
-            validators=[DataRequired()]
-        ),
-        product_name=dict(
             validators=[DataRequired()]
         ),
         amount=dict(
@@ -733,6 +1194,52 @@ class WriteOffAdmin(ModelView):
             validators=[DataRequired(message="Выберите склад")]
         )
     )
+    form_extra_fields = dict(
+        product_name=SelectField(
+            'Название товара',
+            choices=[
+                ('coffee_arabika', 'Арабика'),
+                ('coffee_blend', 'Купаж'),
+                ('milk', 'Молоко'),
+                ('panini', 'Панини'),
+                ('hot_dogs', 'Хот-доги')
+            ],
+            validators=[Required()],
+        )
+    )
+    form_widget_args = {
+        'amount': {
+            'placeholder': 'Количество в кг, л, и поштучно'
+        }
+    }
+
+    def on_model_change(self, form, model, is_created):
+        if is_created:
+            if form.product_name.data == 'coffee_blend':
+                model.storage.coffee_blend -= float(form.amount.data)
+            elif form.product_name.data == 'coffee_arabika':
+                model.storage.coffee_arabika -= float(form.amount.data)
+            elif form.product_name.data == 'milk':
+                model.storage.milk -= float(form.amount.data)
+            elif form.product_name.data == 'panini':
+                model.storage.panini -= int(form.amount.data)
+            else:
+                model.storage.hot_dogs -= int(form.amount.data)
+        else:
+            # TODO update model WriteOffAdmin
+            pass
+
+    def on_model_delete(self, model):
+        if model.product_name == 'coffee_blend':
+            model.storage.coffee_blend += model.amount
+        elif model.product_name == 'coffee_arabika':
+            model.storage.coffee_arabika += model.amount
+        elif model.product_name == 'milk':
+            model.storage.milk += model.amount
+        elif model.product_name == 'panini':
+            model.storage.panini += model.amount
+        else:
+            model.storage.hot_dogs += model.amount
 
 
 class CategoryAdmin(ModelView):
@@ -748,4 +1255,9 @@ class CategoryAdmin(ModelView):
         )
     )
     column_editable_list = ('name', )
+    form_widget_args = {
+        'name': {
+            'placeholder': 'Название для расходов'
+        }
+    }
     

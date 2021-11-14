@@ -7,13 +7,13 @@ from app.models import Barista
 
 
 @app.route('/')
-@app.route('/index', methods=["POST", "GET"])
+@app.route('/index', methods=("POST", "GET"))
 @login_required
 def home():
     return render_template('index.html')
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login', methods=('GET', 'POST'))
 def login():
     form = LoginForm()
     app.logger.info(form.validate_on_submit())
@@ -27,7 +27,7 @@ def login():
     return render_template('auth/login.html', title='Sign In', form=form)
 
 
-@app.route('/new_staff', methods=['GET', 'POST'])
+@app.route('/new_staff', methods=('GET', 'POST'))
 @login_required
 def create_new_staff():
     form = RegistrationForm()

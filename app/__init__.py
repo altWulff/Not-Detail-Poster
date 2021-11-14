@@ -6,6 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_admin import Admin
+from flask_admin.menu import MenuLink
 from flask_moment import Moment
 from flask_security import Security, SQLAlchemyUserDatastore
 from flask_debugtoolbar import DebugToolbarExtension
@@ -29,6 +30,7 @@ from app.routes.menu import menu
 from app.routes.report import report
 from app.routes.errors import errors
 from app.admin_view import (
+    IndexAdmin,
     ModelView,
     ShopAdmin,
     ShopEquipmentAdmin,
@@ -58,6 +60,8 @@ app.register_blueprint(user)
 app.register_blueprint(menu)
 app.register_blueprint(report)
 
+
+# admin.add_view(IndexAdmin(name='Index', endpoint='/'))
 admin.add_view(ShopAdmin(models.Shop, db.session, name='Все кофейни', category="Кофейни"))
 admin.add_view(ShopEquipmentAdmin(models.ShopEquipment, db.session, name='Оборудование', category="Кофейни"))
 admin.add_view(StorageAdmin(models.Storage, db.session, name='Все товары', category="Склады"))
@@ -69,6 +73,9 @@ admin.add_view(ExpenseAdmin(models.Expense, db.session, name='Расходы', c
 admin.add_view(BaristaAdmin(models.Barista, db.session, name='Сотрудники'))
 admin.add_view(CategoryAdmin(models.Category, db.session, name='Категории', category='Разное'))
 admin.add_view(RoleAdmin(models.Role, db.session, name='Доступ', category='Разное'))
+
+# admin.add_sub_category(name="Links", parent_name="Движения товаров")
+# admin.add_link(MenuLink(name='Home Page', url='/', category='Links'))
 
 
 if not app.debug:

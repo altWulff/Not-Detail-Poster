@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import func
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -8,6 +8,7 @@ from app import db, login
 
 
 date_today = datetime(datetime.today().year, datetime.today().month, datetime.today().day)
+
 
 @login.user_loader
 def load_user(user_id):
@@ -27,7 +28,9 @@ class Shop(db.Model):
     address = db.Column(db.String(64), index=True, unique=True)
     cash = db.Column(db.Integer)
     cashless = db.Column(db.Integer)
+    # TODO storage one to one
     storage = db.relationship('Storage', backref='shop', lazy=True)
+    # TODO shop equipments one to one
     shop_equipments = db.relationship('ShopEquipment', backref='shop', lazy=True)
     reports = db.relationship('Report', backref='shop', lazy=True)
     baristas = db.relationship('Barista', secondary=baristas, lazy='subquery',
@@ -102,7 +105,6 @@ class Barista(db.Model, UserMixin):
     active = db.Column(db.Boolean())
     confirmed_at = db.Column(db.DateTime())
     roles = db.relationship('Role', secondary=roles, backref=db.backref('barista', lazy='dynamic'))
-
 
     def __repr__(self):
         return f'<Barista: {self.name}>'
@@ -221,12 +223,11 @@ class Expense(db.Model):
     
     @classmethod
     def get_local(cls, shop_id, today=False):
-        _query =cls.query.filter_by(shop_id=shop_id).filter(cls.is_global==False)
+        _query = cls.query.filter_by(shop_id=shop_id).filter(cls.is_global is False)
         if today:
             _query = _query.filter(cls.timestamp >= date_today)
         return _query
     
-
 
 class Supply(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -239,13 +240,13 @@ class Supply(db.Model):
     
     @classmethod
     def get_local(cls, storage_id):
-        _query =cls.query.filter_by(storage_id=storage_id).filter(cls.timestamp >= date_today)
+        _query = cls.query.filter_by(storage_id=storage_id).filter(cls.timestamp >= date_today)
         return _query
         
     @classmethod
     def get_local_by_shop(cls, shop_id):
         storage = Storage.query.filter_by(shop_id=shop_id).first_or_404()
-        _query =cls.query.filter_by(storage_id=storage.id).filter(cls.timestamp >= date_today)
+        _query = cls.query.filter_by(storage_id=storage.id).filter(cls.timestamp >= date_today)
         return _query
 
 
@@ -266,20 +267,19 @@ class WriteOff(db.Model):
     amount = db.Column(db.Float(50))
     product_name = db.Column(db.String(80))
 
-
     @classmethod
     def get_local_by_shop(cls, shop_id):
         storage = Storage.query.filter_by(shop_id=shop_id).first_or_404()
-        _query =cls.query.filter_by(storage_id=storage.id).filter(cls.timestamp >= date_today)
+        _query = cls.query.filter_by(storage_id=storage.id).filter(cls.timestamp >= date_today)
         return _query
 
-#Товар:
-    #ид
-    #наименование
-    #количество
-    #единица измерения (кг, л, шт в форме)
-    #описание (необязательно)
-    #в продаже(дефолт=Нет)
-    #отношение к складу
+# Товар:
+    # ид
+    # наименование
+    # количество
+    # единица измерения (кг, л, шт в форме)
+    # описание (необязательно)
+    # в продаже(дефолт=Нет)
+    # отношение к складу
 
     

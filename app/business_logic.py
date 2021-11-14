@@ -13,6 +13,7 @@ def transaction_count(shop_id: int) -> int:
     reports_today = reports.filter(func.date(Report.timestamp) == date.today()).all()
     return len(reports_today)
 
+
 def is_report_send(shop_id: int) -> bool:
     return transaction_count(shop_id) >= app.config['REPORTS_PER_DAY']
 
@@ -62,7 +63,7 @@ class TransactionHandler:
             type_cost=form.type_cost.data,
             money=form.money.data,
             is_global=form.is_global.data,
-            timestamp = datetime.now()
+            timestamp=datetime.now()
         )
         self.funds_expenditure(form.money.data, form.type_cost.data)
         for c_id in form.categories.data:
@@ -73,27 +74,27 @@ class TransactionHandler:
     
     def crete_by_weight(self, form):
         self.validate_report_limit()
-        if form.by_weight_choice.data == 'blend':
+        if form.by_weight_choice.data == 'coffee_blend':
             self.storage.coffee_blend -= form.amount.data
         else:
             self.storage.coffee_arabika -= form.amount.data
 
-        self.funds_expenditure(form.money.data, form.type_cost.data)
+        self.cash_flow(form.money.data, form.type_cost.data)
         by_weight = ByWeight(
             storage=self.storage,
             amount=form.amount.data,
             product_name=form.by_weight_choice.data,
             type_cost=form.cash_type.data, 
             money=form.money.data,
-            timestamp = datetime.now()
+            timestamp=datetime.now()
         )
         self.write_to_db(by_weight)
         
     def create_write_off(self, form):
         self.validate_report_limit()
-        if form.write_off_choice.data == 'blend':
+        if form.write_off_choice.data == 'coffee_blend':
             self.storage.coffee_blend -= form.amount.data
-        elif form.write_off_choice.data == 'arabica':
+        elif form.write_off_choice.data == 'coffee_arabika':
             self.storage.coffee_arabika -= form.amount.data
         elif form.write_off_choice.data == 'milk':
             self.storage.milk -= form.amount.data
@@ -105,15 +106,15 @@ class TransactionHandler:
             storage=self.storage, 
             amount=form.amount.data, 
             product_name=form.write_off_choice.data,
-            timestamp = datetime.now()
+            timestamp=datetime.now()
         )
         self.write_to_db(write_off)
     
     def create_supply(self, form):
         self.validate_report_limit()
-        if form.supply_choice.data == 'blend':
+        if form.supply_choice.data == 'coffee_blend':
             self.storage.coffee_blend += form.amount.data
-        elif form.supply_choice.data == 'arabica':
+        elif form.supply_choice.data == 'coffee_arabika':
             self.storage.coffee_arabika += form.amount.data
         elif form.supply_choice.data == 'milk':
             self.storage.milk += form.amount.data
@@ -129,7 +130,7 @@ class TransactionHandler:
             amount=form.amount.data,
             type_cost=form.cash_type.data,
             money=form.money.data,
-            timestamp = datetime.now()
+            timestamp=datetime.now()
         )
         self.write_to_db(supply)
         
@@ -140,8 +141,9 @@ class TransactionHandler:
         cash_balance = form.actual_balance.data - self.shop.cash
         self.cash_flow(cash_balance, 'cash')
         self.cash_flow(form.cashless.data, 'cashless')
-        remainder_of_day = form.cashless.data + cash_balance
+        remainder_of_day = form.cashless.data + form.actual_balance.data
         report = Report(
+            cashbox=remainder_of_day + expanses,
             cash_balance=cash_balance,
             cashless=form.cashless.data,
             actual_balance=form.actual_balance.data,
@@ -149,16 +151,14 @@ class TransactionHandler:
             barista=current_user,
             shop=self.shop,
             timestamp=datetime.now(),
-            coffee_arabika=form.arabica.data,
-            coffee_blend=form.blend.data,
+            coffee_arabika=form.coffee_arabika.data,
+            coffee_blend=form.coffee_blend.data,
             milk=form.milk.data,
             panini=form.panini.data,
             hot_dogs=form.hot_dogs.data
         )
-        report.cashbox = remainder_of_day + expanses
- 
-        report.consumption_coffee_arabika = self.storage.coffee_arabika - form.arabica.data
-        report.consumption_coffee_blend = self.storage.coffee_blend - form.blend.data
+        report.consumption_coffee_arabika = self.storage.coffee_arabika - form.coffee_arabika.data
+        report.consumption_coffee_blend = self.storage.coffee_blend - form.coffee_blend.data
         report.consumption_milk = self.storage.milk - form.milk.data
         report.consumption_panini = self.storage.panini - form.panini.data
         report.consumption_hot_dogs = self.storage.hot_dogs - form.hot_dogs.data
@@ -169,4 +169,3 @@ class TransactionHandler:
         self.storage.panini -= report.consumption_panini
         self.storage.hot_dogs -= report.consumption_hot_dogs
         self.write_to_db(report) 
-

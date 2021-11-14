@@ -1,8 +1,17 @@
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, \
-    SelectField, FormField, FieldList, DecimalField, RadioField, SelectMultipleField
-from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, NumberRange, Required, InputRequired
 from flask_security import current_user
+from flask_wtf import FlaskForm
+from wtforms import (
+    StringField,
+    PasswordField,
+    BooleanField,
+    SubmitField,
+    IntegerField,
+    SelectField,
+    DecimalField,
+    RadioField,
+    SelectMultipleField
+)
+from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, NumberRange, Required, InputRequired
 from app.models import Barista, Shop, Category
 
 
@@ -30,29 +39,34 @@ class LoginForm(FlaskForm):
 
 class RegistrationForm(FlaskForm):
     name = StringField('Имя', validators=[DataRequired()])
-    phone_number = IntegerField('Телефон', validators=[DataRequired()])
+    phone_number = IntegerField('Тел.', validators=[DataRequired()])
     email = StringField('Емейл', validators=[DataRequired(), Email()])
     password = PasswordField('Пароль', validators=[DataRequired()])
     password2 = PasswordField(
-        'Повтор пароля', validators=[DataRequired(), EqualTo('password')])
+        'Повтор пароля',
+        validators=[
+            DataRequired(),
+            EqualTo('password')
+        ]
+    )
     submit = SubmitField('Добавить')
 
-    def validate_username(self, name):
+    def validate_name(self, name):
         user = Barista.query.filter_by(name=name.data).first()
         if user is not None:
-            raise ValidationError('Please use a different name.')
+            raise ValidationError('Пожалуйста ипользуйте другое имя.')
 
     def validate_email(self, email):
         user = Barista.query.filter_by(email=email.data).first()
         if user is not None:
-            raise ValidationError('Please use a different email address.')
+            raise ValidationError('Пожалуйста ипользуйте другой емейл адрес.')
 
 
 class EditProfileForm(FlaskForm):
-    name = StringField('Name', validators=[DataRequired()])
-    phone_number = IntegerField('Phone Number', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    submit = SubmitField('Submit')
+    name = StringField('Имя', validators=[DataRequired()])
+    phone_number = IntegerField('Тел.', validators=[DataRequired()])
+    email = StringField('Емейл', validators=[DataRequired(), Email()])
+    submit = SubmitField('Сохранить')
 
 
 class ExpanseForm(FlaskForm):
@@ -74,7 +88,6 @@ class ExpanseForm(FlaskForm):
     is_global = BooleanField('Глобальный?', default=False)
     coffee_shop = SelectField('Кофейня', validators=[DataRequired(message="Выберите кофейню")])
     categories = NonValidatingSelectMultipleField('Категории')
-
     submit = SubmitField('Отправить') 
     
     def __init__(self, *args, **kwargs):
@@ -88,8 +101,15 @@ class ExpanseForm(FlaskForm):
 
 class ByWeightForm(FlaskForm):
     coffee_shop = SelectField('Кофейня')
-    by_weight_choice = SelectField('Выбор товара', choices=[
-        ('blend', 'Бленд'), ('arabica', 'Арабика')], validators=[Required()], default='blend')
+    by_weight_choice = SelectField(
+        'Выбор товара',
+        default='coffee_blend',
+        validators=[Required()],
+        choices=[
+            ('coffee_blend', 'Бленд'),
+            ('coffee_arabika', 'Арабика')
+        ]
+    )
     amount = MyFloatField(
         'Количество',
         default=0.0,
@@ -102,15 +122,24 @@ class ByWeightForm(FlaskForm):
         ]
     )
     money = IntegerField(
-        'Сумма', validators=[
+        'Сумма',
+        validators=[
             InputRequired(),
             NumberRange(
                 min=0,
                 message='Сумма не может быть нулевой, либо ниже нуля'
             )
-        ])
-    cash_type = RadioField('Тип денег', choices=[('cash', 'Наличка'), ('cashless', 'Безнал')],
-                           validators=[Required()], default='cash')
+        ]
+    )
+    cash_type = RadioField(
+        'Тип денег',
+        default='cash',
+        validators=[Required()],
+        choices=[
+            ('cash', 'Наличка'),
+            ('cashless', 'Безнал')
+        ]
+    )
     submit = SubmitField('Отправить')
     
     def __init__(self, *args, **kwargs):
@@ -123,9 +152,18 @@ class ByWeightForm(FlaskForm):
 
 class WriteOffForm(FlaskForm):
     coffee_shop = SelectField('Coffee Shop')
-    write_off_choice = SelectField('Выбор товара', choices=[
-        ('blend', 'Бленд'), ('arabica', 'Арабика'), ('milk', 'Молоко'),
-        ('panini', 'Панини'), ('hot_dogs', 'Хот-доги')], validators=[Required()], default='blend')
+    write_off_choice = SelectField(
+        'Выбор товара',
+        default='coffee_blend',
+        validators=[Required()],
+        choices=[
+            ('coffee_blend', 'Бленд'),
+            ('coffee_arabika', 'Арабика'),
+            ('milk', 'Молоко'),
+            ('panini', 'Панини'),
+            ('hot_dogs', 'Хот-доги')
+        ]
+    )
     amount = MyFloatField(
         'Количество',
         default=0.0,
@@ -149,17 +187,36 @@ class WriteOffForm(FlaskForm):
 
 class SupplyForm(FlaskForm):
     coffee_shop = SelectField('Coffee Shop')
-    supply_choice = SelectField('Выбор товара', choices=[
-        ('blend', 'Бленд'), ('arabica', 'Арабика'), ('milk', 'Молоко'),
-        ('panini', 'Панини'), ('hot_dogs', 'Хот-доги')], validators=[Required()], default='blend')
+    supply_choice = SelectField(
+        'Выбор товара',
+        default='coffee_blend',
+        validators=[Required()],
+        choices=[
+            ('coffee_blend', 'Бленд'),
+            ('coffee_arabika', 'Арабика'),
+            ('milk', 'Молоко'),
+            ('panini', 'Панини'), ('hot_dogs', 'Хот-доги')
+        ]
+    )
     amount = MyFloatField('Количество', default=0.0)
     cash_type = RadioField(
         'Тип денег',
-        choices=[('cash', 'Наличка'), ('cashless', 'Безнал')],
+        default='cash',
         validators=[Required()],
-        default='cash'
+        choices=[
+            ('cash', 'Наличка'),
+            ('cashless', 'Безнал')
+        ]
     )
-    money = IntegerField('Сумма', validators=[Required(), NumberRange(min=0, message='Сумма должна быть больше нуля')])
+    money = IntegerField(
+        'Сумма',
+        validators=[
+            Required(),
+            NumberRange(
+                min=0,
+                message='Сумма должна быть больше нуля')
+        ]
+    )
     submit = SubmitField('Отправить')
     
     def __init__(self, *args, **kwargs):
@@ -200,18 +257,18 @@ class ReportForm(FlaskForm):
             )
         ]
     )
-    milk = MyFloatField(
-        'Остаток молока',
+    coffee_arabika = MyFloatField(
+        'Остаток арабики',
         default=0.0,
         validators=[
             InputRequired(),
             NumberRange(
                 min=-0.0001,
-                message='Остаток молока должен быть нулевым, либо больше нуля'
+                message='Остаток арабики должен быть нулевым, либо больше нуля'
             )
         ]
     )
-    blend = MyFloatField(
+    coffee_blend = MyFloatField(
         'Остаток купажа',
         default=0.0,
         validators=[
@@ -222,14 +279,14 @@ class ReportForm(FlaskForm):
             )
         ]
     )
-    arabica = MyFloatField(
-        'Остаток арабики',
+    milk = MyFloatField(
+        'Остаток молока',
         default=0.0,
         validators=[
             InputRequired(),
             NumberRange(
                 min=-0.0001,
-                message='Остаток арабики должен быть нулевым, либо больше нуля'
+                message='Остаток молока должен быть нулевым, либо больше нуля'
             )
         ]
     )
@@ -306,7 +363,7 @@ class CoffeeShopForm(FlaskForm):
             )
         ]
     )
-    blend = MyFloatField(
+    coffee_blend = MyFloatField(
         'Купаж',
         default=0.0,
         validators=[
@@ -317,7 +374,7 @@ class CoffeeShopForm(FlaskForm):
             )
         ]
     )
-    arabica = MyFloatField(
+    coffee_arabika = MyFloatField(
         'Арабика',
         default=0.0,
         validators=[
