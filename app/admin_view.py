@@ -16,20 +16,19 @@ class IndexAdmin(AdminIndexView):
         template = 'admin/index.html'
         _query_exp_cash = Expense.query.filter_by(type_cost='cash').all()
         _query_exp_cashless = Expense.query.filter_by(type_cost='cashless').all()
-        #_query_supply_cash = Supply.query.filter_by(type_cost='cash').all()
-        #_query_supply_cashless = Supply.query.filter_by(type_cost='cashless').all()
+        _query_supply_cash = Supply.query.filter_by(type_cost='cash').all()
+        _query_supply_cashless = Supply.query.filter_by(type_cost='cashless').all()
         _query_shop = Shop.query.all()
-        kwargs = {}
+        kwargs = dict()
         kwargs['shop_cash'] = sum([s.cash for s in _query_shop])
         kwargs['shop_cashless'] = sum([s.cashless for s in _query_shop])
         kwargs['all_shop'] = kwargs['shop_cash'] + kwargs['shop_cashless']
         kwargs['exp_cash'] = sum([e.money for e in _query_exp_cash])
         kwargs['exp_cashless'] = sum([e.money for e in _query_exp_cashless])
-        #kwargs['exp_cash'] += sum([s.money for s in _query_supply_cash])
-        #kwargs['exp_cashless'] += sum([s.money for e in _query_supply_cashless])
+        kwargs['exp_cash'] += sum([s.money for s in _query_supply_cash])
+        kwargs['exp_cashless'] += sum([s.money for s in _query_supply_cashless])
         kwargs['all_exp'] = kwargs['exp_cash'] + kwargs['exp_cashless']
         return self.render(template, **kwargs)
-
 
 
 class ModelView(sqla.ModelView):
@@ -96,13 +95,13 @@ class ShopAdmin(ModelView):
         cash='Наличка',
         cashless='Безнал',
         storage='Склад',
-        shop_equipments='Оборудование',
+        shop_equipment='Оборудование',
         reports='Отчеты',
         expenses='Расходы',
         baristas='Баристы'
     )
-    form_create_rules = ('place_name', 'address', 'cash', 'cashless', 'storage', 'shop_equipments', 'baristas')
-    form_edit_rules = ('place_name', 'address', 'cash', 'cashless', 'storage', 'shop_equipments', 'baristas')
+    form_create_rules = ('place_name', 'address', 'cash', 'cashless', 'storage', 'shop_equipment', 'baristas')
+    form_edit_rules = ('place_name', 'address', 'cash', 'cashless', 'storage', 'shop_equipment', 'baristas')
     form_args = dict(
         place_name=dict(
             validators=[DataRequired()]
@@ -278,11 +277,49 @@ class BaristaAdmin(ModelView):
         roles='Доступ',
         active='Активный',
         confirmed_at='Дата найма',
-        password='Пароль'
+        password='Пароль',
+        expenses='Расходы',
+        supplies='Поступления',
+        by_weights='Развес',
+        write_offs='Списания'
     )
-    form_columns = ('name', 'phone_number', 'email', 'password', 'shop', 'confirmed_at', 'active', 'reports')
-    form_create_rules = ('name', 'phone_number', 'email', 'password', 'shop', 'confirmed_at', 'active')
-    form_edit_rules = ('name', 'phone_number', 'email', 'password', 'shop', 'confirmed_at', 'active', 'reports')
+    form_columns = (
+        'name',
+        'phone_number',
+        'email',
+        'password',
+        'shop',
+        'confirmed_at',
+        'active',
+        'reports',
+        'expenses',
+        'supplies',
+        'by_weights',
+        'write_offs'
+    )
+    form_create_rules = (
+        'name',
+        'phone_number',
+        'email',
+        'password',
+        'shop',
+        'confirmed_at',
+        'active'
+    )
+    form_edit_rules = (
+        'name',
+        'phone_number',
+        'email',
+        'password',
+        'shop',
+        'confirmed_at',
+        'active',
+        'reports',
+        'expenses',
+        'supplies',
+        'by_weights',
+        'write_offs'
+    )
     column_formatters = dict(confirmed_at=lambda v, c, m, p: m.confirmed_at.date().strftime("%d.%m.%Y"))
     form_args = dict(
         name=dict(
@@ -340,6 +377,7 @@ class ReportAdmin(ModelView):
     column_default_sort = ('timestamp', True)
     column_searchable_list = ('timestamp', )
     column_exclude_list = (
+        'last_edit',
         'consumption_coffee_arabika',
         'consumption_coffee_blend',
         'consumption_milk',
@@ -685,19 +723,18 @@ class ReportAdmin(ModelView):
             model.cash_balance = cash_balance
             model.remainder_of_day = model.cashless + form.actual_balance.data
             model.cashbox = model.remainder_of_day + expanses
-            # TODO replace storage from list to one
-            print(model.shop.storage[0].coffee_arabika)
+            print(model.shop.storage.coffee_arabika)
 
-            model.consumption_coffee_arabika = model.shop.storage[0].coffee_arabika - float(form.coffee_arabika.data)
-            model.consumption_coffee_blend = model.shop.storage[0].coffee_blend - float(form.coffee_blend.data)
-            model.consumption_milk = model.shop.storage[0].milk - float(form.milk.data)
-            model.consumption_panini = model.shop.storage[0].panini - model.panini
-            model.consumption_hot_dogs = model.shop.storage[0].hot_dogs - model.hot_dogs
-            model.shop.storage[0].coffee_arabika -= model.consumption_coffee_arabika
-            model.shop.storage[0].coffee_blend -= model.consumption_coffee_blend
-            model.shop.storage[0].milk -= model.consumption_milk
-            model.shop.storage[0].panini -= model.consumption_panini
-            model.shop.storage[0].hot_dogs -= model.consumption_hot_dogs
+            model.consumption_coffee_arabika = model.shop.storage.coffee_arabika - float(form.coffee_arabika.data)
+            model.consumption_coffee_blend = model.shop.storage.coffee_blend - float(form.coffee_blend.data)
+            model.consumption_milk = model.shop.storage.milk - float(form.milk.data)
+            model.consumption_panini = model.shop.storage.panini - model.panini
+            model.consumption_hot_dogs = model.shop.storage.hot_dogs - model.hot_dogs
+            model.shop.storage.coffee_arabika -= model.consumption_coffee_arabika
+            model.shop.storage.coffee_blend -= model.consumption_coffee_blend
+            model.shop.storage.milk -= model.consumption_milk
+            model.shop.storage.panini -= model.consumption_panini
+            model.shop.storage.hot_dogs -= model.consumption_hot_dogs
         else:
             # TODO update model ReportAdmin
             pass
@@ -705,11 +742,11 @@ class ReportAdmin(ModelView):
     def on_model_delete(self, model):
         model.shop.cash -= model.cash_balance
         model.shop.cashless -= model.cashless
-        model.shop.storage[0].coffee_arabika += model.consumption_coffee_arabika
-        model.shop.storage[0].coffee_blend += model.consumption_coffee_blend
-        model.shop.storage[0].milk += model.consumption_milk
-        model.shop.storage[0].panini += model.consumption_panini
-        model.shop.storage[0].hot_dogs += model.consumption_hot_dogs
+        model.shop.storage.coffee_arabika += model.consumption_coffee_arabika
+        model.shop.storage.coffee_blend += model.consumption_coffee_blend
+        model.shop.storage.milk += model.consumption_milk
+        model.shop.storage.panini += model.consumption_panini
+        model.shop.storage.hot_dogs += model.consumption_hot_dogs
 
 
 class RoleAdmin(ModelView):

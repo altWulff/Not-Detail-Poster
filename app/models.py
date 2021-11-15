@@ -23,15 +23,14 @@ baristas = db.Table(
 
 
 class Shop(db.Model):
+    __tablename__ = 'shop'
     id = db.Column(db.Integer, primary_key=True)
     place_name = db.Column(db.String(64), index=True, unique=True)
     address = db.Column(db.String(64), index=True, unique=True)
     cash = db.Column(db.Integer)
     cashless = db.Column(db.Integer)
-    # TODO storage one to one
-    storage = db.relationship('Storage', backref='shop', lazy=True)
-    # TODO shop equipments one to one
-    shop_equipments = db.relationship('ShopEquipment', backref='shop', lazy=True)
+    storage = db.relationship("Storage", back_populates="shop", uselist=False)
+    shop_equipment = db.relationship("ShopEquipment", back_populates="shop", uselist=False)
     reports = db.relationship('Report', backref='shop', lazy=True)
     baristas = db.relationship('Barista', secondary=baristas, lazy='subquery',
                                backref=db.backref('shop', lazy=True))
@@ -53,11 +52,13 @@ class Shop(db.Model):
 
 
 class ShopEquipment(db.Model):
+    __tablename__ = 'shop_equipment'
     id = db.Column(db.Integer, primary_key=True)
+    shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'))
+    shop = db.relationship("Shop", back_populates="shop_equipment")
     coffee_machine = db.Column(db.String(64), index=True)
     grinder_1 = db.Column(db.String(64), index=True)
     grinder_2 = db.Column(db.String(64), index=True)
-    shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'))
 
     def __repr__(self):
         if self.shop_id:
@@ -66,7 +67,10 @@ class ShopEquipment(db.Model):
 
 
 class Storage(db.Model):
+    __tablename__ = 'storage'
     id = db.Column(db.Integer, primary_key=True)
+    shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'))
+    shop = db.relationship("Shop", back_populates="storage")
     coffee_arabika = db.Column(db.Float(50))
     coffee_blend = db.Column(db.Float(50))
     milk = db.Column(db.Float(50))
@@ -75,7 +79,6 @@ class Storage(db.Model):
     supplies = db.relationship('Supply', backref='storage', lazy=True)
     by_weights = db.relationship('ByWeight', backref='storage', lazy=True)
     write_offs = db.relationship('WriteOff', backref='storage', lazy=True)
-    shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'))
 
     def __repr__(self):
         if self.shop_id:
@@ -97,13 +100,16 @@ roles = db.Table(
 
 
 class Barista(db.Model, UserMixin):
+    __tablename__ = 'barista'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), index=True, unique=True)
     phone_number = db.Column(db.String(120), unique=True)
-    # TODO удалить поле salary_rate
-    salary_rate = db.Column(db.Integer)
     shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'))
     reports = db.relationship('Report', backref='barista', lazy=True)
+    expenses = db.relationship('Expense', backref='barista', lazy=True)
+    supplies = db.relationship('Supply', backref='barista', lazy=True)
+    by_weights = db.relationship('ByWeight', backref='barista', lazy=True)
+    write_offs = db.relationship('WriteOff', backref='barista', lazy=True)
     password_hash = db.Column(db.String(255))
     email = db.Column(db.String(255), unique=True)
     active = db.Column(db.Boolean())
@@ -131,16 +137,18 @@ class Barista(db.Model, UserMixin):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
     @hybrid_property 
     def has_administrative_rights(self):
         return self.has_role('admin')
     
     @hybrid_property 
-    def has_modarator_rights(self):
+    def has_moderator_rights(self):
         return self.has_role('moderator')
 
 
 class Role(db.Model, RoleMixin):
+    __tablename__ = 'role'
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(80), unique=True)
     description = db.Column(db.String(255))
@@ -157,11 +165,13 @@ expenses = db.Table(
 
 
 class Report(db.Model):
+    __tablename__ = 'report'
     id = db.Column(db.Integer, primary_key=True)
     shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'))
     barista_id = db.Column(db.Integer, db.ForeignKey('barista.id'))
     # Дата
     timestamp = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    last_edit = db.Column(db.DateTime(timezone=True), server_default=func.now())
     # Касса - остаток дня в сумме с расходами
     cashbox = db.Column(db.Integer)
     # Расходы
@@ -200,6 +210,7 @@ categories = db.Table(
 
 
 class Category(db.Model):
+    __tablename__ = 'category'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80))
 
@@ -209,16 +220,18 @@ class Category(db.Model):
     def __str__(self):
         return self.name
 
-# TODO Expense, Supply, WriteOff, ByWeight add barista_id
+
 class Expense(db.Model):
+    __tablename__ = 'expense'
     id = db.Column(db.Integer, primary_key=True)
-    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    barista_id = db.Column(db.Integer, db.ForeignKey('barista.id'))
+    shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'))
+    timestamp = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    last_edit = db.Column(db.DateTime(timezone=True), server_default=func.now())
     is_global = db.Column(db.Boolean, default=False)
     # налл, безнал
     type_cost = db.Column(db.String(64), index=True)
     money = db.Column(db.Integer)
-    # один ко многому одна Кофейня много расходов
-    shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'))
     categories = db.relationship('Category', secondary=categories, lazy='subquery',
                                  backref=db.backref('expense', lazy=True))
 
@@ -241,9 +254,12 @@ class Expense(db.Model):
     
 
 class Supply(db.Model):
+    __tablename__ = 'supply'
     id = db.Column(db.Integer, primary_key=True)
-    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    barista_id = db.Column(db.Integer, db.ForeignKey('barista.id'))
     storage_id = db.Column(db.Integer, db.ForeignKey('storage.id'))
+    timestamp = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    last_edit = db.Column(db.DateTime(timezone=True), server_default=func.now())
     product_name = db.Column(db.String(80))
     amount = db.Column(db.Float(50))
     type_cost = db.Column(db.String(64), index=True)
@@ -262,9 +278,12 @@ class Supply(db.Model):
 
 
 class ByWeight(db.Model):
+    __tablename__ = 'by_weight'
     id = db.Column(db.Integer, primary_key=True)
-    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    barista_id = db.Column(db.Integer, db.ForeignKey('barista.id'))
     storage_id = db.Column(db.Integer, db.ForeignKey('storage.id'))
+    timestamp = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    last_edit = db.Column(db.DateTime(timezone=True), server_default=func.now())
     product_name = db.Column(db.String(80))
     amount = db.Column(db.Float(50))
     type_cost = db.Column(db.String(64), index=True)
@@ -272,9 +291,12 @@ class ByWeight(db.Model):
 
 
 class WriteOff(db.Model):
+    __tablename__ = 'write_off'
     id = db.Column(db.Integer, primary_key=True)
-    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    barista_id = db.Column(db.Integer, db.ForeignKey('barista.id'))
     storage_id = db.Column(db.Integer, db.ForeignKey('storage.id'))
+    timestamp = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    last_edit = db.Column(db.DateTime(timezone=True), server_default=func.now())
     amount = db.Column(db.Float(50))
     product_name = db.Column(db.String(80))
 
@@ -292,5 +314,3 @@ class WriteOff(db.Model):
     # описание (необязательно)
     # в продаже(дефолт=Нет)
     # отношение к складу
-
-    

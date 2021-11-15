@@ -45,23 +45,13 @@ from app.admin_view import (
 )
 user_datastore = SQLAlchemyUserDatastore(db, models.Barista, models.Role)
 security = Security(app, user_datastore)
-admin = Admin(app, name='Not Detail Poster', template_mode='bootstrap4', index_view=IndexAdmin())
 
-
-@security.context_processor
-def security_context_processor():
-    return dict(
-        admin_base_template=admin.base_template,
-        admin_view=admin.index_view,
-        h=admin_helpers,
-    )
 
 app.register_blueprint(user)
 app.register_blueprint(menu)
 app.register_blueprint(report)
 
-
-#admin.add_view(IndexAdmin(name='Index', endpoint='/test'))
+admin = Admin(app, name='Not Detail Poster', template_mode='bootstrap4', index_view=IndexAdmin(name='Обзор'))
 admin.add_view(ShopAdmin(models.Shop, db.session, name='Все кофейни', category="Кофейни"))
 admin.add_view(ShopEquipmentAdmin(models.ShopEquipment, db.session, name='Оборудование', category="Кофейни"))
 admin.add_view(StorageAdmin(models.Storage, db.session, name='Все товары', category="Склады"))
@@ -74,8 +64,14 @@ admin.add_view(BaristaAdmin(models.Barista, db.session, name='Сотрудник
 admin.add_view(CategoryAdmin(models.Category, db.session, name='Категории', category='Разное'))
 admin.add_view(RoleAdmin(models.Role, db.session, name='Доступ', category='Разное'))
 
-# admin.add_sub_category(name="Links", parent_name="Движения товаров")
-# admin.add_link(MenuLink(name='Home Page', url='/', category='Links'))
+
+@security.context_processor
+def security_context_processor():
+    return dict(
+        admin_base_template=admin.base_template,
+        admin_view=admin.index_view,
+        h=admin_helpers,
+    )
 
 
 if not app.debug:
