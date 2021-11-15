@@ -41,7 +41,9 @@ class Shop(db.Model):
         return f'<Shop: {self.place_name}>'
 
     def __str__(self):
-        return f'{self.place_name} / {self.address}'
+        if self:
+            return f'{self.place_name} / {self.address}'
+        return f'{self}>'
         
     @classmethod
     def get_barista_work(cls, barista_id):
@@ -82,7 +84,9 @@ class Storage(db.Model):
             return f'<Storage: {self.id}>'
 
     def __str__(self):
-        return f'{self.shop.place_name} / {self.shop.address}'
+        if self.shop:
+            return f'{self.shop.place_name} / {self.shop.address}'
+        return f'<Storage: id-{self.id}>'
 
 
 roles = db.Table(
@@ -127,6 +131,13 @@ class Barista(db.Model, UserMixin):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+    @hybrid_property 
+    def has_administrative_rights(self):
+        return self.has_role('admin')
+    
+    @hybrid_property 
+    def has_modarator_rights(self):
+        return self.has_role('moderator')
 
 
 class Role(db.Model, RoleMixin):
@@ -198,7 +209,7 @@ class Category(db.Model):
     def __str__(self):
         return self.name
 
-
+# TODO Expense, Supply, WriteOff, ByWeight add barista_id
 class Expense(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)

@@ -3,19 +3,33 @@ from datetime import datetime
 from sqlalchemy import func
 from flask import abort, redirect, request, url_for, Markup
 from flask_security import current_user
-from flask_admin import BaseView, expose
+from flask_admin import AdminIndexView, expose
 from flask_admin.contrib import sqla
-from app.models import Report, Expense
+from app.models import Shop, Report, Expense, Supply
 from wtforms import RadioField, SelectField
 from wtforms.validators import DataRequired, NumberRange, Required, InputRequired
 
 
-class IndexAdmin(BaseView):
-    @expose('/')
+class IndexAdmin(AdminIndexView):
+    @expose('/', methods=('GET', 'POST'))
     def index(self):
-        self._template_args['name'] = 'foobar'
-        self._template_args['code'] = '12345'
-        super(IndexAdmin, self).index()
+        template = 'admin/index.html'
+        _query_exp_cash = Expense.query.filter_by(type_cost='cash').all()
+        _query_exp_cashless = Expense.query.filter_by(type_cost='cashless').all()
+        #_query_supply_cash = Supply.query.filter_by(type_cost='cash').all()
+        #_query_supply_cashless = Supply.query.filter_by(type_cost='cashless').all()
+        _query_shop = Shop.query.all()
+        kwargs = {}
+        kwargs['shop_cash'] = sum([s.cash for s in _query_shop])
+        kwargs['shop_cashless'] = sum([s.cashless for s in _query_shop])
+        kwargs['all_shop'] = kwargs['shop_cash'] + kwargs['shop_cashless']
+        kwargs['exp_cash'] = sum([e.money for e in _query_exp_cash])
+        kwargs['exp_cashless'] = sum([e.money for e in _query_exp_cashless])
+        #kwargs['exp_cash'] += sum([s.money for s in _query_supply_cash])
+        #kwargs['exp_cashless'] += sum([s.money for e in _query_supply_cashless])
+        kwargs['all_exp'] = kwargs['exp_cash'] + kwargs['exp_cashless']
+        return self.render(template, **kwargs)
+
 
 
 class ModelView(sqla.ModelView):
@@ -866,21 +880,27 @@ class ExpenseAdmin(ModelView):
 
         return super(ExpenseAdmin, self).render(template, **kwargs)
 
+
+    def on_form_prefill(self, form, id):
+        pass
+
     def on_model_change(self, form, model, is_created):
-        if is_created:
-            if form.type_cost.data == 'cash':
-                model.shop.cash -= form.money.data
-            else:
-                model.shop.cashless -= form.money.data
+        money = model.money
+        if is_created == False:
+            expense = Expense.query.filter_by(id=model.id).first()
+            print('Prev money', expense.money, model.money)
+            
+        if model.type_cost == 'cash':
+            model.shop.cash -= money
         else:
-            # TODO update model ExpenseAdmin
-            pass
+            model.shop.cashless -= money
 
     def on_model_delete(self, model):
-        if model.type_cost == 'cash':
-            model.shop.cash += model.money
-        else:
-            model.shop.cashless += model.money
+        if model.type_cost and model.money and model.shop:
+            if model.type_cost == 'cash':
+                model.shop.cash += model.money
+            else:
+                model.shop.cashless += model.money
 
 
 class SupplyAdmin(ModelView):

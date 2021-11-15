@@ -18,7 +18,6 @@ app.config.from_object(DevelopmentConfig)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 login = LoginManager(app)
-admin = Admin(app, name='Not Detail Poster', template_mode='bootstrap4')
 toolbar = DebugToolbarExtension(app)
 moment = Moment(app)
 
@@ -46,6 +45,7 @@ from app.admin_view import (
 )
 user_datastore = SQLAlchemyUserDatastore(db, models.Barista, models.Role)
 security = Security(app, user_datastore)
+admin = Admin(app, name='Not Detail Poster', template_mode='bootstrap4', index_view=IndexAdmin())
 
 
 @security.context_processor
@@ -61,7 +61,7 @@ app.register_blueprint(menu)
 app.register_blueprint(report)
 
 
-# admin.add_view(IndexAdmin(name='Index', endpoint='/'))
+#admin.add_view(IndexAdmin(name='Index', endpoint='/test'))
 admin.add_view(ShopAdmin(models.Shop, db.session, name='Все кофейни', category="Кофейни"))
 admin.add_view(ShopEquipmentAdmin(models.ShopEquipment, db.session, name='Оборудование', category="Кофейни"))
 admin.add_view(StorageAdmin(models.Storage, db.session, name='Все товары', category="Склады"))
