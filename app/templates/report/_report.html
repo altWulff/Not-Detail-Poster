@@ -1,8 +1,9 @@
 <div class="container">
+<div class="col-sm-15">
  <div class="card">
      <div class="card-body">
-         <h5 class="card-title">{{ day_report.shop.place_name }} / {{ day_report.shop.address }}</h5>
-    <h6 class="card-subtitle mb-2 text-muted">Отправил <a href="{{ url_for('user.profile', user_name=day_report.barista.name) }}" class="link-secondary">{{ day_report.barista.name }}</a></h6>
+         <h3 class="card-title">{{ day_report.shop.place_name }} / {{ day_report.shop.address }}</h3>
+    <h5 class="card-subtitle mb-2 text-muted">Отправил <a href="{{ url_for('user.profile', user_name=day_report.barista.name) }}" class="link-secondary">{{ day_report.barista.name }}</a></h5>
     
     <div class="row">
         <div class="col-sm-4">
@@ -10,7 +11,7 @@
             <p data-bs-toggle="tooltip" data-bs-html="true" title="Выручка за день">Касса: {{ day_report.cashbox }} грн.</p>
             <p data-bs-toggle="tooltip" data-bs-html="true" title="Расходы за день">Расходы:</p>
             {{ render_expansion(local_expense, day_report)}}
-                        <br>
+            <br>
             <p data-bs-toggle="tooltip" data-bs-html="true" title="Остаток дня">О.Д.: {{ day_report.remainder_of_day }} грн.</p>
             <p data-bs-toggle="tooltip" data-bs-html="true" title="Безнал">Б.Н.: {{ day_report.cashless }} грн.</p>
             <p data-bs-toggle="tooltip" data-bs-html="true" title="Остаток налички">О.Н.: {{ day_report.cash_balance }} грн.</p>
@@ -18,21 +19,22 @@
 
         </div>
         <div class="col-sm-4">
-            <h5>Глобальные траты</h5>
+            <h5 class="text-muted">Глобальные траты</h5>
             {{ render_expansion(global_expense, day_report) }}
             {{ render_supply(supply, day_report)}}
         </div>
         <div class="col-sm-4">
-            <h5>Расход за день</h5>
+            <h5 class="text-muted">Расход за день</h5>
             <p>КА: {{ "%.2f"|format(day_report.consumption_coffee_arabika) }} кг, КБ: {{ "%.2f"|format(day_report.consumption_coffee_blend) }} кг</p>
             <p>М: {{ "%.2f"|format(day_report.consumption_milk) }} л</p>
             <p>П: {{day_report.consumption_panini}} шт., К: {{day_report.consumption_hot_dogs}} шт.</p>
-            <h5>Отстаток дня</h5>
+            <h5 class="text-muted">Отстаток дня</h5>
             <p>КА: {{"%.2f"|format(day_report.coffee_arabika)}} кг, КБ: {{ "%.2f"|format(day_report.coffee_blend) }} кг</p>
             <p>М: {{ "%.2f"|format(day_report.milk) }} л</p>
             <p>П: {{day_report.panini}} шт., К: {{day_report.hot_dogs}} шт.</p>
         </div>
     </div>
+</div>
 </div>
 </div>
 </div>
