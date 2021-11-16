@@ -52,8 +52,8 @@ class ModelView(sqla.ModelView):
 
     def is_accessible(self):
         is_active = current_user.is_active and current_user.is_authenticated
-        is_admin = current_user.has_role('admin')
-        is_moderator = current_user.has_role('moderator')
+        is_admin = current_user.has_administrative_rights
+        is_moderator = current_user.has_moderator_rights
         
         return is_active and is_admin or is_moderator
 
@@ -716,15 +716,23 @@ class ReportAdmin(ModelView):
 
     def on_model_change(self, form, model, is_created):
         if is_created:
-            expanses = sum([e.money for e in model.expenses if e.type_cost == 'cash'])
-            cash_balance = form.actual_balance.data - model.shop.cash
-            model.shop.cash += cash_balance
-            model.shop.cashless += model.cashless
-            model.cash_balance = cash_balance
-            model.remainder_of_day = model.cashless + form.actual_balance.data
-            model.cashbox = model.remainder_of_day + expanses
-            print(model.shop.storage.coffee_arabika)
+            if model.expense:
+                expanses = model.expense
+            else:
+                expanses = Expense.by_timestamp(model.shop.id, model.timestamp)
+            expanses = sum([e.money for e in expenses if e.type_cost == 'cash'])
+            last_actual_balance = model.shop.cash + expanses
+            cash_balance = form.actual_balance.data - last_actual_balance
+            remainder_of_day = cash_balance + form.cashless.data
+            cashbox = remainder_of_day + expanses
 
+            model.cash_balance = cash_balance
+            model.remainder_of_day = remainder_of_day
+            model.cashbox = cashbox
+
+            model.shop.cash += cash_balance + expanses
+            model.shop.cashless += form.cashless.data
+            
             model.consumption_coffee_arabika = model.shop.storage.coffee_arabika - float(form.coffee_arabika.data)
             model.consumption_coffee_blend = model.shop.storage.coffee_blend - float(form.coffee_blend.data)
             model.consumption_milk = model.shop.storage.milk - float(form.milk.data)

@@ -131,7 +131,7 @@ class ByWeightForm(FlaskForm):
             )
         ]
     )
-    cash_type = RadioField(
+    type_cost = RadioField(
         'Тип денег',
         default='cash',
         validators=[Required()],
@@ -199,7 +199,7 @@ class SupplyForm(FlaskForm):
         ]
     )
     amount = MyFloatField('Количество', default=0.0)
-    cash_type = RadioField(
+    type_cost = RadioField(
         'Тип денег',
         default='cash',
         validators=[Required()],

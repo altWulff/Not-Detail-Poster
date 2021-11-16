@@ -247,9 +247,15 @@ class Expense(db.Model):
     
     @classmethod
     def get_local(cls, shop_id, today=False):
-        _query = cls.query.filter_by(shop_id=shop_id).filter(cls.is_global is False)
+        _query = cls.query.filter_by(shop_id=shop_id).filter(cls.is_global==False)
         if today:
             _query = _query.filter(cls.timestamp >= date_today)
+        return _query
+        
+    @classmethod
+    def by_timestamp(cls, shop_id, timestamp):
+        _query = cls.query.filter_by(shop_id=shop_id).filter(cls.is_global==False)
+        _query = _query.filter(cls.timestamp >= timestamp)
         return _query
     
 

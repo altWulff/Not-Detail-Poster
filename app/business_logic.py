@@ -84,7 +84,7 @@ class TransactionHandler:
             storage=self.storage,
             amount=form.amount.data,
             product_name=form.by_weight_choice.data,
-            type_cost=form.cash_type.data, 
+            type_cost=form.type_cost.data, 
             money=form.money.data,
             timestamp=datetime.now()
         )
@@ -128,7 +128,7 @@ class TransactionHandler:
             storage=self.storage,
             product_name=form.supply_choice.data,
             amount=form.amount.data,
-            type_cost=form.cash_type.data,
+            type_cost=form.type_cost.data,
             money=form.money.data,
             timestamp=datetime.now()
         )
@@ -138,12 +138,15 @@ class TransactionHandler:
         self.validate_report_limit()
         expanses = Expense.get_local(self.shop.id, True)
         expanses = sum([e.money for e in expanses if e.type_cost == 'cash'])
-        cash_balance = form.actual_balance.data - self.shop.cash
-        self.cash_flow(cash_balance, 'cash')
+        last_actual_balance = self.shop.cash + expanses
+        cash_balance = form.actual_balance.data - last_actual_balance
+        remainder_of_day = cash_balance + form.cashless.data
+        cashbox = remainder_of_day + expanses
+        print(last_actual_balance, cash_balance, remainder_of_day, cashbox, expanses)
+        self.cash_flow(cash_balance + expanses, 'cash')
         self.cash_flow(form.cashless.data, 'cashless')
-        remainder_of_day = form.cashless.data + form.actual_balance.data
         report = Report(
-            cashbox=remainder_of_day + expanses,
+            cashbox=cashbox,
             cash_balance=cash_balance,
             cashless=form.cashless.data,
             actual_balance=form.actual_balance.data,

@@ -99,13 +99,13 @@ def create_coffee_shop():
             panini=form.panini.data,
             hot_dogs=form.hot_dogs.data
         )
-        equipments = ShopEquipment(
+        equipment = ShopEquipment(
             coffee_machine=form.coffee_machine.data,
             grinder_1=form.grinder_1.data,
             grinder_2=form.grinder_2.data
         )
-        shop.shop_equipments.append(equipments)
-        shop.storage.append(storage)
+        shop.shop_equipmen = equipment
+        shop.storage = storage
         db.session.add(shop)
         db.session.add(storage)
         db.session.commit()
