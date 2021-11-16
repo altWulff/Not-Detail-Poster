@@ -1,5 +1,5 @@
-<div class="modal fade" id="ConsumptionModal" tabindex="-1" aria-labelledby="ConsumptionModal" aria-hidden="true">
-    <div class="modal-dialog">
+<div class="modal fade" id="ConsumptionModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="ConsumptionModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <form action="{{ url_for('menu.expense') }}" method="post">
             {{ expense_form.csrf_token }}

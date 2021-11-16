@@ -1,5 +1,5 @@
-<div class="modal fade" id="SupplyModal" tabindex="-1" aria-labelledby="SupplyModal" aria-hidden="true">
-    <div class="modal-dialog">
+<div class="modal fade" id="SupplyModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="SupplyModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <form action="{{ url_for('menu.supply') }}" method="post">
             {{ supply_form.csrf_token }}
