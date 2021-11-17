@@ -254,6 +254,9 @@ class Expense(db.Model):
         
     @classmethod
     def by_timestamp(cls, shop_id, timestamp):
+        # TODO сделать фильтр по значениям как ниже
+        #>>> e.timestamp.timetuple()[:3]
+        # (2021, 11, 16)
         _query = cls.query.filter_by(shop_id=shop_id).filter(cls.is_global==False)
         _query = _query.filter(cls.timestamp >= timestamp)
         return _query

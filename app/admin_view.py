@@ -6,7 +6,7 @@ from flask_security import current_user
 from flask_admin import AdminIndexView, expose
 from flask_admin.contrib import sqla
 from app.models import Shop, Report, Expense, Supply
-from wtforms import RadioField, SelectField
+from wtforms import RadioField, SelectField, BooleanField
 from wtforms.validators import DataRequired, NumberRange, Required, InputRequired
 
 
@@ -412,11 +412,20 @@ class ReportAdmin(ModelView):
         expenses='Расходы'
     )
     column_formatters = dict(timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"))
+    form_extra_fields = {
+        'backdating': BooleanField('Обработка задним числом')
+    }
     form_create_rules = (
+        'backdating',
         'timestamp',
         'expenses',
         'cashless',
         'actual_balance',
+        'consumption_coffee_arabika',
+        'consumption_coffee_blend',
+        'consumption_milk',
+        'consumption_panini',
+        'consumption_hot_dogs',
         'coffee_arabika',
         'coffee_blend',
         'milk',
@@ -426,6 +435,7 @@ class ReportAdmin(ModelView):
         'barista'
     )
     form_edit_rules = (
+        'backdating',
         'timestamp',
         'cashbox',
         'expenses',
@@ -510,6 +520,7 @@ class ReportAdmin(ModelView):
             ]
         ),
         consumption_coffee_arabika=dict(
+            default=0.0,
             validators=[
                 InputRequired(),
                 NumberRange(
@@ -519,6 +530,7 @@ class ReportAdmin(ModelView):
             ]
         ),
         consumption_coffee_blend=dict(
+            default=0.0,
             validators=[
                 InputRequired(),
                 NumberRange(
@@ -528,6 +540,7 @@ class ReportAdmin(ModelView):
             ]
         ),
         consumption_milk=dict(
+            default=0.0,
             validators=[
                 InputRequired(),
                 NumberRange(
@@ -537,6 +550,7 @@ class ReportAdmin(ModelView):
             ]
         ),
         consumption_panini=dict(
+            default=0,
             validators=[
                 InputRequired(),
                 NumberRange(
@@ -546,6 +560,7 @@ class ReportAdmin(ModelView):
             ]
         ),
         consumption_hot_dogs=dict(
+            default=0,
             validators=[
                 InputRequired(),
                 NumberRange(
@@ -650,29 +665,37 @@ class ReportAdmin(ModelView):
             'placeholder': 'Количество хот-догов (комплект булка-сосиска), остаток на следующий день'
         }
     }
+    
 
     def sum_page(self, attr: str) -> int:
         _query = self.get_model_data()
-        return sum([p.__dict__[attr] for p in _query])
+        try:
+            return sum([p.__dict__[attr] for p in _query if p])
+        except:
+            return 0
 
     def sum_total(self, attr: str) -> int:
         _query = self.session.query(func.sum(Report.__dict__[attr])).scalar()
-        if not _query:
+        try:
+            return _query
+        except:
             return 0
-        return _query
+        
 
     def median_page(self, attr: str) -> int:
         _query = self.get_model_data()
-        data = [p.__dict__[attr] for p in _query]
-        if len(data) > 1:
+        data = [p.__dict__[attr] for p in _query if p]
+        try:
             return median(data)
-        return 0
+        except:
+            return 0
         
     def median_total(self, attr: str) -> int:
         _query = self.session.query(func.avg(Report.__dict__[attr])).scalar()
-        if not _query:
+        try:
+            return _query
+        except:
             return 0
-        return _query
 
     def render(self, template, **kwargs):
         if template == 'admin/model/report_list.html':
@@ -715,39 +738,39 @@ class ReportAdmin(ModelView):
         return super(ReportAdmin, self).render(template, **kwargs)
 
     def on_model_change(self, form, model, is_created):
-        if is_created:
-            if model.expense:
-                expanses = model.expense
-            else:
-                expanses = Expense.by_timestamp(model.shop.id, model.timestamp)
-            expanses = sum([e.money for e in expenses if e.type_cost == 'cash'])
-            last_actual_balance = model.shop.cash + expanses
-            cash_balance = form.actual_balance.data - last_actual_balance
-            remainder_of_day = cash_balance + form.cashless.data
-            cashbox = remainder_of_day + expanses
+        
+        expanses = Expense.by_timestamp(model.shop.id, model.timestamp)
+        expanses = sum([e.money for e in expanses if e.type_cost == 'cash'])
+        last_actual_balance = model.shop.cash + expanses
+        cash_balance = form.actual_balance.data - last_actual_balance
+        remainder_of_day = cash_balance + form.cashless.data
+        cashbox = remainder_of_day + expanses
 
-            model.cash_balance = cash_balance
-            model.remainder_of_day = remainder_of_day
-            model.cashbox = cashbox
+        model.cash_balance = cash_balance
+        model.remainder_of_day = remainder_of_day
+        model.cashbox = cashbox
 
-            model.shop.cash += cash_balance + expanses
-            model.shop.cashless += form.cashless.data
-            
-            model.consumption_coffee_arabika = model.shop.storage.coffee_arabika - float(form.coffee_arabika.data)
-            model.consumption_coffee_blend = model.shop.storage.coffee_blend - float(form.coffee_blend.data)
-            model.consumption_milk = model.shop.storage.milk - float(form.milk.data)
-            model.consumption_panini = model.shop.storage.panini - model.panini
-            model.consumption_hot_dogs = model.shop.storage.hot_dogs - model.hot_dogs
-            model.shop.storage.coffee_arabika -= model.consumption_coffee_arabika
-            model.shop.storage.coffee_blend -= model.consumption_coffee_blend
-            model.shop.storage.milk -= model.consumption_milk
-            model.shop.storage.panini -= model.consumption_panini
-            model.shop.storage.hot_dogs -= model.consumption_hot_dogs
-        else:
-            # TODO update model ReportAdmin
-            pass
+        if form.backdating.data:
+            model.backdating = form.backdating.data
+            return
+        model.shop.cash += cash_balance + expanses
+        model.shop.cashless += form.cashless.data
+        
+        model.consumption_coffee_arabika = model.shop.storage.coffee_arabika - float(form.coffee_arabika.data)
+        model.consumption_coffee_blend = model.shop.storage.coffee_blend - float(form.coffee_blend.data)
+        model.consumption_milk = model.shop.storage.milk - float(form.milk.data)
+        model.consumption_panini = model.shop.storage.panini - model.panini
+        model.consumption_hot_dogs = model.shop.storage.hot_dogs - model.hot_dogs
+        model.shop.storage.coffee_arabika -= model.consumption_coffee_arabika
+        model.shop.storage.coffee_blend -= model.consumption_coffee_blend
+        model.shop.storage.milk -= model.consumption_milk
+        model.shop.storage.panini -= model.consumption_panini
+        model.shop.storage.hot_dogs -= model.consumption_hot_dogs
+        
 
     def on_model_delete(self, model):
+        #if model.backdating:
+            #return
         model.shop.cash -= model.cash_balance
         model.shop.cashless -= model.cashless
         model.shop.storage.coffee_arabika += model.consumption_coffee_arabika
