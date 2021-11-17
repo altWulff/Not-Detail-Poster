@@ -1,13 +1,15 @@
 from statistics import median
-from datetime import datetime
+from datetime import datetime, date
 from sqlalchemy import func
 from flask import abort, redirect, request, url_for, Markup
 from flask_security import current_user
 from flask_admin import AdminIndexView, expose
 from flask_admin.contrib import sqla
+from flask_admin.model import typefmt
 from app.models import Shop, Report, Expense, Supply
 from wtforms import RadioField, SelectField, BooleanField
 from wtforms.validators import DataRequired, NumberRange, Required, InputRequired
+from flask_admin.contrib.sqla.filters import DateTimeBetweenFilter
 
 
 class IndexAdmin(AdminIndexView):
@@ -32,11 +34,16 @@ class IndexAdmin(AdminIndexView):
 
 
 class ModelView(sqla.ModelView):
+    column_type_formatters = dict(typefmt.BASE_FORMATTERS)
+    column_type_formatters.update({
+        date: lambda view, value: value.strftime('%d.%m.%Y')
+    })
+
     @property
     def can_delete(self):
         is_admin = current_user.has_role('admin')
         is_active = current_user.is_active and current_user.is_authenticated
-        
+
         if is_active and is_admin:
             return True
         return False
@@ -45,7 +52,7 @@ class ModelView(sqla.ModelView):
     def can_create(self):
         is_admin = current_user.has_role('admin')
         is_active = current_user.is_active and current_user.is_authenticated
-        
+
         if is_active and is_admin:
             return True
         return False
@@ -54,7 +61,7 @@ class ModelView(sqla.ModelView):
         is_active = current_user.is_active and current_user.is_authenticated
         is_admin = current_user.has_administrative_rights
         is_moderator = current_user.has_moderator_rights
-        
+
         return is_active and is_admin or is_moderator
 
     def _handle_view(self, name, **kwargs):
@@ -74,7 +81,7 @@ class ModelView(sqla.ModelView):
         sort_column = self._get_column_by_idx(view_args.sort)
         if sort_column is not None:
             sort_column = sort_column[0]
-            
+
         count, data = self.get_list(
             view_args.page,
             sort_column,
@@ -127,7 +134,7 @@ class ShopAdmin(ModelView):
                 )
             ]
         ),
-        
+
     )
     form_widget_args = {
         'place_name': {
@@ -147,7 +154,7 @@ class ShopAdmin(ModelView):
 
 class ShopEquipmentAdmin(ModelView):
     can_view_details = True
-    column_searchable_list = ('coffee_machine', )
+    column_searchable_list = ('coffee_machine',)
     column_labels = dict(
         coffee_machine='Кофе Машина',
         grinder_1='Кофемолка 1',
@@ -183,7 +190,7 @@ class StorageAdmin(ModelView):
         panini=lambda v, c, m, p: f'{m.panini} шт.',
         hot_dogs=lambda v, c, m, p: f'{m.hot_dogs} шт.',
     )
-    column_filters = ('shop', )
+    column_filters = ('shop',)
     form_create_rules = ('coffee_arabika', 'coffee_blend', 'milk', 'panini', 'hot_dogs', 'shop')
     form_edit_rules = (
         'coffee_arabika',
@@ -198,15 +205,15 @@ class StorageAdmin(ModelView):
             validators=[
                 InputRequired(),
                 NumberRange(
-                    min=-0.0001, 
+                    min=-0.0001,
                     message='Количество арабики должно быть нулевым, либо больше нуля')
-                ]
+            ]
         ),
         coffee_blend=dict(
             validators=[
                 InputRequired(),
                 NumberRange(
-                    min=-0.0001, 
+                    min=-0.0001,
                     message='Количество бленда должно быть нулевым, либо больше нуля'
                 )
             ]
@@ -215,7 +222,7 @@ class StorageAdmin(ModelView):
             validators=[
                 InputRequired(),
                 NumberRange(
-                    min=-0.0001, 
+                    min=-0.0001,
                     message='Количество молока должно быть нулевым, либо больше нуля'
                 )
             ]
@@ -224,7 +231,7 @@ class StorageAdmin(ModelView):
             validators=[
                 InputRequired(),
                 NumberRange(
-                    min=-1, 
+                    min=-1,
                     message='Количество панини должно быть нулевым, либо больше нуля'
                 )
             ]
@@ -233,7 +240,7 @@ class StorageAdmin(ModelView):
             validators=[
                 InputRequired(),
                 NumberRange(
-                    min=-1, 
+                    min=-1,
                     message='Количество хот-догов должно быть нулевым, либо больше нуля'
                 )
             ]
@@ -320,14 +327,14 @@ class BaristaAdmin(ModelView):
         'by_weights',
         'write_offs'
     )
-    column_formatters = dict(confirmed_at=lambda v, c, m, p: m.confirmed_at.date().strftime("%d.%m.%Y"))
     form_args = dict(
         name=dict(
             validators=[DataRequired()]
         ),
         confirmed_at=dict(
             default=datetime.now(),
-            validators=[DataRequired()]
+            validators=[DataRequired()],
+            format='%d.%m.%Y %H:%M'
         ),
         active=dict(default=True),
         shop=dict(
@@ -348,16 +355,6 @@ class BaristaAdmin(ModelView):
             validators=[DataRequired()]
         )
     )
-    
-    @property
-    def can_edit(self):
-        is_admin = current_user.has_role('admin')
-        is_active = current_user.is_active and current_user.is_authenticated
-        
-        if is_active and is_admin:
-            return True
-        return False
-
     form_widget_args = {
         'name': {
             'placeholder': 'Имя сотрудника'
@@ -367,16 +364,29 @@ class BaristaAdmin(ModelView):
         },
         'email': {
             'placeholder': 'Емейл'
-        }
+        },
+        'confirmed_at': {
+            'data-date-format': u'DD.MM.YYYY HH:mm'
+        },
     }
+
+    @property
+    def can_edit(self):
+        is_admin = current_user.has_role('admin')
+        is_active = current_user.is_active and current_user.is_authenticated
+
+        if is_active and is_admin:
+            return True
+        return False
 
 
 class ReportAdmin(ModelView):
     list_template = 'admin/model/report_list.html'
     can_view_details = True
     column_default_sort = ('timestamp', True)
-    column_searchable_list = ('timestamp', )
+    column_searchable_list = ('timestamp',)
     column_exclude_list = (
+        'backdating',
         'last_edit',
         'consumption_coffee_arabika',
         'consumption_coffee_blend',
@@ -411,7 +421,6 @@ class ReportAdmin(ModelView):
         hot_dogs='Хот-доги/ост.',
         expenses='Расходы'
     )
-    column_formatters = dict(timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"))
     form_extra_fields = {
         'backdating': BooleanField('Обработка задним числом')
     }
@@ -458,7 +467,8 @@ class ReportAdmin(ModelView):
     )
     form_args = dict(
         timestamp=dict(
-            validators=[DataRequired()]
+            validators=[DataRequired()],
+            format='%d.%m.%Y %H:%M'
         ),
         shop=dict(
             validators=[
@@ -473,7 +483,7 @@ class ReportAdmin(ModelView):
                 )
             ]
         ),
- 
+
         cashbox=dict(
             validators=[
                 InputRequired(),
@@ -617,7 +627,8 @@ class ReportAdmin(ModelView):
     )
     form_widget_args = {
         'timestamp': {
-            'placeholder': 'Дата и время отправки отчета'
+            'placeholder': 'Дата и время отправки отчета',
+            'data-date-format': u'DD.MM.YYYY HH:mm'
         },
         'cashbox': {
             'placeholder': 'Касса'
@@ -665,7 +676,6 @@ class ReportAdmin(ModelView):
             'placeholder': 'Количество хот-догов (комплект булка-сосиска), остаток на следующий день'
         }
     }
-    
 
     def sum_page(self, attr: str) -> int:
         _query = self.get_model_data()
@@ -680,7 +690,6 @@ class ReportAdmin(ModelView):
             return _query
         except:
             return 0
-        
 
     def median_page(self, attr: str) -> int:
         _query = self.get_model_data()
@@ -689,7 +698,7 @@ class ReportAdmin(ModelView):
             return median(data)
         except:
             return 0
-        
+
     def median_total(self, attr: str) -> int:
         _query = self.session.query(func.avg(Report.__dict__[attr])).scalar()
         try:
@@ -738,7 +747,6 @@ class ReportAdmin(ModelView):
         return super(ReportAdmin, self).render(template, **kwargs)
 
     def on_model_change(self, form, model, is_created):
-        
         expanses = Expense.by_timestamp(model.shop.id, model.timestamp)
         expanses = sum([e.money for e in expanses if e.type_cost == 'cash'])
         last_actual_balance = model.shop.cash + expanses
@@ -755,7 +763,7 @@ class ReportAdmin(ModelView):
             return
         model.shop.cash += cash_balance + expanses
         model.shop.cashless += form.cashless.data
-        
+
         model.consumption_coffee_arabika = model.shop.storage.coffee_arabika - float(form.coffee_arabika.data)
         model.consumption_coffee_blend = model.shop.storage.coffee_blend - float(form.coffee_blend.data)
         model.consumption_milk = model.shop.storage.milk - float(form.milk.data)
@@ -766,11 +774,10 @@ class ReportAdmin(ModelView):
         model.shop.storage.milk -= model.consumption_milk
         model.shop.storage.panini -= model.consumption_panini
         model.shop.storage.hot_dogs -= model.consumption_hot_dogs
-        
 
     def on_model_delete(self, model):
-        #if model.backdating:
-            #return
+        if model.backdating:
+            return
         model.shop.cash -= model.cash_balance
         model.shop.cashless -= model.cashless
         model.shop.storage.coffee_arabika += model.consumption_coffee_arabika
@@ -794,12 +801,12 @@ class RoleAdmin(ModelView):
             validators=[DataRequired()]
         ),
     )
-    
+
     @property
     def can_edit(self):
         is_admin = current_user.has_role('admin')
         is_active = current_user.is_active and current_user.is_authenticated
-        
+
         if is_active and is_admin:
             return True
         return False
@@ -812,11 +819,11 @@ class ExpenseAdmin(ModelView):
         type_cost = '' if model.type_cost == 'cash' else ' (Безнал)'
         formatter = f'{model.money} грн.{type_cost}'
         return Markup(f'{formatter}')
-
     list_template = 'admin/model/expense_list.html'
     can_set_page_size = True
     column_list = ('timestamp', 'money', 'is_global', 'categories', 'shop')
     form_create_rules = (
+        'backdating',
         'timestamp',
         'is_global',
         'type_cost',
@@ -825,6 +832,7 @@ class ExpenseAdmin(ModelView):
         'shop'
     )
     form_edit_rules = (
+        'backdating',
         'timestamp',
         'is_global',
         'type_cost',
@@ -845,22 +853,26 @@ class ExpenseAdmin(ModelView):
     can_view_details = True
     column_default_sort = ('timestamp', True)
     column_formatters = dict(
-        timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"),
         type_cost=lambda v, c, m, p: 'Наличка' if m.type_cost == 'cash' else 'Безнал',
         is_global=lambda v, c, m, p: 'Да' if m.is_global else 'Нет',
         money=_list_money
     )
     form_extra_fields = {
+        'backdating': BooleanField('Обработка задним числом'),
         'type_cost': RadioField(
             'Тип траты',
+            default='cash',
             choices=[
                 ('cash', 'Наличка'),
                 ('cashless', 'Безнал')
             ],
-            validators=[Required()], default='cash'
+            validators=[Required()]
         )
     }
     form_widget_args = {
+        'timestamp': {
+            'data-date-format': u'DD.MM.YYYY HH:mm'
+        },
         'money': {
             'placeholder': 'В гривнях'
         },
@@ -884,7 +896,8 @@ class ExpenseAdmin(ModelView):
     }
     form_args = dict(
         timestamp=dict(
-            validators=[DataRequired()]
+            validators=[DataRequired()],
+            format='%d.%m.%Y %H:%M'
         ),
         money=dict(
             validators=[
@@ -948,22 +961,25 @@ class ExpenseAdmin(ModelView):
 
         return super(ExpenseAdmin, self).render(template, **kwargs)
 
-
     def on_form_prefill(self, form, id):
         pass
 
     def on_model_change(self, form, model, is_created):
+        if form.backdating.data:
+            return
         money = model.money
-        if is_created == False:
+        if not is_created:
             expense = Expense.query.filter_by(id=model.id).first()
             print('Prev money', expense.money, model.money)
-            
+
         if model.type_cost == 'cash':
             model.shop.cash -= money
         else:
             model.shop.cashless -= money
 
     def on_model_delete(self, model):
+        if model.backdating:
+            return
         if model.type_cost and model.money and model.shop:
             if model.type_cost == 'cash':
                 model.shop.cash += model.money
@@ -1001,18 +1017,18 @@ class SupplyAdmin(ModelView):
         storage='Склад'
     )
     column_filters = ('timestamp', 'type_cost', 'storage')
-    column_searchable_list = ('timestamp', )
-    form_create_rules = ('timestamp', 'product_name', 'amount', 'type_cost', 'money', 'storage')
-    form_edit_rules = ('timestamp', 'product_name', 'amount', 'type_cost', 'money', 'storage')
+    column_searchable_list = ('timestamp',)
+    form_create_rules = ('backdating', 'timestamp', 'product_name', 'amount', 'type_cost', 'money', 'storage')
+    form_edit_rules = ('backdating', 'timestamp', 'product_name', 'amount', 'type_cost', 'money', 'storage')
     column_formatters = dict(
-        timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"),
         type_cost=lambda v, c, m, p: 'Наличка' if m.type_cost == 'cash' else 'Безнал',
         money=_list_money,
         amount=_list_amount
     )
     form_args = dict(
         timestamp=dict(
-            validators=[DataRequired()]
+            validators=[DataRequired()],
+            format='%d.%m.%Y %H:%M'
         ),
         amount=dict(
             validators=[
@@ -1041,6 +1057,7 @@ class SupplyAdmin(ModelView):
         )
     )
     form_extra_fields = dict(
+        backdating=BooleanField('Обработка задним числом'),
         type_cost=RadioField(
             'Тип траты',
             choices=[
@@ -1063,6 +1080,9 @@ class SupplyAdmin(ModelView):
         )
     )
     form_widget_args = {
+        'timestamp': {
+            'data-date-format': u'DD.MM.YYYY HH:mm'
+        },
         'money': {
             'placeholder': 'В гривнях'
         },
@@ -1096,6 +1116,8 @@ class SupplyAdmin(ModelView):
             pass
 
     def on_model_delete(self, model):
+        if model.backdating:
+            return
         if model.product_name == 'coffee_blend':
             model.storage.coffee_blend -= model.amount
         elif model.product_name == 'coffee_arabika':
@@ -1144,16 +1166,16 @@ class ByWeightAdmin(ModelView):
     )
     column_filters = ('timestamp', 'product_name', 'type_cost')
     column_formatters = dict(
-        timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"),
         type_cost=lambda v, c, m, p: 'Наличка' if m.type_cost == 'cash' else 'Безнал',
         money=_list_money,
         amount=_list_amount
     )
-    form_create_rules = ('timestamp', 'product_name', 'amount', 'type_cost', 'money', 'storage')
-    form_edit_rules = ('timestamp', 'product_name', 'amount', 'type_cost', 'money', 'storage')
+    form_create_rules = ('backdating', 'timestamp', 'product_name', 'amount', 'type_cost', 'money', 'storage')
+    form_edit_rules = ('backdating', 'timestamp', 'product_name', 'amount', 'type_cost', 'money', 'storage')
     form_args = dict(
         timestamp=dict(
-            validators=[DataRequired()]
+            validators=[DataRequired()],
+            format='%d.%m.%Y %H:%M'
         ),
         amount=dict(
             validators=[
@@ -1178,6 +1200,7 @@ class ByWeightAdmin(ModelView):
         )
     )
     form_extra_fields = dict(
+        backdating=BooleanField('Обработка задним числом'),
         type_cost=RadioField(
             'Тип траты',
             choices=[
@@ -1200,6 +1223,9 @@ class ByWeightAdmin(ModelView):
         )
     )
     form_widget_args = {
+        'timestamp': {
+            'data-date-format': u'DD.MM.YYYY HH:mm'
+        },
         'money': {
             'placeholder': 'В гривнях'
         },
@@ -1212,6 +1238,9 @@ class ByWeightAdmin(ModelView):
     }
 
     def on_model_change(self, form, model, is_created):
+        if form.backdating.data:
+            return
+
         if is_created:
             if form.product_name.data == 'coffee_blend':
                 model.storage.coffee_blend -= float(form.amount.data)
@@ -1227,6 +1256,8 @@ class ByWeightAdmin(ModelView):
             pass
 
     def on_model_delete(self, model):
+        if model.backdating:
+            return
         if model.product_name == 'coffee_blend':
             model.storage.coffee_blend += float(model.amount)
         else:
@@ -1267,7 +1298,8 @@ class WriteOffAdmin(ModelView):
     form_edit_rules = ('timestamp', 'product_name', 'amount', 'storage')
     form_args = dict(
         timestamp=dict(
-            validators=[DataRequired()]
+            validators=[DataRequired()],
+            format='%d.%m.%Y %H:%M'
         ),
         amount=dict(
             validators=[
@@ -1283,6 +1315,7 @@ class WriteOffAdmin(ModelView):
         )
     )
     form_extra_fields = dict(
+        backdating=BooleanField('Обработка задним числом'),
         product_name=SelectField(
             'Название товара',
             choices=[
@@ -1296,12 +1329,17 @@ class WriteOffAdmin(ModelView):
         )
     )
     form_widget_args = {
+        'timestamp': {
+            'data-date-format': u'DD.MM.YYYY HH:mm'
+        },
         'amount': {
             'placeholder': 'Количество в кг, л, и поштучно'
         }
     }
 
     def on_model_change(self, form, model, is_created):
+        if form.backdating.data:
+            return
         if is_created:
             if form.product_name.data == 'coffee_blend':
                 model.storage.coffee_blend -= float(form.amount.data)
@@ -1318,6 +1356,8 @@ class WriteOffAdmin(ModelView):
             pass
 
     def on_model_delete(self, model):
+        if model.backdating:
+            return
         if model.product_name == 'coffee_blend':
             model.storage.coffee_blend += model.amount
         elif model.product_name == 'coffee_arabika':
@@ -1336,16 +1376,15 @@ class CategoryAdmin(ModelView):
         name='Название категории',
         expense='Расходы'
     )
-    form_create_rules = ('name', )
+    form_create_rules = ('name',)
     form_args = dict(
         name=dict(
             validators=[DataRequired()]
         )
     )
-    column_editable_list = ('name', )
+    column_editable_list = ('name',)
     form_widget_args = {
         'name': {
             'placeholder': 'Название для расходов'
         }
     }
-    
