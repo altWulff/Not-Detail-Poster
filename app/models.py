@@ -239,6 +239,9 @@ class Expense(db.Model):
 
     def __repr__(self):
         return f'<Expense: {self.categories}({self.type_cost}) - {self.money}>'
+     
+    def __str__(self):
+        return f'{self.timestamp.timetuple()[:3]} {self.categories}; {self.money} грн.({self.type_cost}) '
 
     @classmethod     
     def get_global(cls, shop_id, today=False):

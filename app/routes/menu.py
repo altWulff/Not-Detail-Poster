@@ -1,6 +1,7 @@
 from datetime import datetime
 from flask import render_template, redirect, url_for, flash, Blueprint, request
 from flask_security import current_user, login_required
+from flask_modals import render_template_modal
 from app import app, db
 from app.forms import ExpanseForm, ByWeightForm, WriteOffForm, SupplyForm, CoffeeShopForm, TransferForm
 from app.models import Shop, Storage, ShopEquipment, Expense, Supply, ByWeight, WriteOff, Category
@@ -21,7 +22,7 @@ def expense():
         return redirect(url_for("home"))
     else:
         flash(transaction.NON_VALID_MESSAGE)
-    return render_template("index.html")
+    return render_template_modal('index.html', modal='modal-form')
 
 
 @menu.route('/by_weight', methods=['POST', ])
@@ -35,7 +36,7 @@ def by_weight():
         return redirect(url_for("home"))
     else:
         flash(transaction.NON_VALID_MESSAGE)
-    return render_template("index.html")
+    return render_template_modal('index.html', modal='modal-form')
 
 
 @menu.route('/write_off', methods=('POST', ))
@@ -49,7 +50,7 @@ def write_off():
         return redirect(url_for("home"))
     else:
         flash(transaction.NON_VALID_MESSAGE)
-    return render_template("index.html")
+    return render_template_modal('index.html', modal='modal-form')
 
 
 @menu.route('/supply', methods=('POST', ))
@@ -63,7 +64,7 @@ def supply():
         return redirect(url_for("home"))
     else:
         flash(transaction.NON_VALID_MESSAGE)
-    return render_template("index.html")
+    return render_template_modal('index.html', modal='modal-form')
 
 
 # TODO доделать перемещение
@@ -78,7 +79,7 @@ def transfer():
         return redirect(url_for("home"))
     else:
         flash(f'Errr... ')
-    return render_template("index.html")
+    return render_template_modal('index.html', modal='modal-form')
 
 
 @menu.route('/create_coffee_shop', methods=('GET', 'POST'))

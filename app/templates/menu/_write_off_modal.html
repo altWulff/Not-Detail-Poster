@@ -1,6 +1,7 @@
 <div class="modal fade" id="WriteOffModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="WriteOffModal" aria-hidden="true">\
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
+            {{ modal_messages() }}
             <form action="{{ url_for('menu.write_off') }}" method="post">
             {{ write_off_form.csrf_token }}
             <div class="modal-header">

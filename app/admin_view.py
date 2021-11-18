@@ -747,7 +747,7 @@ class ReportAdmin(ModelView):
         return super(ReportAdmin, self).render(template, **kwargs)
 
     def on_model_change(self, form, model, is_created):
-        expanses = Expense.by_timestamp(model.shop.id, model.timestamp)
+        expanses = model.expenses
         expanses = sum([e.money for e in expanses if e.type_cost == 'cash'])
         last_actual_balance = model.shop.cash + expanses
         cash_balance = form.actual_balance.data - last_actual_balance

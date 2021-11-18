@@ -1,6 +1,7 @@
 from datetime import datetime
 from flask import render_template, redirect, url_for, flash
 from flask_security import login_required, login_user, logout_user
+from flask_modals import render_template_modal
 from app import app, db
 from app.forms import LoginForm, RegistrationForm
 from app.models import Barista
@@ -10,7 +11,7 @@ from app.models import Barista
 @app.route('/index', methods=("POST", "GET"))
 @login_required
 def home():
-    return render_template('index.html')
+    return render_template_modal('index.html', modal='modal-form')
 
 
 @app.route('/login', methods=('GET', 'POST'))

@@ -1,7 +1,8 @@
 import logging
 from logging.handlers import RotatingFileHandler
 import os
-from flask import Flask
+from flask import Flask, request, session
+from flask_babelex import Babel
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
@@ -12,6 +13,7 @@ from flask_security import Security, SQLAlchemyUserDatastore
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_admin import helpers as admin_helpers
 from config import DevelopmentConfig
+from flask_modals import Modal
 
 app = Flask(__name__)
 app.config.from_object(DevelopmentConfig)
@@ -20,6 +22,8 @@ migrate = Migrate(app, db)
 login = LoginManager(app)
 toolbar = DebugToolbarExtension(app)
 moment = Moment(app)
+modal = Modal(app)
+babel = Babel(app)
 
 from app import routes, models, forms, routes
 from app.routes import auth
@@ -73,6 +77,11 @@ def security_context_processor():
         h=admin_helpers,
     )
 
+@babel.localeselector
+def get_locale():
+    if request.args.get('lang'):
+        session['lang'] = request.args.get('lang')
+    return session.get('lang', 'en')
 
 if not app.debug:
     if not os.path.exists('logs'):
