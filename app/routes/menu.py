@@ -104,10 +104,11 @@ def create_coffee_shop():
             grinder_1=form.grinder_1.data,
             grinder_2=form.grinder_2.data
         )
-        shop.shop_equipmen = equipment
+        shop.shop_equipment = equipment
         shop.storage = storage
-        db.session.add(shop)
         db.session.add(storage)
+        db.session.add(equipment)
+        db.session.add(shop)
         db.session.commit()
         flash('Создана новая кофейня!')
         return redirect(url_for('home'))
