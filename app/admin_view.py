@@ -41,28 +41,34 @@ class ModelView(sqla.ModelView):
 
     @property
     def can_delete(self):
-        is_admin = current_user.has_role('admin')
-        is_active = current_user.is_active and current_user.is_authenticated
-
-        if is_active and is_admin:
-            return True
+        try:
+            is_admin = current_user.has_role('admin')
+            is_active = current_user.is_active and current_user.is_authenticated
+            return is_active and is_admin
+        except:
+            pass
         return False
 
     @property
     def can_create(self):
-        is_admin = current_user.has_role('admin')
-        is_active = current_user.is_active and current_user.is_authenticated
-
-        if is_active and is_admin:
-            return True
+        try:
+            is_admin = current_user.has_role('admin')
+            is_active = current_user.is_active and current_user.is_authenticated
+            return is_active and is_admin
+        except:
+            pass
         return False
 
     def is_accessible(self):
-        is_active = current_user.is_active and current_user.is_authenticated
-        is_admin = current_user.has_administrative_rights
-        is_moderator = current_user.has_moderator_rights
-
-        return is_active and is_admin or is_moderator
+        try:
+            is_active = current_user.is_active and current_user.is_authenticated
+            
+            is_admin = current_user.has_administrative_rights
+            is_moderator = current_user.has_moderator_rights
+    
+            return is_active and is_admin or is_moderator
+        except:
+            return False
 
     def _handle_view(self, name, **kwargs):
         """
@@ -747,7 +753,7 @@ class ReportAdmin(ModelView):
         return super(ReportAdmin, self).render(template, **kwargs)
 
     def on_model_change(self, form, model, is_created):
-        expanses = model.expenses
+        expanses = form.expenses.data
         expanses = sum([e.money for e in expanses if e.type_cost == 'cash'])
         last_actual_balance = model.shop.cash + expanses
         cash_balance = form.actual_balance.data - last_actual_balance
