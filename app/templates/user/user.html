@@ -9,7 +9,7 @@
         <h4>{{_('Место работы')}}:</h4>
         <ul>
             {% for s in user.shop %}
-                <li><a href="{{ url_for('reports.on_address', shop_address=s.address)}}">{{s.place_name}} / {{ s.address}}</a></li>
+                <li>{{s.place_name}} / {{ s.address}}</li>
             {% endfor %}
         </ul>
         <h4>{{_('Роли')}}:</h4>

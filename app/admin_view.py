@@ -752,6 +752,72 @@ class ReportAdmin(ModelView):
 
         return super(ReportAdmin, self).render(template, **kwargs)
 
+    def update_model(self, form, model):
+        try:
+            new_cash_balance, old_cash_balance = form.cash_balance.data, model.cash_balance
+            new_cashless, old_cashless = form.cashless.data, model.cashless
+            new_actual_balance, old_actual_balance = form.actual_balance.data, model.actual_balance
+            new_expenses = sum([e.money for e in form.expenses.data if e.type_cost == 'cash'])
+            expenses_data = form.expenses.data
+            old_expenses = sum([e.money for e in model.expenses if e.type_cost == 'cash'])
+
+            new_consumption_coffee_arabika = form.consumption_coffee_arabika.data
+            old_consumption_coffee_arabika = model.consumption_coffee_arabika
+
+            new_consumption_coffee_blend = form.consumption_coffee_blend.data
+            old_consumption_coffee_blend = model.consumption_coffee_blend
+
+            new_consumption_milk = form.consumption_milk.data
+            old_consumption_milk = model.consumption_milk
+
+            new_consumption_panini = form.consumption_panini.data
+            old_consumption_panini = model.consumption_panini
+
+            new_consumption_hot_dogs = form.consumption_hot_dogs.data
+            old_consumption_hot_dogs = model.consumption_hot_dogs
+
+            form.populate_obj(model)
+            self._on_model_change(form, model, False)
+            self.session.commit()
+        except Exception as ex:
+            if not self.handle_view_exception(ex):
+                flash(gettext('Failed to update record. %(error)s', error=str(ex)), 'error')
+                log.exception('Failed to update record.')
+
+            self.session.rollback()
+
+            return False
+        else:
+            if new_cash_balance != old_cash_balance:
+                form.cash_balance.data = old_cash_balance
+
+            if new_cashless != old_cashless:
+                form.cashless.data = old_cashless
+
+            if new_expenses != old_expenses:
+                form.expenses.data = expenses_data
+
+            if new_actual_balance != old_actual_balance:
+                form.actual_balance.data = old_actual_balance
+
+            if new_consumption_coffee_arabika != old_consumption_coffee_arabika:
+                form.consumption_coffee_arabika.data = old_consumption_coffee_arabika
+
+            if new_consumption_coffee_blend != old_consumption_coffee_blend:
+                form.consumption_coffee_blend.data = old_consumption_coffee_blend
+
+            if new_consumption_milk != old_consumption_milk:
+                form.consumption_milk.data = old_consumption_milk
+
+            if new_consumption_panini != old_consumption_panini:
+                form.consumption_panini.data = old_consumption_panini
+
+            if new_consumption_hot_dogs != old_consumption_hot_dogs:
+                form.consumption_hot_dogs.data = old_consumption_hot_dogs
+
+            self.after_model_change(form, model, False)
+        return True
+
     def on_model_change(self, form, model, is_created):
         expanses = form.expenses.data
         expanses = sum([e.money for e in expanses if e.type_cost == 'cash'])
@@ -773,13 +839,29 @@ class ReportAdmin(ModelView):
         model.consumption_coffee_arabika = model.shop.storage.coffee_arabika - float(form.coffee_arabika.data)
         model.consumption_coffee_blend = model.shop.storage.coffee_blend - float(form.coffee_blend.data)
         model.consumption_milk = model.shop.storage.milk - float(form.milk.data)
-        model.consumption_panini = model.shop.storage.panini - model.panini
-        model.consumption_hot_dogs = model.shop.storage.hot_dogs - model.hot_dogs
+        model.consumption_panini = model.shop.storage.panini - int(form.panini.data)
+        model.consumption_hot_dogs = model.shop.storage.hot_dogs - int(form.hot_dogs.data)
+
         model.shop.storage.coffee_arabika -= model.consumption_coffee_arabika
         model.shop.storage.coffee_blend -= model.consumption_coffee_blend
         model.shop.storage.milk -= model.consumption_milk
         model.shop.storage.panini -= model.consumption_panini
         model.shop.storage.hot_dogs -= model.consumption_hot_dogs
+
+    def after_model_change(self, form, model, is_created):
+        if not is_created:
+            # TODO некоректно обрабатываются расходы
+            # expanses = form.expenses.data
+            # expanses = sum([e.money for e in expanses if e.type_cost == 'cash'])
+
+            model.shop.cash -= form.cash_balance.data
+            model.shop.cashless -= form.cashless.data
+            model.shop.storage.coffee_arabika += float(form.consumption_coffee_arabika.data)
+            model.shop.storage.coffee_blend += float(form.consumption_coffee_blend.data)
+            model.shop.storage.milk += float(form.consumption_milk.data)
+            model.shop.storage.panini += int(form.consumption_panini.data)
+            model.shop.storage.hot_dogs += int(form.consumption_hot_dogs.data)
+            self.session.commit()
 
     def on_model_delete(self, model):
         if model.backdating:
@@ -967,21 +1049,9 @@ class ExpenseAdmin(ModelView):
 
         return super(ExpenseAdmin, self).render(template, **kwargs)
 
-    # def on_form_prefill(self, form, id):
-    #     print('on_form_prefill', form, id)
-
-    def after_model_change(self, form, model, is_created):
-        if not is_created:
-            if form.type_cost.data == 'cash':
-                model.shop.cash += form.money.data
-            else:
-                model.shop.cashless += form.money.data
-            self.session.commit()
-
     def update_model(self, form, model):
         try:
-            new_money = form.money.data
-            old_money = model.money
+            new_money, old_money = form.money.data, model.money
             form.populate_obj(model)
             self._on_model_change(form, model, False)
             self.session.commit()
@@ -989,9 +1059,7 @@ class ExpenseAdmin(ModelView):
             if not self.handle_view_exception(ex):
                 flash(gettext('Failed to update record. %(error)s', error=str(ex)), 'error')
                 log.exception('Failed to update record.')
-
             self.session.rollback()
-
             return False
         else:
             if new_money != old_money:
@@ -1007,6 +1075,14 @@ class ExpenseAdmin(ModelView):
             model.shop.cash -= money
         else:
             model.shop.cashless -= money
+
+    def after_model_change(self, form, model, is_created):
+        if not is_created:
+            if form.type_cost.data == 'cash':
+                model.shop.cash += form.money.data
+            else:
+                model.shop.cashless += form.money.data
+            self.session.commit()
 
     def on_model_delete(self, model):
         if model.backdating:
@@ -1125,26 +1201,73 @@ class SupplyAdmin(ModelView):
         }
     }
 
-    def on_model_change(self, form, model, is_created):
-        if is_created:
-            if form.product_name.data == 'coffee_blend':
-                model.storage.coffee_blend += float(form.amount.data)
-            elif form.product_name.data == 'coffee_arabika':
-                model.storage.coffee_arabika += float(form.amount.data)
-            elif form.product_name.data == 'milk':
-                model.storage.milk += float(form.amount.data)
-            elif form.product_name.data == 'panini':
-                model.storage.panini += int(form.amount.data)
-            else:
-                model.storage.hot_dogs += int(form.amount.data)
+    def update_model(self, form, model):
+        try:
+            new_money = form.money.data
+            old_money = model.money
 
-            if form.type_cost.data == 'cash':
-                model.storage.shop.cash -= form.money.data
-            else:
-                model.storage.shop.cashless -= form.money.data
+            new_amount = form.amount.data
+            old_amount = model.amount
+
+            new_product_name = form.product_name.data
+            old_product_name = model.product_name
+
+            form.populate_obj(model)
+            self._on_model_change(form, model, False)
+            self.session.commit()
+        except Exception as ex:
+            if not self.handle_view_exception(ex):
+                flash(gettext('Failed to update record. %(error)s', error=str(ex)), 'error')
+                log.exception('Failed to update record.')
+            self.session.rollback()
+            return False
         else:
-            # TODO update model SupplyAdmin
-            pass
+            if new_money != old_money:
+                form.money.data = old_money
+            if new_amount != old_amount:
+                form.amount.data = old_amount
+            if new_product_name != old_product_name:
+                form.product_name.data = old_product_name
+            self.after_model_change(form, model, False)
+        return True
+
+    def on_model_change(self, form, model, is_created):
+        if form.backdating.data:
+            return
+        if form.product_name.data == 'coffee_blend':
+            model.storage.coffee_blend += float(form.amount.data)
+        elif form.product_name.data == 'coffee_arabika':
+            model.storage.coffee_arabika += float(form.amount.data)
+        elif form.product_name.data == 'milk':
+            model.storage.milk += float(form.amount.data)
+        elif form.product_name.data == 'panini':
+            model.storage.panini += int(form.amount.data)
+        else:
+            model.storage.hot_dogs += int(form.amount.data)
+
+        if form.type_cost.data == 'cash':
+            model.storage.shop.cash -= form.money.data
+        else:
+            model.storage.shop.cashless -= form.money.data
+
+    def after_model_change(self, form, model, is_created):
+        if not is_created:
+            if form.type_cost.data == 'cash':
+                model.storage.shop.cash += form.money.data
+            else:
+                model.storage.shop.cashless += form.money.data
+
+            if form.product_name.data == 'coffee_blend':
+                model.storage.coffee_blend -= float(form.amount.data)
+            elif form.product_name.data == 'coffee_arabika':
+                model.storage.coffee_arabika -= float(form.amount.data)
+            elif form.product_name.data == 'milk':
+                model.storage.milk -= float(form.amount.data)
+            elif form.product_name.data == 'panini':
+                model.storage.panini -= int(form.amount.data)
+            else:
+                model.storage.hot_dogs -= int(form.amount.data)
+            self.session.commit()
 
     def on_model_delete(self, model):
         if model.backdating:
@@ -1245,10 +1368,7 @@ class ByWeightAdmin(ModelView):
             gettext('Название товара'),
             choices=[
                 ('coffee_arabika', gettext('Арабика')),
-                ('coffee_blend', gettext('Купаж')),
-                ('milk', gettext('Молоко')),
-                ('panini', gettext('Панини')),
-                ('hot_dogs', gettext('Хот-доги'))
+                ('coffee_blend', gettext('Купаж'))
             ],
             validators=[Required()],
         )
@@ -1268,23 +1388,64 @@ class ByWeightAdmin(ModelView):
         }
     }
 
+    def update_model(self, form, model):
+        try:
+            new_money = form.money.data
+            old_money = model.money
+
+            new_amount = form.amount.data
+            old_amount = model.amount
+
+            new_product_name = form.product_name.data
+            old_product_name = model.product_name
+
+            form.populate_obj(model)
+            self._on_model_change(form, model, False)
+            self.session.commit()
+        except Exception as ex:
+            if not self.handle_view_exception(ex):
+                flash(gettext('Failed to update record. %(error)s', error=str(ex)), 'error')
+                log.exception('Failed to update record.')
+
+            self.session.rollback()
+
+            return False
+        else:
+            if new_money != old_money:
+                form.money.data = old_money
+            if new_amount != old_amount:
+                form.amount.data = old_amount
+            if new_product_name != old_product_name:
+                form.product_name.data = old_product_name
+            self.after_model_change(form, model, False)
+        return True
+
     def on_model_change(self, form, model, is_created):
         if form.backdating.data:
             return
 
-        if is_created:
-            if form.product_name.data == 'coffee_blend':
-                model.storage.coffee_blend -= float(form.amount.data)
-            else:
-                model.storage.coffee_arabika -= float(form.amount.data)
-
-            if form.type_cost.data == 'cash':
-                model.storage.shop.cash += form.money.data
-            else:
-                model.storage.shop.cashless += form.money.data
+        if form.product_name.data == 'coffee_blend':
+            model.storage.coffee_blend -= float(form.amount.data)
         else:
-            # TODO update model ByWeightAdmin
-            pass
+            model.storage.coffee_arabika -= float(form.amount.data)
+
+        if form.type_cost.data == 'cash':
+            model.storage.shop.cash += form.money.data
+        else:
+            model.storage.shop.cashless += form.money.data
+
+    def after_model_change(self, form, model, is_created):
+        if not is_created:
+            if form.type_cost.data == 'cash':
+                model.storage.shop.cash -= form.money.data
+            else:
+                model.storage.shop.cashless -= form.money.data
+
+            if form.product_name.data == 'coffee_blend':
+                model.storage.coffee_blend += float(form.amount.data)
+            else:
+                model.storage.coffee_arabika += float(form.amount.data)
+            self.session.commit()
 
     def on_model_delete(self, model):
         if model.backdating:
@@ -1368,23 +1529,58 @@ class WriteOffAdmin(ModelView):
         }
     }
 
-    def on_model_change(self, form, model, is_created):
-        if form.backdating.data:
-            return
-        if is_created:
-            if form.product_name.data == 'coffee_blend':
-                model.storage.coffee_blend -= float(form.amount.data)
-            elif form.product_name.data == 'coffee_arabika':
-                model.storage.coffee_arabika -= float(form.amount.data)
-            elif form.product_name.data == 'milk':
-                model.storage.milk -= float(form.amount.data)
-            elif form.product_name.data == 'panini':
-                model.storage.panini -= int(form.amount.data)
-            else:
-                model.storage.hot_dogs -= int(form.amount.data)
+    def update_model(self, form, model):
+        try:
+            new_amount = form.amount.data
+            old_amount = model.amount
+
+            new_product_name = form.product_name.data
+            old_product_name = model.product_name
+
+            form.populate_obj(model)
+            self._on_model_change(form, model, False)
+            self.session.commit()
+        except Exception as ex:
+            if not self.handle_view_exception(ex):
+                flash(gettext('Failed to update record. %(error)s', error=str(ex)), 'error')
+                log.exception('Failed to update record.')
+
+            self.session.rollback()
+
+            return False
         else:
-            # TODO update model WriteOffAdmin
-            pass
+            if new_amount != old_amount:
+                form.amount.data = old_amount
+            if new_product_name != old_product_name:
+                form.product_name.data = old_product_name
+            self.after_model_change(form, model, False)
+        return True
+
+    def on_model_change(self, form, model, is_created):
+        if form.product_name.data == 'coffee_blend':
+            model.storage.coffee_blend -= float(form.amount.data)
+        elif form.product_name.data == 'coffee_arabika':
+            model.storage.coffee_arabika -= float(form.amount.data)
+        elif form.product_name.data == 'milk':
+            model.storage.milk -= float(form.amount.data)
+        elif form.product_name.data == 'panini':
+            model.storage.panini -= int(form.amount.data)
+        else:
+            model.storage.hot_dogs -= int(form.amount.data)
+
+    def after_model_change(self, form, model, is_created):
+        if not is_created:
+            if form.product_name.data == 'coffee_blend':
+                model.storage.coffee_blend += float(form.amount.data)
+            elif form.product_name.data == 'coffee_arabika':
+                model.storage.coffee_arabika += float(form.amount.data)
+            elif form.product_name.data == 'milk':
+                model.storage.milk += float(form.amount.data)
+            elif form.product_name.data == 'panini':
+                model.storage.panini += int(form.amount.data)
+            else:
+                model.storage.hot_dogs += int(form.amount.data)
+            self.session.commit()
 
     def on_model_delete(self, model):
         if model.backdating:

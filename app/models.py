@@ -228,9 +228,6 @@ class Category(db.Model):
     name = db.Column(db.String(80))
 
     def __repr__(self):
-        return f'<Category: {self.name}>'
-        
-    def __str__(self):
         return self.name.title()
 
 
