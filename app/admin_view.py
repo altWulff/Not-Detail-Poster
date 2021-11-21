@@ -708,7 +708,7 @@ class ReportAdmin(ModelView):
     def median_total(self, attr: str) -> int:
         _query = self.session.query(func.avg(Report.__dict__[attr])).scalar()
         try:
-            return _query
+            return round(_query)
         except:
             return 0
 
@@ -819,7 +819,7 @@ class ReportAdmin(ModelView):
         return True
 
     def on_model_change(self, form, model, is_created):
-        expanses = form.expenses.data
+        expanses = model.expenses
         expanses = sum([e.money for e in expanses if e.type_cost == 'cash'])
         last_actual_balance = model.shop.cash + expanses
         cash_balance = form.actual_balance.data - last_actual_balance
@@ -1113,6 +1113,16 @@ class SupplyAdmin(ModelView):
         formatter = f'{model.money} грн.{type_cost}'
         return Markup(f'{formatter}')
 
+    def _list_product_name(view, context, model, name):
+        prettified = dict(
+            coffee_arabika=gettext('арабика'),
+            coffee_blend=gettext('купаж'),
+            milk=gettext('молоко'),
+            panini=gettext('панини'),
+            hot_dogs=gettext('хот-доги')
+        )
+        return Markup(f'{prettified[model.product_name]}')
+
     can_set_page_size = True
     column_list = ('timestamp', 'product_name', 'amount', 'money', 'storage')
     column_labels = dict(
@@ -1129,6 +1139,7 @@ class SupplyAdmin(ModelView):
     form_edit_rules = ('backdating', 'timestamp', 'product_name', 'amount', 'type_cost', 'money', 'storage')
     column_formatters = dict(
         type_cost=lambda v, c, m, p: 'Наличка' if m.type_cost == 'cash' else 'Безнал',
+        product_name=_list_product_name,
         money=_list_money,
         amount=_list_amount
     )
@@ -1308,6 +1319,16 @@ class ByWeightAdmin(ModelView):
         formatter = f'{model.money} грн.{type_cost}'
         return Markup(f'{formatter}')
 
+    def _list_product_name(view, context, model, name):
+        prettified = dict(
+            coffee_arabika=gettext('арабика'),
+            coffee_blend=gettext('купаж'),
+            milk=gettext('молоко'),
+            panini=gettext('панини'),
+            hot_dogs=gettext('хот-доги')
+        )
+        return Markup(f'{prettified[model.product_name]}')
+
     can_set_page_size = True
     column_list = ('timestamp', 'product_name', 'amount', 'money', 'storage')
     column_labels = dict(
@@ -1321,6 +1342,7 @@ class ByWeightAdmin(ModelView):
     column_filters = ('timestamp', 'product_name', 'type_cost')
     column_formatters = dict(
         type_cost=lambda v, c, m, p: 'Наличка' if m.type_cost == 'cash' else 'Безнал',
+        product_name=_list_product_name,
         money=_list_money,
         amount=_list_amount
     )
@@ -1473,6 +1495,16 @@ class WriteOffAdmin(ModelView):
             formatter = f'{model.amount} шт.'
         return Markup(f'{formatter}')
 
+    def _list_product_name(view, context, model, name):
+        prettified = dict(
+            coffee_arabika=gettext('арабика'),
+            coffee_blend=gettext('купаж'),
+            milk=gettext('молоко'),
+            panini=gettext('панини'),
+            hot_dogs=gettext('хот-доги')
+        )
+        return Markup(f'{prettified[model.product_name]}')
+
     can_set_page_size = True
     column_list = ('timestamp', 'product_name', 'amount', 'storage')
     column_labels = dict(
@@ -1484,6 +1516,7 @@ class WriteOffAdmin(ModelView):
     column_filters = ('timestamp', 'product_name')
     column_formatters = dict(
         timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"),
+        product_name=_list_product_name,
         amount=_list_amount
     )
     form_create_rules = ('timestamp', 'product_name', 'amount', 'storage')
