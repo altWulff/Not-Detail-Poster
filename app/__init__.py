@@ -1,25 +1,26 @@
+import os
 import logging
 from logging.handlers import RotatingFileHandler
-import os
 from flask import Flask, request, session
 from flask_babelex import Babel
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_admin import Admin
-from flask_admin.menu import MenuLink
 from flask_moment import Moment
 from flask_security import Security, SQLAlchemyUserDatastore
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_admin import helpers as admin_helpers
-from config import DevelopmentConfig
 from flask_modals import Modal
+from flask_babelex import lazy_gettext as _l
+from config import DevelopmentConfig
 
 app = Flask(__name__)
 app.config.from_object(DevelopmentConfig)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 login = LoginManager(app)
+login.login_message = _l('Please log in to access this page.')
 toolbar = DebugToolbarExtension(app)
 moment = Moment(app)
 modal = Modal(app)
@@ -77,11 +78,11 @@ def security_context_processor():
         h=admin_helpers,
     )
 
+
 @babel.localeselector
 def get_locale():
-    if request.args.get('lang'):
-        session['lang'] = request.args.get('lang')
-    return session.get('lang', 'en')
+    return request.accept_languages.best_match(app.config['LANGUAGES'])
+
 
 if not app.debug:
     if not os.path.exists('logs'):

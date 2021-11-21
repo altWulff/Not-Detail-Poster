@@ -2,6 +2,7 @@ from datetime import datetime, date
 from sqlalchemy import func
 from flask import flash, redirect, url_for
 from flask_security import current_user
+from flask_babelex import _
 from app.models import Shop, Report, Expense, Storage, Category, WriteOff, Supply, ByWeight
 from app import app, db
 
@@ -19,11 +20,6 @@ def is_report_send(shop_id: int) -> bool:
 
 
 class TransactionHandler:
-    COMMIT_MESSAGE = 'Транзакция принята!'
-    NON_VALID_MESSAGE = 'Транзакция не принята!  Попробуйте заново, с коректными значениями.'
-    LIMIT_MESSAGE = 'Сегодняшний отчет уже был отправлен!'
-    COMMIT_REPORT_MESSAGE = 'Отчет за день отправлен!'
-    
     def __init__(self, shop_id=None):
         self.shop = self.get_shop_from_id(shop_id)
         self.storage = self.get_storage_from_id(shop_id)
@@ -36,10 +32,8 @@ class TransactionHandler:
         query = Storage.query.filter_by(shop_id=shop_id).first_or_404()
         return query
 
-    def validate_report_limit(self):
-        if is_report_send(self.shop.id):
-            flash(self.LIMIT_MESSAGE)
-            return redirect(url_for('home'))
+    def is_report_send(self, shop_id: int) -> bool:
+        return transaction_count(shop_id) >= app.config['REPORTS_PER_DAY']
             
     def funds_expenditure(self, money, type_cost):
         if type_cost == 'cash':
@@ -58,7 +52,6 @@ class TransactionHandler:
         db.session.commit()
         
     def create_expense(self, form):
-        self.validate_report_limit()
         expense = Expense(
             type_cost=form.type_cost.data,
             money=form.money.data,
@@ -73,7 +66,6 @@ class TransactionHandler:
         self.write_to_db(expense)
     
     def crete_by_weight(self, form):
-        self.validate_report_limit()
         if form.by_weight_choice.data == 'coffee_blend':
             self.storage.coffee_blend -= form.amount.data
         else:
@@ -91,7 +83,6 @@ class TransactionHandler:
         self.write_to_db(by_weight)
         
     def create_write_off(self, form):
-        self.validate_report_limit()
         if form.write_off_choice.data == 'coffee_blend':
             self.storage.coffee_blend -= form.amount.data
         elif form.write_off_choice.data == 'coffee_arabika':
@@ -111,7 +102,6 @@ class TransactionHandler:
         self.write_to_db(write_off)
     
     def create_supply(self, form):
-        self.validate_report_limit()
         if form.supply_choice.data == 'coffee_blend':
             self.storage.coffee_blend += form.amount.data
         elif form.supply_choice.data == 'coffee_arabika':
@@ -135,7 +125,6 @@ class TransactionHandler:
         self.write_to_db(supply)
         
     def create_report(self, form):
-        self.validate_report_limit()
         expanses = Expense.get_local(self.shop.id, True)
         expanses = sum([e.money for e in expanses if e.type_cost == 'cash'])
         last_actual_balance = self.shop.cash + expanses
@@ -165,10 +154,10 @@ class TransactionHandler:
         report.consumption_milk = self.storage.milk - form.milk.data
         report.consumption_panini = self.storage.panini - form.panini.data
         report.consumption_hot_dogs = self.storage.hot_dogs - form.hot_dogs.data
-        
+
         self.storage.coffee_arabika -= report.consumption_coffee_arabika
         self.storage.coffee_blend -= report.consumption_coffee_blend
         self.storage.milk -= report.consumption_milk
         self.storage.panini -= report.consumption_panini
         self.storage.hot_dogs -= report.consumption_hot_dogs
-        self.write_to_db(report) 
+        self.write_to_db(report)

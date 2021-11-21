@@ -13,6 +13,8 @@ class Config:
     REPORTS_USER_VIEW = 3
     REPORTS_PER_PAGE = 3
     REPORTS_PER_DAY = 1
+    LANGUAGES = ['ru', 'uk']
+    BABEL_DEFAULT_LOCALE = 'ru'
 
 
 class ProductionConfig(Config):

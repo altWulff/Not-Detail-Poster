@@ -52,4 +52,4 @@ def create_new_staff():
 @login_required
 def logout():
     logout_user()
-    return redirect('index')
+    return redirect(url_for('home'))

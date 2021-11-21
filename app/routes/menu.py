@@ -1,11 +1,12 @@
 from datetime import datetime
 from flask import render_template, redirect, url_for, flash, Blueprint, request
-from flask_security import current_user, login_required
+from flask_security import login_required
 from flask_modals import render_template_modal
-from app import app, db
+from app import db
 from app.forms import ExpanseForm, ByWeightForm, WriteOffForm, SupplyForm, CoffeeShopForm, TransferForm
-from app.models import Shop, Storage, ShopEquipment, Expense, Supply, ByWeight, WriteOff, Category
-from app.business_logic import transaction_count, TransactionHandler
+from app.models import Shop, Storage, ShopEquipment, Barista
+from app.business_logic import TransactionHandler
+from flask_babelex import _
 
 
 menu = Blueprint('menu', __name__, url_prefix='/menu')
@@ -17,11 +18,14 @@ def expense():
     form = ExpanseForm()
     transaction = TransactionHandler(form.coffee_shop.data)
     if form.validate_on_submit():
-        transaction.create_expense(form)
-        flash(transaction.COMMIT_MESSAGE)
+        if transaction.is_report_send(form.shop.data):
+            flash(_('Сегодняшний отчет уже был отправлен!'))
+        else:
+            transaction.create_expense(form)
+            flash(_('Транзакция принята!'))
         return redirect(url_for("home"))
     else:
-        flash(transaction.NON_VALID_MESSAGE)
+        flash(_('Транзакция не принята!  Попробуйте заново, с коректными значениями.'))
     return render_template_modal('index.html', modal='modal-form')
 
 
@@ -31,11 +35,14 @@ def by_weight():
     form = ByWeightForm(request.form)
     transaction = TransactionHandler(form.coffee_shop.data)
     if form.validate_on_submit():
-        transaction.crete_by_weight(form)
-        flash(transaction.COMMIT_MESSAGE)
+        if transaction.is_report_send(form.shop.data):
+            flash(_('Сегодняшний отчет уже был отправлен!'))
+        else:
+            transaction.crete_by_weight(form)
+            flash(_('Транзакция принята!'))
         return redirect(url_for("home"))
     else:
-        flash(transaction.NON_VALID_MESSAGE)
+        flash(_('Транзакция не принята!  Попробуйте заново, с коректными значениями.'))
     return render_template_modal('index.html', modal='modal-form')
 
 
@@ -45,11 +52,14 @@ def write_off():
     form = WriteOffForm(request.form)
     transaction = TransactionHandler(form.coffee_shop.data)
     if form.validate_on_submit():
-        transaction.create_write_off(form)
-        flash(transaction.COMMIT_MESSAGE)
+        if transaction.is_report_send(form.shop.data):
+            flash(_('Сегодняшний отчет уже был отправлен!'))
+        else:
+            transaction.create_write_off(form)
+            flash(_('Транзакция принята!'))
         return redirect(url_for("home"))
     else:
-        flash(transaction.NON_VALID_MESSAGE)
+        flash(_('Транзакция не принята!  Попробуйте заново, с коректными значениями.'))
     return render_template_modal('index.html', modal='modal-form')
 
 
@@ -59,11 +69,14 @@ def supply():
     form = SupplyForm(request.form)
     transaction = TransactionHandler(form.coffee_shop.data)
     if form.validate_on_submit():
-        transaction.create_supply(form)
-        flash(transaction.COMMIT_MESSAGE)
+        if transaction.is_report_send(form.shop.data):
+            flash(_('Сегодняшний отчет уже был отправлен!'))
+        else:
+            transaction.create_supply(form)
+            flash(_('Транзакция принята!'))
         return redirect(url_for("home"))
     else:
-        flash(transaction.NON_VALID_MESSAGE)
+        flash(_('Транзакция не принята!  Попробуйте заново, с коректными значениями.'))
     return render_template_modal('index.html', modal='modal-form')
 
 
@@ -80,6 +93,16 @@ def transfer():
     else:
         flash(f'Errr... ')
     return render_template_modal('index.html', modal='modal-form')
+
+
+# @menu.route('/add_staff', methods=('POST', ))
+# @login_required
+# def add_staff_to_shop():
+#     form = AddStaffForm(request.form)
+#     if form.validate_on_submit():
+#         flash('')
+#         return redirect(url_for("home"))
+#     return render_template_modal('index.html', modal='modal-form')
 
 
 @menu.route('/create_coffee_shop', methods=('GET', 'POST'))
@@ -107,10 +130,13 @@ def create_coffee_shop():
         )
         shop.shop_equipment = equipment
         shop.storage = storage
+        for staff_id in form.staff_list.data:
+            staff = Barista.query.filter_by(id=staff_id).first_or_404()
+            shop.baristas.append(staff)
         db.session.add(storage)
         db.session.add(equipment)
         db.session.add(shop)
         db.session.commit()
-        flash('Создана новая кофейня!')
+        flash(_('Создана новая кофейня!'))
         return redirect(url_for('home'))
     return render_template('menu/new_coffee_shop.html', form=form)

@@ -1,11 +1,10 @@
-from sqlalchemy import func
-from datetime import datetime, date
 from flask import render_template, redirect, url_for, flash, Blueprint, request
 from flask_security import login_required, current_user
+from flask_babelex import _
 from app import db, app
 from app.forms import ReportForm
 from app.models import Shop, Report, Storage, Expense, Supply, baristas, Barista
-from app.business_logic import transaction_count, date_today, TransactionHandler
+from app.business_logic import TransactionHandler
 
 
 report = Blueprint('reports', __name__, url_prefix='/report')
@@ -15,12 +14,13 @@ report = Blueprint('reports', __name__, url_prefix='/report')
 @login_required
 def create():
     form = ReportForm(request.form)
-    shop_query = Shop.get_barista_work(current_user.id)
-    form.shop.choices = [(shop.id, shop) for shop in shop_query]
     if form.validate_on_submit():
         transaction = TransactionHandler(form.shop.data)
-        transaction.create_report(form)
-        flash(transaction.COMMIT_REPORT_MESSAGE)
+        if transaction.is_report_send(form.shop.data):
+            flash(_('Сегодняшний отчет уже был отправлен!'))
+        else:
+            transaction.create_report(form)
+            flash(_('Отчет за день отправлен!'))
         return redirect(url_for('home'))
     return render_template('report/create_report.html', title='Создание отчёта', form=form)
 
