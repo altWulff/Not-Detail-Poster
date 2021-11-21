@@ -1,16 +1,26 @@
 {% extends "base.html" %}
-{% block title %}Профиль {{user.name}}{% endblock %}
+{% block title %}{{_('Профиль')}} {{user.name}}{% endblock %}
 {% block content %}
-<h4>Имя: {{ user.name }}</h4>
-<h4>Моб.тел.: {{ user.phone_number }}</h4>
-<h4>Емейл: {{ user.email }}</h4>
-<h4>Роли:</h4>
-<ul>
-    {% for role in user.roles %}
-        <li>{{role.name}}</li>
-    {% endfor %}
-</ul>
-{% if current_user == user %}
-    <a href="{{ url_for('user.edit', user_name=current_user.name) }} ">Редактировать профиль</a>
-{% endif %}
+<div class="row">
+    <div class="col">
+        <h4>{{_('Имя')}}: {{ user.name }}</h4>
+        <h4>{{_('Тел.')}}: {{ user.phone_number }}</h4>
+        <h4>{{_('Емейл')}}: {{ user.email }}</h4>
+        <h4>{{_('Место работы')}}:</h4>
+        <ul>
+            {% for s in user.shop %}
+                <li><a href="{{ url_for('reports.on_address', shop_address=s.address)}}">{{s.place_name}} / {{ s.address}}</a></li>
+            {% endfor %}
+        </ul>
+        <h4>{{_('Роли')}}:</h4>
+        <ul>
+            {% for role in user.roles %}
+                <li>{{role.name}}</li>
+            {% endfor %}
+        </ul>
+        {% if current_user == user %}
+            <a href="{{ url_for('user.edit', user_name=current_user.name) }} ">{{_('Редактировать профиль')}}</a>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

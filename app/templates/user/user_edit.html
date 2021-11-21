@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Профиль {{user.name}}{% endblock %}
+{% block title %}{{_('Профиль')}} {{user.name}}{% endblock %}
 {% block style %}
 .form-floating:focus-within {
   z-index: 2;
@@ -18,11 +18,11 @@
     }
 {% endblock %}
 {% block content %}
-<h1>Edit Profile</h1>
-<form action="" method="post">
+<h1>Редактирование профиля</h1>
+<form method="post">
     {{ form.csrf_token }}
     {{ render_field(form.name) }}
-    {{ render_field(form.phone_number) }}
+    {{ render_phone_field(form.phone_number) }}
     {{ render_field(form.email) }}
     <p>{{ form.submit(class="w-100 btn btn-lg btn-primary") }}</p>
 </form>
