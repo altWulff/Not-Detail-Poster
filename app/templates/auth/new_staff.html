@@ -1,24 +1,17 @@
 {% extends "base.html" %}
-{% block title %}Новый сотрудник{% endblock %}
+{% block title %}{{ _('Новый сотрудник') }}{% endblock %}
 {% block head %}
 {% endblock %}
 {% block content %}
-<h1>Новый сотрудник</h1>
+<h1>{{ _('Новый сотрудник') }}</h1>
     <form action="" method="post">
-    {{ form.csrf_token }}
-    {{ render_field(form.name) }}
-    {{ render_field(form.phone_number) }}
-    {{ render_field(form.email) }}
-    <div class="form-floating mb-3">
-        {{ form.password(type="password", class="form-control", id="floatingPassword", placeholder=' ') }}
-        {{ form.password.label(for="floatingPassword")}}
-        {{ with_errors(form.password) }}
-    </div>
-    <div class="form-floating mb-3">
-        {{ form.password2(type="password", class="form-control", id="floatingPassword", placeholder=' ') }}
-        {{ form.password2.label(for="floatingPassword")}}
-        {{ with_errors(form.password2) }}
-    </div>
-    <p>{{ form.submit(class="w-100 btn btn-lg btn-primary") }}</p>
+        {{ form.csrf_token }}
+        {{ render_field(form.name) }}
+        {{ render_phone_field(form.phone_number) }}
+        {{ render_field(form.email) }}
+        {{ render_password_field(form.password) }}
+        {{ render_password_field(form.password2) }}
+        {{ render_select_field(form.work_place) }}
+        {{ form.submit(class="w-100 btn btn-lg btn-primary") }}
     </form>
 {% endblock %}

@@ -415,9 +415,8 @@ class CoffeeShopForm(FlaskForm):
             )
         ]
     )
-    submit = SubmitField(_l('Создать'))
     staff_list = NonValidatingSelectMultipleField(_l('Добавить сотрудников'))
-    submit = SubmitField(_l('Добавить'))
+    submit = SubmitField(_l('Создать'))
 
     def __init__(self, *args, **kwargs):
         super(CoffeeShopForm, self).__init__(*args, **kwargs)

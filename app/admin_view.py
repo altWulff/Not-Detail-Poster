@@ -9,7 +9,11 @@ from flask_admin.model import typefmt
 from app.models import Shop, Report, Expense, Supply
 from wtforms import RadioField, SelectField, BooleanField
 from wtforms.validators import DataRequired, NumberRange, Required, InputRequired
-from flask_admin.contrib.sqla.filters import DateTimeBetweenFilter
+import logging
+from flask import flash
+from flask_admin.babel import gettext
+
+log = logging.getLogger("flask-admin.sqla")
 
 
 class IndexAdmin(AdminIndexView):
@@ -103,15 +107,15 @@ class ShopAdmin(ModelView):
     can_view_details = True
     column_searchable_list = ('place_name', 'address')
     column_labels = dict(
-        place_name='Название',
-        address='Адрес',
-        cash='Наличка',
-        cashless='Безнал',
-        storage='Склад',
-        shop_equipment='Оборудование',
-        reports='Отчеты',
-        expenses='Расходы',
-        baristas='Баристы'
+        place_name=gettext('Название'),
+        address=gettext('Адрес'),
+        cash=gettext('Наличка'),
+        cashless=gettext('Безнал'),
+        storage=gettext('Склад'),
+        shop_equipment=gettext('Оборудование'),
+        reports=gettext('Отчеты'),
+        expenses=gettext('Расходы'),
+        baristas=gettext('Баристы')
     )
     form_create_rules = ('place_name', 'address', 'cash', 'cashless', 'storage', 'shop_equipment', 'baristas')
     form_edit_rules = ('place_name', 'address', 'cash', 'cashless', 'storage', 'shop_equipment', 'baristas')
@@ -127,7 +131,7 @@ class ShopAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-1,
-                    message='Сумма должна быть нулевой, либо больше нуля'
+                    message=gettext('Сумма должна быть нулевой, либо больше нуля')
                 )
             ]
         ),
@@ -136,7 +140,7 @@ class ShopAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-1,
-                    message='Сумма должна быть нулевой, либо больше нуля'
+                    message=gettext('Сумма должна быть нулевой, либо больше нуля')
                 )
             ]
         ),
@@ -144,16 +148,16 @@ class ShopAdmin(ModelView):
     )
     form_widget_args = {
         'place_name': {
-            'placeholder': 'Название кофейни'
+            'placeholder': gettext('Название кофейни')
         },
         'address': {
-            'placeholder': 'Адрес кофейни'
+            'placeholder': gettext('Адрес кофейни')
         },
         'cash': {
-            'placeholder': 'Наличка в гривне'
+            'placeholder': gettext('Наличка в гривне')
         },
         'cashless': {
-            'placeholder': 'Безнал в гривне'
+            'placeholder': gettext('Безнал в гривне')
         }
     }
 
@@ -162,16 +166,17 @@ class ShopEquipmentAdmin(ModelView):
     can_view_details = True
     column_searchable_list = ('coffee_machine',)
     column_labels = dict(
-        coffee_machine='Кофе Машина',
-        grinder_1='Кофемолка 1',
-        grinder_2='Кофемолка 2',
-        shop='Кофейня'
+        coffee_machine=gettext('Кофе Машина'),
+        grinder_1=gettext('Кофемолка 1'),
+        grinder_2=gettext('Кофемолка 2'),
+        shop=gettext('Кофейня')
     )
     form_args = dict(
         shop=dict(
             validators=[
                 DataRequired(
-                    message='Выберите кофейню')
+                    message=gettext('Выберите кофейню')
+                )
             ]
         )
     )
@@ -179,15 +184,15 @@ class ShopEquipmentAdmin(ModelView):
 
 class StorageAdmin(ModelView):
     column_labels = dict(
-        coffee_arabika='Арабика',
-        coffee_blend='Бленд',
-        milk='Молоко',
-        panini='Панини',
-        hot_dogs='Хот-доги',
-        shop='Кофейня',
-        supplies='Поступления',
-        by_weights='Развес',
-        write_offs='Списания'
+        coffee_arabika=gettext('Арабика'),
+        coffee_blend=gettext('Бленд'),
+        milk=gettext('Молоко'),
+        panini=gettext('Панини'),
+        hot_dogs=gettext('Хот-доги'),
+        shop=gettext('Кофейня'),
+        supplies=gettext('Поступления'),
+        by_weights=gettext('Развес'),
+        write_offs=gettext('Списания')
     )
     column_formatters = dict(
         coffee_arabika=lambda v, c, m, p: f'{m.coffee_arabika} кг',
@@ -212,7 +217,7 @@ class StorageAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-0.0001,
-                    message='Количество арабики должно быть нулевым, либо больше нуля')
+                    message=gettext('Количество арабики должно быть нулевым, либо больше нуля'))
             ]
         ),
         coffee_blend=dict(
@@ -220,7 +225,7 @@ class StorageAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-0.0001,
-                    message='Количество бленда должно быть нулевым, либо больше нуля'
+                    message=gettext('Количество бленда должно быть нулевым, либо больше нуля')
                 )
             ]
         ),
@@ -229,7 +234,7 @@ class StorageAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-0.0001,
-                    message='Количество молока должно быть нулевым, либо больше нуля'
+                    message=gettext('Количество молока должно быть нулевым, либо больше нуля')
                 )
             ]
         ),
@@ -238,7 +243,7 @@ class StorageAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-1,
-                    message='Количество панини должно быть нулевым, либо больше нуля'
+                    message=gettext('Количество панини должно быть нулевым, либо больше нуля')
                 )
             ]
         ),
@@ -247,32 +252,33 @@ class StorageAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-1,
-                    message='Количество хот-догов должно быть нулевым, либо больше нуля'
+                    message=gettext('Количество хот-догов должно быть нулевым, либо больше нуля')
                 )
             ]
         ),
         shop=dict(
             validators=[
                 DataRequired(
-                    message='Выберите кофейню')
+                    message=gettext('Выберите кофейню')
+                )
             ]
         )
     )
     form_widget_args = {
         'coffee_arabika': {
-            'placeholder': 'Введите количество арабики в кг'
+            'placeholder': gettext('Введите количество арабики в кг')
         },
         'coffee_blend': {
-            'placeholder': 'Введите количество купажа в кг'
+            'placeholder': gettext('Введите количество купажа в кг')
         },
         'milk': {
-            'placeholder': 'Введите количество молока в л'
+            'placeholder': gettext('Введите количество молока в л')
         },
         'panini': {
-            'placeholder': 'Введите количество панини'
+            'placeholder': gettext('Введите количество панини')
         },
         'hot_dogs': {
-            'placeholder': 'Введите количество хот-догов (комплект булка-сосиска)'
+            'placeholder': gettext('Введите количество хот-догов (комплект булка-сосиска)')
         }
     }
 
@@ -282,19 +288,19 @@ class BaristaAdmin(ModelView):
     column_searchable_list = ('name', 'phone_number', 'email')
     column_exclude_list = ('password_hash', 'roles', 'reports', 'salary_rate')
     column_labels = dict(
-        name='Имя',
-        phone_number='Тел.',
-        email='Емейл',
-        shop='Кофейня',
-        reports='Отчеты',
-        roles='Доступ',
-        active='Активный',
-        confirmed_at='Дата найма',
-        password='Пароль',
-        expenses='Расходы',
-        supplies='Поступления',
-        by_weights='Развес',
-        write_offs='Списания'
+        name=gettext('Имя'),
+        phone_number=gettext('Тел.'),
+        email=gettext('Емейл'),
+        shop=gettext('Кофейня'),
+        reports=gettext('Отчеты'),
+        roles=gettext('Доступ'),
+        active=gettext('Активный'),
+        confirmed_at=gettext('Дата найма'),
+        password=gettext('Пароль'),
+        expenses=gettext('Расходы'),
+        supplies=gettext('Поступления'),
+        by_weights=gettext('Развес'),
+        write_offs=gettext('Списания')
     )
     form_columns = (
         'name',
@@ -343,17 +349,10 @@ class BaristaAdmin(ModelView):
             format='%d.%m.%Y %H:%M'
         ),
         active=dict(default=True),
-        shop=dict(
-            validators=[
-                DataRequired(
-                    message='Выберите место работы сотрудника'
-                )
-            ]
-        ),
         roles=dict(
             validators=[
                 DataRequired(
-                    message='Выберите уровень доступа сотрудника'
+                    message=gettext('Выберите уровень доступа сотрудника')
                 )
             ]
         ),
@@ -363,13 +362,13 @@ class BaristaAdmin(ModelView):
     )
     form_widget_args = {
         'name': {
-            'placeholder': 'Имя сотрудника'
+            'placeholder': gettext('Имя сотрудника')
         },
         'phone_number': {
-            'placeholder': 'Мобильный телефон'
+            'placeholder': gettext('Мобильный телефон')
         },
         'email': {
-            'placeholder': 'Емейл'
+            'placeholder': gettext('Емейл')
         },
         'confirmed_at': {
             'data-date-format': u'DD.MM.YYYY HH:mm'
@@ -407,28 +406,28 @@ class ReportAdmin(ModelView):
     )
     column_filters = ('timestamp', 'barista', 'shop')
     column_labels = dict(
-        shop='Кофейня',
-        barista='Бариста',
-        timestamp='Дата',
-        cashbox='Касса',
-        remainder_of_day='Остаток дня',
-        cashless='Б.Н',
-        cash_balance='Остаток наличности',
-        actual_balance='Фактический остаток',
-        consumption_coffee_arabika='Арабика/день',
-        consumption_coffee_blend='Бленд/день',
-        consumption_milk='Молоко/день',
-        consumption_panini='Панини/день',
-        consumption_hot_dogs='Хот-доги/день',
-        coffee_arabika='Арабика/ост.',
-        coffee_blend='Бленд/ост.',
-        milk='Молоко/ост.',
-        panini='Панини/ост.',
-        hot_dogs='Хот-доги/ост.',
-        expenses='Расходы'
+        shop=gettext('Кофейня'),
+        barista=gettext('Бариста'),
+        timestamp=gettext('Дата'),
+        cashbox=gettext('Касса'),
+        remainder_of_day=gettext('Остаток дня'),
+        cashless=gettext('Б.Н'),
+        cash_balance=gettext('Остаток наличности'),
+        actual_balance=gettext('Фактический остаток'),
+        consumption_coffee_arabika=gettext('Арабика/день'),
+        consumption_coffee_blend=gettext('Бленд/день'),
+        consumption_milk=gettext('Молоко/день'),
+        consumption_panini=gettext('Панини/день'),
+        consumption_hot_dogs=gettext('Хот-доги/день'),
+        coffee_arabika=gettext('Арабика/ост.'),
+        coffee_blend=gettext('Бленд/ост.'),
+        milk=gettext('Молоко/ост.'),
+        panini=gettext('Панини/ост.'),
+        hot_dogs=gettext('Хот-доги/ост.'),
+        expenses=gettext('Расходы')
     )
     form_extra_fields = {
-        'backdating': BooleanField('Обработка задним числом')
+        'backdating': BooleanField(gettext('Обработка задним числом'))
     }
     form_create_rules = (
         'backdating',
@@ -479,13 +478,14 @@ class ReportAdmin(ModelView):
         shop=dict(
             validators=[
                 DataRequired(
-                    message='Выберите кофейню')
+                    message=gettext('Выберите кофейню')
+                )
             ]
         ),
         barista=dict(
             validators=[
                 DataRequired(
-                    message='Выберите сотрудника'
+                    message=gettext('Выберите сотрудника')
                 )
             ]
         ),
@@ -495,7 +495,7 @@ class ReportAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=0,
-                    message='Сумма не может быть нулевой, либо ниже нуля'
+                    message=gettext('Сумма не может быть нулевой, либо ниже нуля')
                 )
             ]
         ),
@@ -504,7 +504,7 @@ class ReportAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=0,
-                    message='Сумма не может быть нулевой, либо ниже нуля'
+                    message=gettext('Сумма не может быть нулевой, либо ниже нуля')
                 )
             ]
         ),
@@ -513,7 +513,7 @@ class ReportAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=0,
-                    message='Сумма не может быть нулевой, либо ниже нуля'
+                    message=gettext('Сумма не может быть нулевой, либо ниже нуля')
                 )
             ]
         ),
@@ -522,7 +522,7 @@ class ReportAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=0,
-                    message='Сумма не может быть нулевой, либо ниже нуля'
+                    message=gettext('Сумма не может быть нулевой, либо ниже нуля')
                 )
             ]
         ),
@@ -531,7 +531,7 @@ class ReportAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=0,
-                    message='Сумма не может быть нулевой, либо ниже нуля'
+                    message=gettext('Сумма не может быть нулевой, либо ниже нуля')
                 )
             ]
         ),
@@ -541,7 +541,7 @@ class ReportAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-0.0001,
-                    message='Расход за день не может быть ниже нуля'
+                    message=gettext('Расход за день не может быть ниже нуля')
                 )
             ]
         ),
@@ -551,7 +551,7 @@ class ReportAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-0.0001,
-                    message='Расход за день не может быть ниже нуля'
+                    message=gettext('Расход за день не может быть ниже нуля')
                 )
             ]
         ),
@@ -561,7 +561,7 @@ class ReportAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-0.0001,
-                    message='Расход за день не может быть ниже нуля'
+                    message=gettext('Расход за день не может быть ниже нуля')
                 )
             ]
         ),
@@ -571,7 +571,7 @@ class ReportAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-1,
-                    message='Расход за день не может быть ниже нуля'
+                    message=gettext('Расход за день не может быть ниже нуля')
                 )
             ]
         ),
@@ -581,7 +581,7 @@ class ReportAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-1,
-                    message='Расход за день не может быть ниже нуля'
+                    message=gettext('Расход за день не может быть ниже нуля')
                 )
             ]
         ),
@@ -590,7 +590,7 @@ class ReportAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-0.0001,
-                    message='Остаток арабики должен быть нулевым, либо больше нуля'
+                    message=gettext('Остаток арабики должен быть нулевым, либо больше нуля')
                 )
             ]
         ),
@@ -599,7 +599,7 @@ class ReportAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-0.0001,
-                    message='Остаток купажа должен быть нулевым, либо больше нуля'
+                    message=gettext('Остаток купажа должен быть нулевым, либо больше нуля')
                 )
             ]
         ),
@@ -608,7 +608,7 @@ class ReportAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-0.0001,
-                    message='Остаток молока должен быть нулевым, либо больше нуля'
+                    message=gettext('Остаток молока должен быть нулевым, либо больше нуля')
                 )
             ]
         ),
@@ -617,7 +617,7 @@ class ReportAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-1,
-                    message='Остаток панини должен быть нулевым, либо больше нуля'
+                    message=gettext('Остаток панини должен быть нулевым, либо больше нуля')
                 )
             ]
         ),
@@ -626,60 +626,60 @@ class ReportAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-1,
-                    message='Остаток хот-догов должен быть нулевым, либо больше нуля'
+                    message=gettext('Остаток хот-догов должен быть нулевым, либо больше нуля')
                 )
             ]
         ),
     )
     form_widget_args = {
         'timestamp': {
-            'placeholder': 'Дата и время отправки отчета',
+            'placeholder': gettext('Дата и время отправки отчета'),
             'data-date-format': u'DD.MM.YYYY HH:mm'
         },
         'cashbox': {
-            'placeholder': 'Касса'
+            'placeholder': gettext('Касса')
         },
         'remainder_of_day': {
-            'placeholder': 'Остаток дня, сумма остатка наличности и безнала'
+            'placeholder': gettext('Остаток дня, сумма остатка наличности и безнала')
         },
         'cashless': {
-            'placeholder': 'Безнал'
+            'placeholder': gettext('Безнал')
         },
         'cash_balance': {
-            'placeholder': 'Разница между утренним фактическим остатком и вечерним'
+            'placeholder': gettext('Разница между утренним фактическим остатком и вечерним')
         },
         'actual_balance': {
-            'placeholder': 'Фактический остаток наличности вечером'
+            'placeholder': gettext('Фактический остаток наличности вечером')
         },
         'consumption_coffee_arabika': {
-            'placeholder': 'Расход арабики в кг за день'
+            'placeholder': gettext('Расход арабики в кг за день')
         },
         'consumption_coffee_blend': {
-            'placeholder': 'Расход купажа в кг за день'
+            'placeholder': gettext('Расход купажа в кг за день')
         },
         'consumption_milk': {
-            'placeholder': 'Расход молока в л за день'
+            'placeholder': gettext('Расход молока в л за день')
         },
         'consumption_panini': {
-            'placeholder': 'Расход панини за день'
+            'placeholder': gettext('Расход панини за день')
         },
         'consumption_hot_dogs': {
-            'placeholder': 'Расход хот-догов (комплект булка-сосиска) за день'
+            'placeholder': gettext('Расход хот-догов (комплект булка-сосиска) за день')
         },
         'coffee_arabika': {
-            'placeholder': 'Количество арабики в кг, остаток на следующий день'
+            'placeholder': gettext('Количество арабики в кг, остаток на следующий день')
         },
         'coffee_blend': {
-            'placeholder': 'Количество купажа в кг, остаток на следующий день'
+            'placeholder': gettext('Количество купажа в кг, остаток на следующий день')
         },
         'milk': {
-            'placeholder': 'Количество молока в л, остаток на следующий день'
+            'placeholder': gettext('Количество молока в л, остаток на следующий день')
         },
         'panini': {
-            'placeholder': 'Количество панини, остаток на следующий день'
+            'placeholder': gettext('Количество панини, остаток на следующий день')
         },
         'hot_dogs': {
-            'placeholder': 'Количество хот-догов (комплект булка-сосиска), остаток на следующий день'
+            'placeholder': gettext('Количество хот-догов (комплект булка-сосиска), остаток на следующий день')
         }
     }
 
@@ -797,9 +797,9 @@ class RoleAdmin(ModelView):
     can_delete = False
     can_create = False
     column_labels = dict(
-        name='Название',
-        description='Описание',
-        barista='Бариста'
+        name=gettext('Название'),
+        description=gettext('Описание'),
+        barista=gettext('Бариста')
     )
     column_formatters = dict(name=lambda v, c, m, p: m.name.title())
     form_args = dict(
@@ -849,12 +849,12 @@ class ExpenseAdmin(ModelView):
     column_filters = ('timestamp', 'is_global', 'type_cost', 'categories', 'shop')
     column_searchable_list = ('timestamp',)
     column_labels = dict(
-        timestamp='Дата',
-        is_global='Глобальная?',
-        type_cost='Тип траты',
-        money='Сумма траты',
-        categories='Категории',
-        shop='Кофейня'
+        timestamp=gettext('Дата'),
+        is_global=gettext('Глобальная?'),
+        type_cost=gettext('Тип траты'),
+        money=gettext('Сумма траты'),
+        categories=gettext('Категории'),
+        shop=gettext('Кофейня')
     )
     can_view_details = True
     column_default_sort = ('timestamp', True)
@@ -866,11 +866,11 @@ class ExpenseAdmin(ModelView):
     form_extra_fields = {
         'backdating': BooleanField('Обработка задним числом'),
         'type_cost': RadioField(
-            'Тип траты',
+            gettext('Тип траты'),
             default='cash',
             choices=[
-                ('cash', 'Наличка'),
-                ('cashless', 'Безнал')
+                ('cash', gettext('Наличка')),
+                ('cashless', gettext('Безнал'))
             ],
             validators=[Required()]
         )
@@ -880,7 +880,7 @@ class ExpenseAdmin(ModelView):
             'data-date-format': u'DD.MM.YYYY HH:mm'
         },
         'money': {
-            'placeholder': 'В гривнях'
+            'placeholder': gettext('В гривнях')
         },
         'type_cost': {
             'class': 'form-check'
@@ -889,13 +889,13 @@ class ExpenseAdmin(ModelView):
     form_ajax_refs = {
         'categories': {
             'fields': ('name',),
-            'placeholder': 'Добавить категорию',
+            'placeholder': gettext('Добавить категорию'),
             'page_size': 10,
             'minimum_input_length': 0,
         },
         'shop': {
             'fields': ('place_name', 'address'),
-            'placeholder': 'Кофейня',
+            'placeholder': gettext('Кофейня'),
             'page_size': 10,
             'minimum_input_length': 0,
         }
@@ -910,14 +910,14 @@ class ExpenseAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=0,
-                    message='Сумма не может быть нулевой, либо ниже нуля'
+                    message=gettext('Сумма не может быть нулевой, либо ниже нуля')
                 )
             ]
         ),
         shop=dict(
             validators=[
                 DataRequired(
-                    message="Выберите кофейню"
+                    message=gettext('Выберите кофейню')
                 )
             ]
         )
@@ -967,17 +967,42 @@ class ExpenseAdmin(ModelView):
 
         return super(ExpenseAdmin, self).render(template, **kwargs)
 
-    def on_form_prefill(self, form, id):
-        pass
+    # def on_form_prefill(self, form, id):
+    #     print('on_form_prefill', form, id)
+
+    def after_model_change(self, form, model, is_created):
+        if not is_created:
+            if form.type_cost.data == 'cash':
+                model.shop.cash += form.money.data
+            else:
+                model.shop.cashless += form.money.data
+            self.session.commit()
+
+    def update_model(self, form, model):
+        try:
+            new_money = form.money.data
+            old_money = model.money
+            form.populate_obj(model)
+            self._on_model_change(form, model, False)
+            self.session.commit()
+        except Exception as ex:
+            if not self.handle_view_exception(ex):
+                flash(gettext('Failed to update record. %(error)s', error=str(ex)), 'error')
+                log.exception('Failed to update record.')
+
+            self.session.rollback()
+
+            return False
+        else:
+            if new_money != old_money:
+                form.money.data = old_money
+            self.after_model_change(form, model, False)
+        return True
 
     def on_model_change(self, form, model, is_created):
         if form.backdating.data:
             return
         money = model.money
-        if not is_created:
-            expense = Expense.query.filter_by(id=model.id).first()
-            print('Prev money', expense.money, model.money)
-
         if model.type_cost == 'cash':
             model.shop.cash -= money
         else:
@@ -1015,12 +1040,12 @@ class SupplyAdmin(ModelView):
     can_set_page_size = True
     column_list = ('timestamp', 'product_name', 'amount', 'money', 'storage')
     column_labels = dict(
-        timestamp='Дата',
-        product_name='Название товара',
-        amount='Количество',
-        type_cost='Тип траты',
-        money='Сумма',
-        storage='Склад'
+        timestamp=gettext('Дата'),
+        product_name=gettext('Название товара'),
+        amount=gettext('Количество'),
+        type_cost=gettext('Тип траты'),
+        money=gettext('Сумма'),
+        storage=gettext('Склад')
     )
     column_filters = ('timestamp', 'type_cost', 'storage')
     column_searchable_list = ('timestamp',)
@@ -1041,7 +1066,7 @@ class SupplyAdmin(ModelView):
                 DataRequired(),
                 NumberRange(
                     min=0.0001,
-                    message='Количество не может быть нулевым, либо ниже нуля'
+                    message=gettext('Количество не может быть нулевым, либо ниже нуля')
                 )
             ]
         ),
@@ -1050,37 +1075,37 @@ class SupplyAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-1,
-                    message='Сумма не может быть нулевой, либо ниже нуля'
+                    message=gettext('Сумма не может быть нулевой, либо ниже нуля')
                 )
             ]
         ),
         storage=dict(
             validators=[
                 DataRequired(
-                    message="Выберите склад"
+                    message=gettext('Выберите склад')
                 )
             ]
         )
     )
     form_extra_fields = dict(
-        backdating=BooleanField('Обработка задним числом'),
+        backdating=BooleanField(gettext('Обработка задним числом')),
         type_cost=RadioField(
-            'Тип траты',
+            gettext('Тип траты'),
             choices=[
-                ('cash', 'Наличка'),
-                ('cashless', 'Безнал')
+                ('cash', gettext('Наличка')),
+                ('cashless', gettext('Безнал'))
             ],
             validators=[Required()],
             default='cash'
         ),
         product_name=SelectField(
-            'Название товара',
+            gettext('Название товара'),
             choices=[
-                ('coffee_arabika', 'Арабика'),
-                ('coffee_blend', 'Купаж'),
-                ('milk', 'Молоко'),
-                ('panini', 'Панини'),
-                ('hot_dogs', 'Хот-доги')
+                ('coffee_arabika', gettext('Арабика')),
+                ('coffee_blend', gettext('Купаж')),
+                ('milk', gettext('Молоко')),
+                ('panini', gettext('Панини')),
+                ('hot_dogs', gettext('Хот-доги'))
             ],
             validators=[Required()],
         )
@@ -1090,13 +1115,13 @@ class SupplyAdmin(ModelView):
             'data-date-format': u'DD.MM.YYYY HH:mm'
         },
         'money': {
-            'placeholder': 'В гривнях'
+            'placeholder': gettext('В гривнях')
         },
         'type_cost': {
             'class': 'form-check'
         },
         'amount': {
-            'placeholder': 'Количество в кг, л, и поштучно'
+            'placeholder': gettext('Количество в кг, л, и поштучно')
         }
     }
 
@@ -1163,12 +1188,12 @@ class ByWeightAdmin(ModelView):
     can_set_page_size = True
     column_list = ('timestamp', 'product_name', 'amount', 'money', 'storage')
     column_labels = dict(
-        timestamp='Дата',
-        product_name='Название товара',
-        amount='Количество',
-        type_cost='Тип траты',
-        money='Сумма',
-        storage='Склад'
+        timestamp=gettext('Дата'),
+        product_name=gettext('Название товара'),
+        amount=gettext('Количество'),
+        type_cost=gettext('Тип траты'),
+        money=gettext('Сумма'),
+        storage=gettext('Склад')
     )
     column_filters = ('timestamp', 'product_name', 'type_cost')
     column_formatters = dict(
@@ -1188,7 +1213,7 @@ class ByWeightAdmin(ModelView):
                 DataRequired(),
                 NumberRange(
                     min=0.0001,
-                    message='Количество не может быть нулевым, либо ниже нуля'
+                    message=gettext('Количество не может быть нулевым, либо ниже нуля')
                 )
             ]
         ),
@@ -1197,33 +1222,33 @@ class ByWeightAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-1,
-                    message='Сумма не может быть нулевой, либо ниже нуля'
+                    message=gettext('Сумма не может быть нулевой, либо ниже нуля')
                 )
             ]
         ),
         storage=dict(
-            validators=[DataRequired(message="Выберите склад")]
+            validators=[DataRequired(message=gettext('Выберите склад'))]
         )
     )
     form_extra_fields = dict(
-        backdating=BooleanField('Обработка задним числом'),
+        backdating=BooleanField(gettext('Обработка задним числом')),
         type_cost=RadioField(
-            'Тип траты',
+            gettext('Тип траты'),
             choices=[
-                ('cash', 'Наличка'),
-                ('cashless', 'Безнал')
+                ('cash', gettext('Наличка')),
+                ('cashless', gettext('Безнал'))
             ],
             validators=[Required()],
             default='cash'
         ),
         product_name=SelectField(
-            'Название товара',
+            gettext('Название товара'),
             choices=[
-                ('coffee_arabika', 'Арабика'),
-                ('coffee_blend', 'Купаж'),
-                ('milk', 'Молоко'),
-                ('panini', 'Панини'),
-                ('hot_dogs', 'Хот-доги')
+                ('coffee_arabika', gettext('Арабика')),
+                ('coffee_blend', gettext('Купаж')),
+                ('milk', gettext('Молоко')),
+                ('panini', gettext('Панини')),
+                ('hot_dogs', gettext('Хот-доги'))
             ],
             validators=[Required()],
         )
@@ -1233,13 +1258,13 @@ class ByWeightAdmin(ModelView):
             'data-date-format': u'DD.MM.YYYY HH:mm'
         },
         'money': {
-            'placeholder': 'В гривнях'
+            'placeholder': gettext('В гривнях')
         },
         'type_cost': {
             'class': 'form-check'
         },
         'amount': {
-            'placeholder': 'Количество в кг, л, и поштучно'
+            'placeholder': gettext('Количество в кг, л, и поштучно')
         }
     }
 
@@ -1290,10 +1315,10 @@ class WriteOffAdmin(ModelView):
     can_set_page_size = True
     column_list = ('timestamp', 'product_name', 'amount', 'storage')
     column_labels = dict(
-        timestamp='Дата',
-        product_name='Название товара',
-        amount='Количество',
-        storage='Склад'
+        timestamp=gettext('Дата'),
+        product_name=gettext('Название товара'),
+        amount=gettext('Количество'),
+        storage=gettext('Склад')
     )
     column_filters = ('timestamp', 'product_name')
     column_formatters = dict(
@@ -1312,24 +1337,24 @@ class WriteOffAdmin(ModelView):
                 DataRequired(),
                 NumberRange(
                     min=0.0001,
-                    message='Количество не может быть нулевым, либо ниже нуля'
+                    message=gettext('Количество не может быть нулевым, либо ниже нуля')
                 )
             ]
         ),
         storage=dict(
-            validators=[DataRequired(message="Выберите склад")]
+            validators=[DataRequired(message=gettext('Выберите склад'))]
         )
     )
     form_extra_fields = dict(
-        backdating=BooleanField('Обработка задним числом'),
+        backdating=BooleanField(gettext('Обработка задним числом')),
         product_name=SelectField(
-            'Название товара',
+            gettext('Название товара'),
             choices=[
-                ('coffee_arabika', 'Арабика'),
-                ('coffee_blend', 'Купаж'),
-                ('milk', 'Молоко'),
-                ('panini', 'Панини'),
-                ('hot_dogs', 'Хот-доги')
+                ('coffee_arabika', gettext('Арабика')),
+                ('coffee_blend', gettext('Купаж')),
+                ('milk', gettext('Молоко')),
+                ('panini', gettext('Панини')),
+                ('hot_dogs', gettext('Хот-доги'))
             ],
             validators=[Required()],
         )
@@ -1339,7 +1364,7 @@ class WriteOffAdmin(ModelView):
             'data-date-format': u'DD.MM.YYYY HH:mm'
         },
         'amount': {
-            'placeholder': 'Количество в кг, л, и поштучно'
+            'placeholder': gettext('Количество в кг, л, и поштучно')
         }
     }
 
@@ -1379,8 +1404,8 @@ class WriteOffAdmin(ModelView):
 class CategoryAdmin(ModelView):
     can_view_details = True
     column_labels = dict(
-        name='Название категории',
-        expense='Расходы'
+        name=gettext('Название категории'),
+        expense=gettext('Расходы')
     )
     form_create_rules = ('name',)
     form_args = dict(
@@ -1391,6 +1416,6 @@ class CategoryAdmin(ModelView):
     column_editable_list = ('name',)
     form_widget_args = {
         'name': {
-            'placeholder': 'Название для расходов'
+            'placeholder': gettext('Название для расходов')
         }
     }

@@ -5,23 +5,23 @@
     <div class="row">
         <div class="col-sm-10 col-sm-offset-1">
             <div class="alert alert-success" role="alert">
-              <h4 class="alert-heading">Вся сумма, <a href="{{ url_for('report.index_view')}}" class="alert-link">детали.</a></h4>
+              <h4 class="alert-heading">{{_('Вся сумма,')}} <a href="{{ url_for('report.index_view')}}" class="alert-link">{{_('детали.')}}</a></h4>
               <p>{{ all_shop }} грн.</p>
               <hr>
-              <p class="mb-0">Безнал: {{  shop_cashless }} грн.</p>
-              <p class="mb-0">Наличка: {{  shop_cash }} грн.</p>
+              <p class="mb-0">{{_('Безнал')}}: {{  shop_cashless }} грн.</p>
+              <p class="mb-0">{{_('Наличка')}}: {{  shop_cash }} грн.</p>
             </div>
             <div class="alert alert-danger" role="alert">
-                <h4 class="alert-heading">Все <a href="{{ url_for('expense.index_view')}}" class="alert-link">расходы</a> / <a href="{{ url_for('supply.index_view')}}" class="alert-link">поступления</a></h4>
+                <h4 class="alert-heading">{{_('Все')}} <a href="{{ url_for('expense.index_view')}}" class="alert-link">{{_('расходы')}}</a> / <a href="{{ url_for('supply.index_view')}}" class="alert-link">{{_('поступления')}}</a></h4>
               <p>{{ all_exp }} грн.</p>
               <hr>
-              <p class="mb-0">Безнал: {{ exp_cashless }} грн.</p>
-              <p class="mb-0">Наличка: {{ exp_cash }} грн.</p>
+              <p class="mb-0">{{_('Безнал')}}: {{ exp_cashless }} грн.</p>
+              <p class="mb-0">{{_('Наличка')}}: {{ exp_cash }} грн.</p>
             </div>
         </div>
     </div>
     <p>
-        <a class="btn btn-primary" href="/"><i class="glyphicon glyphicon-chevron-left"></i>Выйти</a>
+        <a class="btn btn-primary" href="/"><i class="glyphicon glyphicon-chevron-left"></i>{{_('Выйти')}}</a>
     </p>
 </div>
 {% endblock body %}

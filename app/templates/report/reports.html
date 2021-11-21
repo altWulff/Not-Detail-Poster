@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Отчеты{% endblock %}
+{% block title %}{{ _('Отчеты') }}{% endblock %}
 {% block head %}
 {% endblock %}
 {% block content %}
@@ -8,7 +8,7 @@
     {% for day_report in daily_reports %}
        {% include 'report/_report.html' %}
     {% else %}
-    <h5>Отчеты. Здесь пока что ничего нет ...</h5>
+    <h5>{{ _('Отчеты. Здесь пока что ничего нет ...') }}</h5>
     {% endfor %}
 </div>
 <br/>

@@ -2,6 +2,7 @@ from datetime import datetime
 from flask import render_template, redirect, url_for, flash
 from flask_security import login_required, login_user, logout_user
 from flask_modals import render_template_modal
+from flask_babelex import _
 from app import app, db
 from app.forms import LoginForm, RegistrationForm
 from app.models import Barista
@@ -21,10 +22,10 @@ def login():
     if form.validate_on_submit():
         user = Barista.query.filter_by(name=form.name.data).first()
         if user is None:
-            flash('Invalid name, phone number or password')
+            flash(_('Неправильное имя либо пароль'))
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
-        return redirect('index')
+        return redirect(url_for('home'))
     return render_template('auth/login.html', title='Sign In', form=form)
 
 
@@ -43,7 +44,7 @@ def create_new_staff():
         )
         db.session.add(user)
         db.session.commit()
-        flash('Вы добавили нового ссотрудника!')
+        flash(_('Вы добавили нового ссотрудника!'))
         return redirect(url_for('home'))
     return render_template('auth/new_staff.html', form=form)
 

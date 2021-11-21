@@ -1,5 +1,6 @@
 from flask import render_template, redirect, url_for, flash, Blueprint, request
 from flask_security import login_required, current_user
+from flask_babelex import _
 from app import db
 from app.forms import EditProfileForm
 from app.models import Barista
@@ -23,7 +24,7 @@ def edit():
         current_user.phone_number = form.phone_number.data
         current_user.email = form.email.data
         db.session.commit()
-        flash('Your changes have been saved.')
+        flash(_('Ваши изменения были сохранены.'))
         return redirect(url_for('user.profile', user_name=current_user.name))
     elif request.method == 'GET':
         form.name.data = current_user.name

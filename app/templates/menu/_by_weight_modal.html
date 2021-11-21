@@ -1,25 +1,22 @@
-<div class="modal fade" id="ByWeightModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="ByWeightModal" aria-hidden="true">
+<div class="modal fade" id="ByWeightModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="ByWeightModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             {{ modal_messages() }}
             <form action="{{ url_for('menu.by_weight') }}" method="post">
             {{ by_weight_form.csrf_token }}
             <div class="modal-header">
-                <h5 class="modal-title" id="ByWeightModal">Продажа развеса</h5>
+                <h5 class="modal-title" id="ByWeightModalLabel">{{_('Продажа развеса')}}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="mb-3">
-                    {{ by_weight_form.coffee_shop.label }}
-                    {{ by_weight_form.coffee_shop(class="form-select mb-3") }}
-                </div>
+                {{ render_select_field(by_weight_form.coffee_shop) }}
                 <p>{{ by_weight_form.by_weight_choice.label }}{{ by_weight_form.by_weight_choice(class="form-select") }}</p>
                 {{ render_field(by_weight_form.amount) }}
                 <p>{{ by_weight_form.type_cost.label }} {{ by_weight_form.type_cost(class="form-check") }}</p>
                 {{ render_field(by_weight_form.money) }}
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{_('Закрыть')}}</button>
                 {{ by_weight_form.submit(class="btn btn-primary") }}
             </div>
             </form>

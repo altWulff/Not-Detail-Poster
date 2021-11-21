@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block title %}{{ _('Создание нового отчета') }}{% endblock %}
 {% block content %}
 <form action="" method="post" novalidate>
     {{ form.csrf_token }}
@@ -8,9 +9,9 @@
     </div>
     {{ render_field(form.cashless) }}
     {{ render_field(form.actual_balance) }}
-    {{ render_field(form.milk) }}
-    {{ render_field(form.coffee_blend) }}
     {{ render_field(form.coffee_arabika) }}
+    {{ render_field(form.coffee_blend) }}
+    {{ render_field(form.milk) }}
     {{ render_field(form.panini) }}
     {{ render_field(form.hot_dogs) }}
     <p>{{ form.submit(class="w-100 btn btn-lg btn-primary") }}</p>

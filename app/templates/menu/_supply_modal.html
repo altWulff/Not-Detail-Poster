@@ -1,25 +1,22 @@
-<div class="modal fade" id="SupplyModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="SupplyModal" aria-hidden="true">
+<div class="modal fade" id="SupplyModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="SupplyModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             {{ modal_messages() }}
             <form action="{{ url_for('menu.supply') }}" method="post">
             {{ supply_form.csrf_token }}
             <div class="modal-header">
-                <h5 class="modal-title" id="SupplyModal">Поступление</h5>
+                <h5 class="modal-title" id="SupplyModalLabel">{{_('Поступление')}}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="mb-3">
-                    {{ supply_form.coffee_shop.label }}
-                    {{ supply_form.coffee_shop(class="form-select mb-3") }}
-                </div>
-                <p>{{ supply_form.supply_choice.label }}{{ supply_form.supply_choice(class="form-select") }}</p>
+                {{ render_select_field(supply_form.coffee_shop) }}
+                {{ render_select_field(supply_form.supply_choice) }}
                 {{ render_field(supply_form.amount) }}
                 <p>{{ supply_form.type_cost.label }} {{ supply_form.type_cost(class="form-check") }}</p>
                 {{ render_field(supply_form.money) }}
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{_('Закрыть')}}</button>
                 {{ supply_form.submit(class="btn btn-primary") }}
             </div>
             </form>

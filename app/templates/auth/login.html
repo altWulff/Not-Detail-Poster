@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+{% from 'macros.html' import render_field %}
+{% from 'macros.html' import render_password_field %}
+{% from 'macros.html' import render_checkbox %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -16,30 +19,17 @@
     {% endfor %}
 {% endif %}
 {% endwith %}
-{% for error in form.name.errors %}
-    <span style="color: red;">[{{ error }}]</span>
-{% endfor %}
-{% for error in form.password.errors %}
-  <span style="color: red;">[{{ error }}]</span>
-{% endfor %}
-<form action="" method="post" novalidate>
+<form method="post" novalidate>
     {{ form.csrf_token }}
-    <h1 class="h3 mb-3 fw-normal">Войдти в аккаунт</h1>
-
-    <div class="form-floating">
-        {{ form.name(class="form-control", id="floatingInput", placeholder=' ') }}
-        <label for="floatingInput">Имя</label>
-    </div>
-    <div class="form-floating">
-        {{ form.password(class="form-control", id="floatingPassword", placeholder=' ')}}
-        <label for="floatingPassword">Пароль</label>
-    </div>
+    <h1 class="h3 mb-3 fw-normal">{{ _('Войдти в аккаунт') }}</h1>
+    {{ render_field(form.name) }}
+    {{ render_password_field(form.password) }}
     <div class="checkbox mb-3">
         <label>
-            <input type="checkbox" value="remember-me"> Запомнить меня
+            <input type="checkbox" value="remember_me"> {{_('Запомнить меня')}}
         </label>
     </div>
-    <button class="w-100 btn btn-lg btn-primary" type="submit">Вход</button>
+    {{ form.submit(class="w-100 btn btn-lg btn-primary") }}
     <p class="mt-5 mb-3 text-muted">&copy; 2021</p>
   </form>
 </main>

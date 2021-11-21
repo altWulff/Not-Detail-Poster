@@ -1,0 +1,822 @@
+# Ukrainian translations for PROJECT.
+# Copyright (C) 2021 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2021-11-21 15:32+0200\n"
+"PO-Revision-Date: 2021-11-21 14:46+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: uk\n"
+"Language-Team: uk <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: app/__init__.py:23
+msgid "Please log in to access this page."
+msgstr ""
+
+#: app/admin_view.py:110 app/admin_view.py:800
+msgid "Название"
+msgstr ""
+
+#: app/admin_view.py:111 app/forms.py:335
+msgid "Адрес"
+msgstr ""
+
+#: app/admin_view.py:112 app/admin_view.py:872 app/admin_view.py:1095
+#: app/admin_view.py:1238 app/forms.py:81 app/forms.py:146 app/forms.py:215
+#: app/forms.py:337 app/templates/_coffee_shop_view.html:6
+#: app/templates/admin/index.html:12 app/templates/admin/index.html:19
+msgid "Наличка"
+msgstr ""
+
+#: app/admin_view.py:113 app/admin_view.py:646 app/admin_view.py:873
+#: app/admin_view.py:1096 app/admin_view.py:1239 app/forms.py:81
+#: app/forms.py:147 app/forms.py:216 app/forms.py:247 app/forms.py:348
+#: app/templates/_coffee_shop_view.html:7 app/templates/admin/index.html:11
+#: app/templates/admin/index.html:18
+msgid "Безнал"
+msgstr ""
+
+#: app/admin_view.py:114 app/admin_view.py:1048 app/admin_view.py:1196
+#: app/admin_view.py:1321 app/templates/_coffee_shop_view.html:38
+#: app/templates/menu/new_coffee_shop.html:15
+msgid "Склад"
+msgstr ""
+
+#: app/admin_view.py:115 app/templates/_coffee_shop_view.html:24
+#: app/templates/menu/new_coffee_shop.html:11
+msgid "Оборудование"
+msgstr ""
+
+#: app/admin_view.py:116 app/admin_view.py:295
+#: app/templates/_coffee_shop_view.html:74 app/templates/report/reports.html:2
+msgid "Отчеты"
+msgstr ""
+
+#: app/admin_view.py:117 app/admin_view.py:300 app/admin_view.py:427
+#: app/admin_view.py:1408 app/templates/_coffee_shop_view.html:62
+#: app/templates/report/_report.html:12
+msgid "Расходы"
+msgstr ""
+
+#: app/admin_view.py:118
+msgid "Баристы"
+msgstr ""
+
+#: app/admin_view.py:134 app/admin_view.py:143 app/forms.py:343
+#: app/forms.py:354
+msgid "Сумма должна быть нулевой, либо больше нуля"
+msgstr ""
+
+#: app/admin_view.py:151 app/forms.py:334
+msgid "Название кофейни"
+msgstr ""
+
+#: app/admin_view.py:154
+msgid "Адрес кофейни"
+msgstr ""
+
+#: app/admin_view.py:157
+msgid "Наличка в гривне"
+msgstr ""
+
+#: app/admin_view.py:160
+msgid "Безнал в гривне"
+msgstr ""
+
+#: app/admin_view.py:169 app/templates/_coffee_shop_view.html:29
+msgid "Кофе Машина"
+msgstr ""
+
+#: app/admin_view.py:170 app/forms.py:360
+msgid "Кофемолка 1"
+msgstr ""
+
+#: app/admin_view.py:171 app/forms.py:361
+msgid "Кофемолка 2"
+msgstr ""
+
+#: app/admin_view.py:172 app/admin_view.py:192 app/admin_view.py:294
+#: app/admin_view.py:409 app/admin_view.py:857 app/admin_view.py:898
+#: app/forms.py:96 app/forms.py:110 app/forms.py:161 app/forms.py:196
+#: app/forms.py:245
+msgid "Кофейня"
+msgstr ""
+
+#: app/admin_view.py:178 app/admin_view.py:262 app/admin_view.py:481
+#: app/admin_view.py:920 app/forms.py:96
+msgid "Выберите кофейню"
+msgstr ""
+
+#: app/admin_view.py:187 app/admin_view.py:1104 app/admin_view.py:1247
+#: app/admin_view.py:1353 app/forms.py:117 app/forms.py:168 app/forms.py:203
+#: app/forms.py:386 app/templates/_coffee_shop_view.html:43
+msgid "Арабика"
+msgstr ""
+
+#: app/admin_view.py:188 app/forms.py:116 app/forms.py:167 app/forms.py:202
+msgid "Бленд"
+msgstr ""
+
+#: app/admin_view.py:189 app/admin_view.py:1106 app/admin_view.py:1249
+#: app/admin_view.py:1355 app/forms.py:169 app/forms.py:204 app/forms.py:364
+#: app/templates/_coffee_shop_view.html:45
+msgid "Молоко"
+msgstr ""
+
+#: app/admin_view.py:190 app/admin_view.py:1107 app/admin_view.py:1250
+#: app/admin_view.py:1356 app/forms.py:170 app/forms.py:205 app/forms.py:302
+#: app/forms.py:397 app/templates/_coffee_shop_view.html:46
+msgid "Панини"
+msgstr ""
+
+#: app/admin_view.py:191 app/admin_view.py:1108 app/admin_view.py:1251
+#: app/admin_view.py:1357 app/forms.py:171 app/forms.py:206 app/forms.py:313
+#: app/forms.py:408 app/templates/_coffee_shop_view.html:47
+msgid "Хот-доги"
+msgstr ""
+
+#: app/admin_view.py:193 app/admin_view.py:301
+#: app/templates/_coffee_shop_view.html:64
+msgid "Поступления"
+msgstr ""
+
+#: app/admin_view.py:194 app/admin_view.py:302
+msgid "Развес"
+msgstr ""
+
+#: app/admin_view.py:195 app/admin_view.py:303
+#: app/templates/_coffee_shop_view.html:66
+msgid "Списания"
+msgstr ""
+
+#: app/admin_view.py:220 app/forms.py:392
+msgid "Количество арабики должно быть нулевым, либо больше нуля"
+msgstr ""
+
+#: app/admin_view.py:228 app/forms.py:381
+msgid "Количество бленда должно быть нулевым, либо больше нуля"
+msgstr ""
+
+#: app/admin_view.py:237 app/forms.py:370
+msgid "Количество молока должно быть нулевым, либо больше нуля"
+msgstr ""
+
+#: app/admin_view.py:246 app/forms.py:403
+msgid "Количество панини должно быть нулевым, либо больше нуля"
+msgstr ""
+
+#: app/admin_view.py:255 app/forms.py:414
+msgid "Количество хот-догов должно быть нулевым, либо больше нуля"
+msgstr ""
+
+#: app/admin_view.py:269
+msgid "Введите количество арабики в кг"
+msgstr ""
+
+#: app/admin_view.py:272
+msgid "Введите количество купажа в кг"
+msgstr ""
+
+#: app/admin_view.py:275
+msgid "Введите количество молока в л"
+msgstr ""
+
+#: app/admin_view.py:278
+msgid "Введите количество панини"
+msgstr ""
+
+#: app/admin_view.py:281
+msgid "Введите количество хот-догов (комплект булка-сосиска)"
+msgstr ""
+
+#: app/admin_view.py:291 app/forms.py:36 app/forms.py:43 app/forms.py:73
+msgid "Имя"
+msgstr ""
+
+#: app/admin_view.py:292 app/forms.py:44 app/forms.py:74
+msgid "Тел."
+msgstr ""
+
+#: app/admin_view.py:293 app/admin_view.py:371 app/forms.py:45 app/forms.py:75
+msgid "Емейл"
+msgstr ""
+
+#: app/admin_view.py:296
+msgid "Доступ"
+msgstr ""
+
+#: app/admin_view.py:297
+msgid "Активный"
+msgstr ""
+
+#: app/admin_view.py:298
+msgid "Дата найма"
+msgstr ""
+
+#: app/admin_view.py:299 app/forms.py:37 app/forms.py:46
+msgid "Пароль"
+msgstr ""
+
+#: app/admin_view.py:355
+msgid "Выберите уровень доступа сотрудника"
+msgstr ""
+
+#: app/admin_view.py:365
+msgid "Имя сотрудника"
+msgstr ""
+
+#: app/admin_view.py:368
+msgid "Мобильный телефон"
+msgstr ""
+
+#: app/admin_view.py:410 app/admin_view.py:802
+msgid "Бариста"
+msgstr ""
+
+#: app/admin_view.py:411 app/admin_view.py:852 app/admin_view.py:1043
+#: app/admin_view.py:1191 app/admin_view.py:1318
+msgid "Дата"
+msgstr ""
+
+#: app/admin_view.py:412 app/admin_view.py:640
+#: app/templates/report/_report.html:11
+msgid "Касса"
+msgstr ""
+
+#: app/admin_view.py:413
+msgid "Остаток дня"
+msgstr ""
+
+#: app/admin_view.py:414
+msgid "Б.Н"
+msgstr ""
+
+#: app/admin_view.py:415
+msgid "Остаток наличности"
+msgstr ""
+
+#: app/admin_view.py:416 app/forms.py:258
+msgid "Фактический остаток"
+msgstr ""
+
+#: app/admin_view.py:417
+msgid "Арабика/день"
+msgstr ""
+
+#: app/admin_view.py:418
+msgid "Бленд/день"
+msgstr ""
+
+#: app/admin_view.py:419
+msgid "Молоко/день"
+msgstr ""
+
+#: app/admin_view.py:420
+msgid "Панини/день"
+msgstr ""
+
+#: app/admin_view.py:421
+msgid "Хот-доги/день"
+msgstr ""
+
+#: app/admin_view.py:422
+msgid "Арабика/ост."
+msgstr ""
+
+#: app/admin_view.py:423
+msgid "Бленд/ост."
+msgstr ""
+
+#: app/admin_view.py:424
+msgid "Молоко/ост."
+msgstr ""
+
+#: app/admin_view.py:425
+msgid "Панини/ост."
+msgstr ""
+
+#: app/admin_view.py:426
+msgid "Хот-доги/ост."
+msgstr ""
+
+#: app/admin_view.py:430 app/admin_view.py:1091 app/admin_view.py:1234
+#: app/admin_view.py:1349
+msgid "Обработка задним числом"
+msgstr ""
+
+#: app/admin_view.py:488
+msgid "Выберите сотрудника"
+msgstr ""
+
+#: app/admin_view.py:498 app/admin_view.py:507 app/admin_view.py:516
+#: app/admin_view.py:525 app/admin_view.py:534 app/admin_view.py:913
+#: app/admin_view.py:1078 app/admin_view.py:1225 app/forms.py:91
+#: app/forms.py:137 app/forms.py:253 app/forms.py:264
+msgid "Сумма не может быть нулевой, либо ниже нуля"
+msgstr ""
+
+#: app/admin_view.py:544 app/admin_view.py:554 app/admin_view.py:564
+#: app/admin_view.py:574 app/admin_view.py:584
+msgid "Расход за день не может быть ниже нуля"
+msgstr ""
+
+#: app/admin_view.py:593 app/forms.py:275
+msgid "Остаток арабики должен быть нулевым, либо больше нуля"
+msgstr ""
+
+#: app/admin_view.py:602 app/forms.py:286
+msgid "Остаток купажа должен быть нулевым, либо больше нуля"
+msgstr ""
+
+#: app/admin_view.py:611 app/forms.py:297
+msgid "Остаток молока должен быть нулевым, либо больше нуля"
+msgstr ""
+
+#: app/admin_view.py:620
+msgid "Остаток панини должен быть нулевым, либо больше нуля"
+msgstr ""
+
+#: app/admin_view.py:629 app/forms.py:308 app/forms.py:319
+msgid "Остаток хот-догов должен быть нулевым, либо больше нуля"
+msgstr ""
+
+#: app/admin_view.py:636
+msgid "Дата и время отправки отчета"
+msgstr ""
+
+#: app/admin_view.py:643
+msgid "Остаток дня, сумма остатка наличности и безнала"
+msgstr ""
+
+#: app/admin_view.py:649
+msgid "Разница между утренним фактическим остатком и вечерним"
+msgstr ""
+
+#: app/admin_view.py:652
+msgid "Фактический остаток наличности вечером"
+msgstr ""
+
+#: app/admin_view.py:655
+msgid "Расход арабики в кг за день"
+msgstr ""
+
+#: app/admin_view.py:658
+msgid "Расход купажа в кг за день"
+msgstr ""
+
+#: app/admin_view.py:661
+msgid "Расход молока в л за день"
+msgstr ""
+
+#: app/admin_view.py:664
+msgid "Расход панини за день"
+msgstr ""
+
+#: app/admin_view.py:667
+msgid "Расход хот-догов (комплект булка-сосиска) за день"
+msgstr ""
+
+#: app/admin_view.py:670
+msgid "Количество арабики в кг, остаток на следующий день"
+msgstr ""
+
+#: app/admin_view.py:673
+msgid "Количество купажа в кг, остаток на следующий день"
+msgstr ""
+
+#: app/admin_view.py:676
+msgid "Количество молока в л, остаток на следующий день"
+msgstr ""
+
+#: app/admin_view.py:679
+msgid "Количество панини, остаток на следующий день"
+msgstr ""
+
+#: app/admin_view.py:682
+msgid "Количество хот-догов (комплект булка-сосиска), остаток на следующий день"
+msgstr ""
+
+#: app/admin_view.py:801
+msgid "Описание"
+msgstr ""
+
+#: app/admin_view.py:853
+msgid "Глобальная?"
+msgstr ""
+
+#: app/admin_view.py:854 app/admin_view.py:869 app/admin_view.py:1046
+#: app/admin_view.py:1093 app/admin_view.py:1194 app/admin_view.py:1236
+msgid "Тип траты"
+msgstr ""
+
+#: app/admin_view.py:855
+msgid "Сумма траты"
+msgstr ""
+
+#: app/admin_view.py:856 app/forms.py:97
+msgid "Категории"
+msgstr ""
+
+#: app/admin_view.py:883 app/admin_view.py:1118 app/admin_view.py:1261
+msgid "В гривнях"
+msgstr ""
+
+#: app/admin_view.py:892
+msgid "Добавить категорию"
+msgstr ""
+
+#: app/admin_view.py:990
+#, python-format
+msgid "Failed to update record. %(error)s"
+msgstr ""
+
+#: app/admin_view.py:1044 app/admin_view.py:1102 app/admin_view.py:1192
+#: app/admin_view.py:1245 app/admin_view.py:1319 app/admin_view.py:1351
+msgid "Название товара"
+msgstr ""
+
+#: app/admin_view.py:1045 app/admin_view.py:1193 app/admin_view.py:1320
+#: app/forms.py:121 app/forms.py:175 app/forms.py:209
+msgid "Количество"
+msgstr ""
+
+#: app/admin_view.py:1047 app/admin_view.py:1195 app/forms.py:132
+#: app/forms.py:220 app/templates/admin/model/expense_list.html:4
+#: app/templates/admin/model/report_list.html:4
+msgid "Сумма"
+msgstr ""
+
+#: app/admin_view.py:1069 app/admin_view.py:1216 app/admin_view.py:1340
+#: app/forms.py:127 app/forms.py:181
+msgid "Количество не может быть нулевым, либо ниже нуля"
+msgstr ""
+
+#: app/admin_view.py:1085 app/admin_view.py:1230 app/admin_view.py:1345
+msgid "Выберите склад"
+msgstr ""
+
+#: app/admin_view.py:1105 app/admin_view.py:1248 app/admin_view.py:1354
+#: app/forms.py:375 app/templates/_coffee_shop_view.html:44
+msgid "Купаж"
+msgstr ""
+
+#: app/admin_view.py:1124 app/admin_view.py:1267 app/admin_view.py:1367
+msgid "Количество в кг, л, и поштучно"
+msgstr ""
+
+#: app/admin_view.py:1407
+msgid "Название категории"
+msgstr ""
+
+#: app/admin_view.py:1419
+msgid "Название для расходов"
+msgstr ""
+
+#: app/forms.py:27
+msgid "Not a valid float value"
+msgstr ""
+
+#: app/forms.py:38 app/templates/auth/login.html:29
+msgid "Запомнить меня"
+msgstr ""
+
+#: app/forms.py:39
+msgid "Войдти"
+msgstr ""
+
+#: app/forms.py:48
+msgid "Повтор пароля"
+msgstr ""
+
+#: app/forms.py:54
+msgid "Место работы"
+msgstr ""
+
+#: app/forms.py:55 app/forms.py:420
+msgid "Добавить"
+msgstr ""
+
+#: app/forms.py:64
+msgid "Пожалуйста ипользуйте другое имя."
+msgstr ""
+
+#: app/forms.py:69
+msgid "Пожалуйста ипользуйте другой емейл адрес."
+msgstr ""
+
+#: app/forms.py:76
+msgid "Сохранить"
+msgstr ""
+
+#: app/forms.py:95
+msgid "Глобальный?"
+msgstr ""
+
+#: app/forms.py:98 app/forms.py:150 app/forms.py:185 app/forms.py:228
+#: app/forms.py:241
+msgid "Отправить"
+msgstr ""
+
+#: app/forms.py:112 app/forms.py:163 app/forms.py:198
+msgid "Выбор товара"
+msgstr ""
+
+#: app/forms.py:142 app/forms.py:211
+msgid "Тип денег"
+msgstr ""
+
+#: app/forms.py:225
+msgid "Сумма должна быть больше нуля"
+msgstr ""
+
+#: app/forms.py:239
+msgid "Откуда"
+msgstr ""
+
+#: app/forms.py:240
+msgid "Куда"
+msgstr ""
+
+#: app/forms.py:269
+msgid "Остаток арабики"
+msgstr ""
+
+#: app/forms.py:280
+msgid "Остаток купажа"
+msgstr ""
+
+#: app/forms.py:291
+msgid "Остаток молока"
+msgstr ""
+
+#: app/forms.py:323
+msgid "Подтвердить"
+msgstr ""
+
+#: app/forms.py:359
+msgid "Кофе машина"
+msgstr ""
+
+#: app/forms.py:418
+msgid "Создать"
+msgstr ""
+
+#: app/forms.py:419
+msgid "Добавить сотрудников"
+msgstr ""
+
+#: app/routes/auth.py:25
+msgid "Неправильное имя либо пароль"
+msgstr ""
+
+#: app/routes/auth.py:47
+msgid "Вы добавили нового ссотрудника!"
+msgstr ""
+
+#: app/routes/menu.py:22 app/routes/menu.py:39 app/routes/menu.py:56
+#: app/routes/menu.py:73 app/routes/report.py:20
+msgid "Сегодняшний отчет уже был отправлен!"
+msgstr ""
+
+#: app/routes/menu.py:25 app/routes/menu.py:42 app/routes/menu.py:59
+#: app/routes/menu.py:76
+msgid "Транзакция принята!"
+msgstr ""
+
+#: app/routes/menu.py:28 app/routes/menu.py:45 app/routes/menu.py:62
+#: app/routes/menu.py:79
+msgid "Транзакция не принята!  Попробуйте заново, с коректными значениями."
+msgstr ""
+
+#: app/routes/menu.py:140
+msgid "Создана новая кофейня!"
+msgstr ""
+
+#: app/routes/report.py:23
+msgid "Отчет за день отправлен!"
+msgstr ""
+
+#: app/routes/user.py:27
+msgid "Ваши изменения были сохранены."
+msgstr ""
+
+#: app/templates/_coffee_shop_view.html:9
+msgid "Сотрудники"
+msgstr ""
+
+#: app/templates/_coffee_shop_view.html:30
+#: app/templates/_coffee_shop_view.html:31
+msgid "Кофемолка"
+msgstr ""
+
+#: app/templates/_coffee_shop_view.html:54
+msgid "Текущие транзакции"
+msgstr ""
+
+#: app/templates/_coffee_shop_view.html:60
+msgid "Отчет за день отправлен"
+msgstr ""
+
+#: app/templates/index.html:2
+msgid "Главная"
+msgstr ""
+
+#: app/templates/index.html:13
+msgid "Кофейня не создана"
+msgstr ""
+
+#: app/templates/index.html:15
+msgid "Создать новую"
+msgstr ""
+
+#: app/templates/macros.html:50
+msgid "Новые отчеты"
+msgstr ""
+
+#: app/templates/macros.html:57
+msgid "Старые отчеты"
+msgstr ""
+
+#: app/templates/macros.html:117 app/templates/macros.html:136
+#: app/templates/macros.html:151
+msgid "Отсутствуют"
+msgstr ""
+
+#: app/templates/admin/index.html:8
+msgid "Вся сумма,"
+msgstr ""
+
+#: app/templates/admin/index.html:8
+msgid "детали."
+msgstr ""
+
+#: app/templates/admin/index.html:15
+msgid "Все"
+msgstr ""
+
+#: app/templates/admin/index.html:15
+msgid "расходы"
+msgstr ""
+
+#: app/templates/admin/index.html:15
+msgid "поступления"
+msgstr ""
+
+#: app/templates/admin/index.html:24
+msgid "Выйти"
+msgstr ""
+
+#: app/templates/admin/model/expense_list.html:18
+#: app/templates/admin/model/expense_list.html:49
+#: app/templates/admin/model/report_list.html:18
+#: app/templates/admin/model/report_list.html:49
+msgid "На странице"
+msgstr ""
+
+#: app/templates/admin/model/expense_list.html:26
+#: app/templates/admin/model/report_list.html:26
+msgid "Полная сумма"
+msgstr ""
+
+#: app/templates/admin/model/expense_list.html:35
+#: app/templates/admin/model/report_list.html:35
+msgid "Медиана"
+msgstr ""
+
+#: app/templates/admin/model/expense_list.html:57
+#: app/templates/admin/model/report_list.html:57
+msgid "Полное среднее"
+msgstr ""
+
+#: app/templates/auth/login.html:24
+msgid "Войдти в аккаунт"
+msgstr ""
+
+#: app/templates/auth/new_staff.html:2 app/templates/auth/new_staff.html:6
+msgid "Новый сотрудник"
+msgstr ""
+
+#: app/templates/errors/404.html:4
+msgid "Страница на найдена"
+msgstr ""
+
+#: app/templates/errors/404.html:5
+msgid "Ошибка 404"
+msgstr ""
+
+#: app/templates/errors/500.html:4
+msgid "Уупс, что-то пошло не так..."
+msgstr ""
+
+#: app/templates/errors/500.html:5
+msgid "Ошибка 500"
+msgstr ""
+
+#: app/templates/errors/500.html:6
+msgid "Назад"
+msgstr ""
+
+#: app/templates/menu/_by_weight_modal.html:8
+#: app/templates/menu/_user_menu.html:20
+msgid "Продажа развеса"
+msgstr ""
+
+#: app/templates/menu/_by_weight_modal.html:19
+#: app/templates/menu/_expense_modal.html:28
+#: app/templates/menu/_supply_modal.html:19
+#: app/templates/menu/_write_off_modal.html:17
+msgid "Закрыть"
+msgstr ""
+
+#: app/templates/menu/_expense_modal.html:8
+#: app/templates/menu/_user_menu.html:14
+msgid "Расход"
+msgstr ""
+
+#: app/templates/menu/_supply_modal.html:8
+#: app/templates/menu/_user_menu.html:17
+msgid "Поступление"
+msgstr ""
+
+#: app/templates/menu/_user_menu.html:4
+msgid "Пользователь"
+msgstr ""
+
+#: app/templates/menu/_user_menu.html:7
+msgid "Создание отчёта"
+msgstr ""
+
+#: app/templates/menu/_user_menu.html:11
+msgid "Транзакции"
+msgstr ""
+
+#: app/templates/menu/_user_menu.html:23
+#: app/templates/menu/_write_off_modal.html:8
+msgid "Списание"
+msgstr ""
+
+#: app/templates/menu/_user_menu.html:29
+msgid "Администрирование"
+msgstr ""
+
+#: app/templates/menu/_user_menu.html:33
+msgid "Выход"
+msgstr ""
+
+#: app/templates/menu/new_coffee_shop.html:2
+msgid "Создание новой кофейни"
+msgstr ""
+
+#: app/templates/menu/new_coffee_shop.html:4
+msgid "Создание кофейни"
+msgstr ""
+
+#: app/templates/report/_report.html:6
+msgid "Отправил"
+msgstr ""
+
+#: app/templates/report/_report.html:15
+msgid "О.Д."
+msgstr ""
+
+#: app/templates/report/_report.html:16
+msgid "Б.Н."
+msgstr ""
+
+#: app/templates/report/_report.html:17
+msgid "О.Н."
+msgstr ""
+
+#: app/templates/report/_report.html:18
+msgid "Ф.О."
+msgstr ""
+
+#: app/templates/report/_report.html:21
+msgid "Глобальные траты"
+msgstr ""
+
+#: app/templates/report/_report.html:26
+msgid "Расход за день"
+msgstr ""
+
+#: app/templates/report/create_report.html:2
+msgid "Создание нового отчета"
+msgstr ""
+
+#: app/templates/report/reports.html:11
+msgid "Отчеты. Здесь пока что ничего нет ..."
+msgstr ""
+
+#~ msgid "Неверное имя либо пароль"
+#~ msgstr ""
+

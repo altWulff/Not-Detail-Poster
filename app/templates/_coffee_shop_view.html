@@ -3,10 +3,10 @@
         <div class="card-body">
             <h3 class="card-title">{{coffee_shop.place_name}} / {{coffee_shop.address}}</h3>
             {% if current_user.has_role('admin') or current_user.has_role('moderator') %}
-            <h5 class="card-subtitle mb-2 text-muted">Наличка: {{coffee_shop.cash}} грн.</h5>
-            <h5 class="card-subtitle mb-2 text-muted">Безнал: {{coffee_shop.cashless}} грн.</h5>
+            <h5 class="card-subtitle mb-2 text-muted">{{ _('Наличка') }}: {{coffee_shop.cash}} грн.</h5>
+            <h5 class="card-subtitle mb-2 text-muted">{{ _('Безнал') }}: {{coffee_shop.cashless}} грн.</h5>
             {% endif %}
-            <p class="card-text">Сотрудники:</p>
+            <p class="card-text">{{ _('Сотрудники') }}:</p>
             <ul>
                 {% for barista in coffee_shop.baristas %}
                     <li><a href="{{ url_for('user.profile', user_name=barista.name) }}" class="link-secondary">{{ barista.name }}</a></li>
@@ -21,49 +21,49 @@
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingEquipment_{{coffee_shop.id}}">
                         <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEquipment_{{coffee_shop.id}}" aria-expanded="false" aria-controls="collapseEquipment_{{coffee_shop.id}}">
-                            Оборудование
+                            {{ _('Оборудование') }}
                         </button>
                     </h2>
                     <div id="collapseEquipment_{{coffee_shop.id}}" class="accordion-collapse collapse show" aria-labelledby="headingEquipment_{{coffee_shop.id}}" data-bs-parent="#accordion_{{coffee_shop.id}}">
                         <div class="accordion-body">
-                            <p class="card-text">Кофе Машина: {{cs_equip.query.filter_by(id=coffee_shop.id).first().coffee_machine}}</p>
-                            <p class="card-text">Кофемолка 1: {{cs_equip.query.filter_by(id=coffee_shop.id).first().grinder_1}}</p>
-                            <p class="card-text">Кофемолка 2: {{cs_equip.query.filter_by(id=coffee_shop.id).first().grinder_2}}</p>
+                            <p class="card-text">{{ _('Кофе Машина') }}: {{cs_equip.query.filter_by(id=coffee_shop.id).first().coffee_machine}}</p>
+                            <p class="card-text">{{ _('Кофемолка') }} 1: {{cs_equip.query.filter_by(id=coffee_shop.id).first().grinder_1}}</p>
+                            <p class="card-text">{{ _('Кофемолка') }} 2: {{cs_equip.query.filter_by(id=coffee_shop.id).first().grinder_2}}</p>
                         </div>
                     </div>
                 </div>
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingStorage_{{coffee_shop.id}}">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseStorage_{{coffee_shop.id}}" aria-expanded="false" aria-controls="collapseStorage_{{coffee_shop.id}}">
-                            Склад
+                            {{ _('Склад') }}
                         </button>
                     </h2>
                     <div id="collapseStorage_{{coffee_shop.id}}" class="accordion-collapse collapse" aria-labelledby="headingStorage_{{coffee_shop.id}}" data-bs-parent="#accordion_{{coffee_shop.id}}">
                         <div class="accordion-body">
-                            <p class="card-text">Арабика: {{warehouse.query.filter_by(id=coffee_shop.id).first().coffee_arabika}} кг</p>
-                            <p class="card-text">Купаж: {{warehouse.query.filter_by(id=coffee_shop.id).first().coffee_blend}} кг</p>
-                            <p class="card-text">Молоко: {{warehouse.query.filter_by(id=coffee_shop.id).first().milk}} л</p>
-                            <p class="card-text">Панини: {{warehouse.query.filter_by(id=coffee_shop.id).first().panini}} шт.</p>
-                            <p class="card-text">Хот-доги: {{warehouse.query.filter_by(id=coffee_shop.id).first().hot_dogs}} шт.</p>
+                            <p class="card-text">{{ _('Арабика') }}: {{warehouse.query.filter_by(id=coffee_shop.id).first().coffee_arabika}} кг</p>
+                            <p class="card-text">{{ _('Купаж') }}: {{warehouse.query.filter_by(id=coffee_shop.id).first().coffee_blend}} кг</p>
+                            <p class="card-text">{{ _('Молоко') }}: {{warehouse.query.filter_by(id=coffee_shop.id).first().milk}} л</p>
+                            <p class="card-text">{{ _('Панини') }}: {{warehouse.query.filter_by(id=coffee_shop.id).first().panini}} шт.</p>
+                            <p class="card-text">{{ _('Хот-доги') }}: {{warehouse.query.filter_by(id=coffee_shop.id).first().hot_dogs}} шт.</p>
                         </div>
                     </div>
                 </div>
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingTransactions_{{coffee_shop.id}}">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTransactions_{{coffee_shop.id}}" aria-expanded="true" aria-controls="collapseTransactions_{{coffee_shop.id}}">
-                            Текущие транзакции
+                            {{ _('Текущие транзакции') }}
                         </button>
                     </h2>
                     <div id="collapseTransactions_{{coffee_shop.id}}" class="accordion-collapse collapse" aria-labelledby="headingTransactions_{{coffee_shop.id}}" data-bs-parent="#accordion_{{coffee_shop.id}}">
                         <div class="accordion-body">
                             {% if is_report_send(coffee_shop.id) %}
-                            <p class="card-text">Отчет за день отправлен</p>
+                            <p class="card-text">{{ _('Отчет за день отправлен') }}</p>
                             {% else %}
-                            <h5 class="text-muted">Расходы</h5>
+                            <h5 class="text-muted">{{ _('Расходы') }}</h5>
                             {{ render_expansion_by_day(expense.get_local(coffee_shop.id, True)) }}
-                            <h5 class="text-muted">Поступления</h5>
+                            <h5 class="text-muted">{{ _('Поступления') }}</h5>
                             {{ render_supply_by_day(supply.get_local_by_shop(coffee_shop.id)) }}
-                            <h5 class="text-muted">Списания</h5>
+                            <h5 class="text-muted">{{ _('Списания') }}</h5>
                             {{ render_write_off_on_day(write_off.get_local_by_shop(coffee_shop.id)) }}
                             {% endif %}
                         </div>
@@ -71,7 +71,7 @@
                 </div>
             </div>
             <br/>
-            <a href="{{ url_for('reports.on_address', shop_address=coffee_shop.address)}}" class="card-link">Отчеты</a>
+            <a href="{{ url_for('reports.on_address', shop_address=coffee_shop.address)}}" class="card-link">{{ _('Отчеты') }}</a>
         </div>
     </div>
     <br/>

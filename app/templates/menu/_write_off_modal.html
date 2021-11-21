@@ -1,23 +1,20 @@
-<div class="modal fade" id="WriteOffModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="WriteOffModal" aria-hidden="true">\
+<div class="modal fade" id="WriteOffModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="WriteOffModalLabel" aria-hidden="true">\
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             {{ modal_messages() }}
             <form action="{{ url_for('menu.write_off') }}" method="post">
             {{ write_off_form.csrf_token }}
             <div class="modal-header">
-                <h5 class="modal-title" id="WriteOffModal">Списание</h5>
+                <h5 class="modal-title" id="WriteOffModalLabel">{{ _('Списание') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="mb-3">
-                    {{ write_off_form.coffee_shop.label }}
-                    {{ write_off_form.coffee_shop(class="form-select mb-3") }}
-                </div>
-                <p>{{ write_off_form.write_off_choice.label }}{{ write_off_form.write_off_choice(class="form-select") }}</p>
+                {{ render_select_field(write_off_form.coffee_shop) }}
+                {{ render_select_field(write_off_form.write_off_choice) }}
                 {{ render_field(supply_form.amount) }}
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Закрыть') }}</button>
                 {{ write_off_form.submit(class="btn btn-primary") }}
             </div>
             </form>

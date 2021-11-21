@@ -12,24 +12,55 @@
 </div>
 {% endmacro %}
 
+{% macro render_checkbox(field) %}
+ <div class="checkbox mb-3">
+     {{ field.label(class="form-check-input")}}
+     {{ field(class="form-check-input") }}
+</div>
+{% endmacro %}
+
+{% macro render_select_field(field) %}
+<div class="mb-3">
+    {{ field.label }}
+    {{ field(class="form-select mb-3") }}
+</div>
+{% endmacro %}
+
+{% macro render_phone_field(field) %}
+ <div class="form-floating mb-3">
+    {{ field(class="form-control phone_mask", id="floatingInput", placeholder=' ') }}
+    {{ field.label(class="floatingInput")}}
+    {{ with_errors(field) }}
+</div>
+{% endmacro %}
+
+{% macro render_password_field(field) %}
+<div class="form-floating mb-3">
+    {{ field(type="password", class="form-control", id="floatingPassword", placeholder=' ') }}
+    {{ field.label(for="floatingPassword")}}
+    {{ with_errors(field) }}
+</div>
+{% endmacro %}
+
 {% macro pagination(prev_url, next_url) %}
 <ul class="pagination">
     {% if prev_url %}
         <li class="page-item">
           <a class="page-link" href="{{ prev_url }}">
-            <span aria-hidden="true">Новые отчеты</span>
+            <span aria-hidden="true">{{ _('Новые отчеты') }}</span>
           </a>
         </li>
     {% endif %}
     {% if next_url %}
     <li class="page-item">
       <a class="page-link" href="{{ next_url }}">
-        <span aria-hidden="true">Старые отчеты</span>
+        <span aria-hidden="true">{{ _('Старые отчеты') }}</span>
       </a>
     </li>
     {% endif %}
 </ul>
 {% endmacro %}
+
 {% macro render_expansion(expansion, report) %}
     <ul class="list-group">
         {% for expanse in expansion %}
@@ -83,7 +114,7 @@
             <span class="badge bg-primary rounded-pill"> {{expanse.type_cost}}</span>
         </li>
         {% else %}
-        <p>Отсутствуют</p>
+        <p>{{ _('Отсутствуют') }}</p>
         {% endfor %}
     </ul>
 {% endmacro %}
@@ -102,7 +133,7 @@
             <span class="badge bg-primary rounded-pill"> {{s.type_cost}}</span>
         </li>
         {% else %}
-        <p>Отсутствуют</p>
+        <p>{{ _('Отсутствуют') }}</p>
         {% endfor %}
     </ul>
 {% endmacro %}
@@ -117,7 +148,7 @@
             </div>
         </li>
         {% else %}
-        <p>Отсутствуют</p>
+        <p>{{ _('Отсутствуют') }}</p>
         {% endfor %}
     </ul>
 {% endmacro %}

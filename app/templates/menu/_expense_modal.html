@@ -1,18 +1,15 @@
-<div class="modal fade" id="ConsumptionModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="ConsumptionModal" aria-hidden="true">
+<div class="modal fade" id="ConsumptionModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="ConsumptionModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             {{ modal_messages() }}
             <form action="{{ url_for('menu.expense') }}" method="post">
             {{ expense_form.csrf_token }}
             <div class="modal-header">
-                <h5 class="modal-title" id="ConsumptionModal">Расход</h5>
+                <h5 class="modal-title" id="ConsumptionModalLabel">{{_('Расход')}}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="mb-3">
-                    {{ expense_form.coffee_shop.label }}
-                    {{ expense_form.coffee_shop(class="form-select mb-3") }}
-                </div>
+                {{ render_select_field(expense_form.coffee_shop) }}
                 <div class="form-floating mb-3">
                 </div>
                 <div class="mb-3 form-check">
@@ -21,15 +18,14 @@
                 </div>
                 <div class="form-check">
                 {% for radio in expense_form.type_cost %}
-                   {{ radio.label}} {{ radio }}
+                   {{ radio.label }} {{ radio }}
                 {% endfor %}
                 </div>
                 {{ render_field(expense_form.money) }}
-                {{expense_form.categories.label}}
-                {{ expense_form.categories(class="form-select") }}
+                {{ render_select_field(expense_form.categories) }}
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{_('Закрыть')}}</button>
                 {{ expense_form.submit(class="btn btn-primary") }}
             </div>
             </form>

@@ -2,7 +2,6 @@ from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import func
 from sqlalchemy.ext.hybrid import hybrid_property
-
 from flask_security import UserMixin, RoleMixin
 from app import db, login
 
@@ -32,8 +31,11 @@ class Shop(db.Model):
     storage = db.relationship("Storage", back_populates="shop", uselist=False)
     shop_equipment = db.relationship("ShopEquipment", back_populates="shop", uselist=False)
     reports = db.relationship('Report', backref='shop', lazy=True)
-    baristas = db.relationship('Barista', secondary=baristas, lazy='subquery',
-                               backref=db.backref('shop', lazy=True))
+    baristas = db.relationship(
+        'Barista',
+        secondary=baristas, lazy='subquery',
+        backref=db.backref('shop', lazy=True)
+    )
     expenses = db.relationship('Expense', backref='shop', lazy=True)
 
     def __repr__(self):
@@ -42,11 +44,14 @@ class Shop(db.Model):
     def __str__(self):
         if self:
             return f'{self.place_name} / {self.address}'
-        return f'{self}>'
+        return f'{self}'
         
     @classmethod
-    def get_barista_work(cls, barista_id):
-        _query = cls.query.filter(cls.baristas.any(id=barista_id))
+    def get_barista_work(cls, barista):
+        if barista.has_administrative_rights:
+            _query = cls.query
+        else:
+            _query = cls.query.filter(cls.baristas.any(id=barista.id))
         _query = _query.order_by('place_name')
         return _query
 
@@ -63,7 +68,7 @@ class ShopEquipment(db.Model):
     def __repr__(self):
         if self.shop_id:
             return f'<ShopEquipment: {self.shop.place_name}>'
-        return f'<ShopEquipment: {self.id}>'
+        return f'<ShopEquipment_id: {self.id}>'
 
 
 class Storage(db.Model):
@@ -84,7 +89,7 @@ class Storage(db.Model):
         if self.shop_id:
             return f'<Storage: {self.shop.place_name}>'
         else:
-            return f'<Storage: {self.id}>'
+            return f'<Storage_id: {self.id}>'
 
     def __str__(self):
         if self.shop:
@@ -122,9 +127,6 @@ class Barista(db.Model, UserMixin):
     def __str__(self):
         return f'{self.name}'
 
-    def check_phone_number(self, phone_number):
-        return self.phone_number == phone_number
-    
     @hybrid_property
     def password(self):
         return self.password_hash
@@ -135,9 +137,6 @@ class Barista(db.Model, UserMixin):
         _password_hash = generate_password_hash(new_pass)
         self.password_hash = _password_hash
 
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
-
     @hybrid_property 
     def has_administrative_rights(self):
         return self.has_role('admin')
@@ -145,6 +144,12 @@ class Barista(db.Model, UserMixin):
     @hybrid_property 
     def has_moderator_rights(self):
         return self.has_role('moderator')
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+    def check_phone_number(self, phone_number):
+        return self.phone_number == phone_number
 
 
 class Role(db.Model, RoleMixin):
@@ -176,8 +181,12 @@ class Report(db.Model):
     # Касса - остаток дня в сумме с расходами
     cashbox = db.Column(db.Integer)
     # Расходы
-    expenses = db.relationship('Expense', secondary=expenses, lazy='subquery',
-                               backref=db.backref('reports', lazy=True))
+    expenses = db.relationship(
+        'Expense',
+        secondary=expenses,
+        lazy='subquery',
+        backref=db.backref('reports', lazy=True)
+    )
     # О.Д. - сумма нала и безнала за день
     remainder_of_day = db.Column(db.Integer)
     # Б.Н. безнал да день
@@ -202,6 +211,9 @@ class Report(db.Model):
     def __repr__(self):
         return f'<Report {self.timestamp}>'
 
+    def __str__(self):
+        return f'Отчет за {self.timestamp.strftime("%d.%m.%y")}г.'
+
 
 categories = db.Table(
     'categories',
@@ -219,7 +231,7 @@ class Category(db.Model):
         return f'<Category: {self.name}>'
         
     def __str__(self):
-        return self.name
+        return self.name.title()
 
 
 class Expense(db.Model):
@@ -234,14 +246,18 @@ class Expense(db.Model):
     # налл, безнал
     type_cost = db.Column(db.String(64), index=True)
     money = db.Column(db.Integer)
-    categories = db.relationship('Category', secondary=categories, lazy='subquery',
-                                 backref=db.backref('expense', lazy=True))
+    categories = db.relationship(
+        'Category',
+        secondary=categories,
+        lazy='subquery',
+        backref=db.backref('expense', lazy=True)
+    )
 
     def __repr__(self):
-        return f'<Expense: {self.categories}({self.type_cost}) - {self.money}>'
+        return f'<Expense: {self.money} {self.timestamp.strftime("%d.%m.%y")}г.>'
      
     def __str__(self):
-        return f'{self.timestamp.timetuple()[:3]} {self.categories}; {self.money} грн.({self.type_cost}) '
+        return f'{self.money} грн.({self.type_cost}) / {self.categories} / {self.timestamp.strftime("%d.%m.%y")}г.'
 
     @classmethod     
     def get_global(cls, shop_id, today=False):
@@ -260,7 +276,7 @@ class Expense(db.Model):
     @classmethod
     def by_timestamp(cls, shop_id, timestamp):
         # TODO сделать фильтр по значениям как ниже
-        #>>> e.timestamp.timetuple()[:3]
+        # >>> e.timestamp.timetuple()[:3]
         # (2021, 11, 16)
         _query = cls.query.filter_by(shop_id=shop_id).filter(cls.is_global==False)
         _query = _query.filter(cls.timestamp >= timestamp)
@@ -291,6 +307,9 @@ class Supply(db.Model):
         _query = cls.query.filter_by(storage_id=storage.id).filter(cls.timestamp >= date_today)
         return _query
 
+    def __str__(self):
+        return f'{self.money} грн.({self.type_cost}) / {self.timestamp.strftime("%d.%m.%y")}г.'
+
 
 class ByWeight(db.Model):
     __tablename__ = 'by_weight'
@@ -305,6 +324,9 @@ class ByWeight(db.Model):
     type_cost = db.Column(db.String(64), index=True)
     money = db.Column(db.Integer)
 
+    def __str__(self):
+        return f'{self.money} грн.({self.type_cost}) / {self.timestamp.strftime("%d.%m.%y")}г.'
+
 
 class WriteOff(db.Model):
     __tablename__ = 'write_off'
@@ -316,6 +338,9 @@ class WriteOff(db.Model):
     last_edit = db.Column(db.DateTime(timezone=True), server_default=func.now())
     amount = db.Column(db.Float(50))
     product_name = db.Column(db.String(80))
+
+    def __str__(self):
+        return f'{self.product_name}: {self.amount} / {self.timestamp.strftime("%d.%m.%y")}г.'
 
     @classmethod
     def get_local_by_shop(cls, shop_id):

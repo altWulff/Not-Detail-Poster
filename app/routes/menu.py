@@ -1,4 +1,3 @@
-from datetime import datetime
 from flask import render_template, redirect, url_for, flash, Blueprint, request
 from flask_security import login_required
 from flask_modals import render_template_modal
