@@ -1,0 +1,22 @@
+<ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="pills-expansion-tab" data-bs-toggle="pill" data-bs-target="#pills-expansion" type="button" role="tab" aria-controls="pills-expansion" aria-selected="true">{{ _('Расходы') }}</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-supply-tab" data-bs-toggle="pill" data-bs-target="#pills-supply" type="button" role="tab" aria-controls="pills-supply" aria-selected="false">{{ _('Поступления') }}</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-write_off-tab" data-bs-toggle="pill" data-bs-target="#pills-write_off" type="button" role="tab" aria-controls="pills-write_off" aria-selected="false">{{ _('Списания') }}</button>
+    </li>
+</ul>
+<div class="tab-content" id="pills-tabContent">
+    <div class="tab-pane fade show active" id="pills-expansion" role="tabpanel" aria-labelledby="pills-expansion-tab">
+        {{ render_expansion_by_day(expense.get_local(coffee_shop.id, True)) }}
+    </div>
+    <div class="tab-pane fade" id="pills-supply" role="tabpanel" aria-labelledby="pills-supply-tab">
+        {{ render_supply_by_day(supply.get_local_by_shop(coffee_shop.id)) }}
+    </div>
+    <div class="tab-pane fade" id="pills-write_off" role="tabpanel" aria-labelledby="pills-write_off-tab">
+        {{ render_write_off_on_day(write_off.get_local_by_shop(coffee_shop.id)) }}
+    </div>
+</div>

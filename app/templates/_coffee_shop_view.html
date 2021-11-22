@@ -59,12 +59,7 @@
                             {% if is_report_send(coffee_shop.id) %}
                             <p class="card-text">{{ _('Отчет за день отправлен') }}</p>
                             {% else %}
-                            <h5 class="text-muted">{{ _('Расходы') }}</h5>
-                            {{ render_expansion_by_day(expense.get_local(coffee_shop.id, True)) }}
-                            <h5 class="text-muted">{{ _('Поступления') }}</h5>
-                            {{ render_supply_by_day(supply.get_local_by_shop(coffee_shop.id)) }}
-                            <h5 class="text-muted">{{ _('Списания') }}</h5>
-                            {{ render_write_off_on_day(write_off.get_local_by_shop(coffee_shop.id)) }}
+                            {% include '_transaction_view.html' %}
                             {% endif %}
                         </div>
                     </div>
