@@ -435,11 +435,11 @@ class ReportAdmin(ModelView):
         'expenses',
         'cashless',
         'actual_balance',
-        'consumption_coffee_arabika',
-        'consumption_coffee_blend',
-        'consumption_milk',
-        'consumption_panini',
-        'consumption_hot_dogs',
+        # 'consumption_coffee_arabika',
+        # 'consumption_coffee_blend',
+        # 'consumption_milk',
+        # 'consumption_panini',
+        # 'consumption_hot_dogs',
         'coffee_arabika',
         'coffee_blend',
         'milk',
@@ -752,6 +752,16 @@ class ReportAdmin(ModelView):
 
         return super(ReportAdmin, self).render(template, **kwargs)
 
+    def create_form(self, obj=None):
+        form = super(ReportAdmin, self).create_form(obj)
+        form.barista.data = current_user
+        print(form.data)
+        return form
+
+    def on_form_prefill(self, form, id):
+        print(form.data, id)
+        pass
+
     def update_model(self, form, model):
         try:
             new_cash_balance, old_cash_balance = form.cash_balance.data, model.cash_balance
@@ -775,6 +785,21 @@ class ReportAdmin(ModelView):
 
             new_consumption_hot_dogs = form.consumption_hot_dogs.data
             old_consumption_hot_dogs = model.consumption_hot_dogs
+
+            new_coffee_arabika = form.coffee_arabika.data
+            old_coffee_arabika = model.coffee_arabika
+
+            new_coffee_blend = form.coffee_blend.data
+            old_coffee_blend = model.coffee_blend
+
+            new_milk = form.milk.data
+            old_milk = model.milk
+
+            new_panini = form.panini.data
+            old_panini = model.panini
+
+            new_hot_dogs = form.hot_dogs.data
+            old_hot_dogs = model.hot_dogs
 
             form.populate_obj(model)
             self._on_model_change(form, model, False)
@@ -815,6 +840,21 @@ class ReportAdmin(ModelView):
             if new_consumption_hot_dogs != old_consumption_hot_dogs:
                 form.consumption_hot_dogs.data = old_consumption_hot_dogs
 
+            if new_coffee_arabika != old_coffee_arabika:
+                form.coffee_arabika.data = old_coffee_arabika
+
+            if new_coffee_blend != old_coffee_blend:
+                form.coffee_blend.data = old_coffee_blend
+
+            if new_milk != old_milk:
+                form.milk.data = old_milk
+
+            if new_panini != old_panini:
+                form.panini.data = old_panini
+
+            if new_hot_dogs != old_hot_dogs:
+                form.hot_dogs.data = old_hot_dogs
+
             self.after_model_change(form, model, False)
         return True
 
@@ -833,8 +873,8 @@ class ReportAdmin(ModelView):
         if form.backdating.data:
             model.backdating = form.backdating.data
             return
-        model.shop.cash += cash_balance + expanses
-        model.shop.cashless += form.cashless.data
+        # model.shop.cash += cash_balance + expanses
+        # model.shop.cashless += form.cashless.data
 
         model.consumption_coffee_arabika = model.shop.storage.coffee_arabika - float(form.coffee_arabika.data)
         model.consumption_coffee_blend = model.shop.storage.coffee_blend - float(form.coffee_blend.data)
@@ -854,8 +894,8 @@ class ReportAdmin(ModelView):
             # expanses = form.expenses.data
             # expanses = sum([e.money for e in expanses if e.type_cost == 'cash'])
 
-            model.shop.cash -= form.cash_balance.data
-            model.shop.cashless -= form.cashless.data
+            # model.shop.cash -= form.cash_balance.data
+            # model.shop.cashless -= form.cashless.data
             model.shop.storage.coffee_arabika += float(form.consumption_coffee_arabika.data)
             model.shop.storage.coffee_blend += float(form.consumption_coffee_blend.data)
             model.shop.storage.milk += float(form.consumption_milk.data)
@@ -866,8 +906,10 @@ class ReportAdmin(ModelView):
     def on_model_delete(self, model):
         if model.backdating:
             return
-        model.shop.cash -= model.cash_balance
-        model.shop.cashless -= model.cashless
+        # expanses = model.expenses
+        # expanses = sum([e.money for e in expanses if e.type_cost == 'cash'])
+        # model.shop.cash -= (model.cash_balance + expanse)
+        # model.shop.cashless -= model.cashless
         model.shop.storage.coffee_arabika += model.consumption_coffee_arabika
         model.shop.storage.coffee_blend += model.consumption_coffee_blend
         model.shop.storage.milk += model.consumption_milk
