@@ -759,11 +759,14 @@ class ReportAdmin(ModelView):
         return form
 
     def on_form_prefill(self, form, id):
-        print(form.data, id)
-        pass
+        print('-'*10, 'Start', '-'*10)
+        print('on_form_prefill')
+        print('cash_balance form:', form.cash_balance.data)
+        print('-'*10, 'END', '-'*10)
 
     def update_model(self, form, model):
         try:
+            new_remainder_of_day, old_remainder_of_day = form.remainder_of_day.data, model.remainder_of_day
             new_cash_balance, old_cash_balance = form.cash_balance.data, model.cash_balance
             new_cashless, old_cashless = form.cashless.data, model.cashless
             new_actual_balance, old_actual_balance = form.actual_balance.data, model.actual_balance
@@ -800,6 +803,9 @@ class ReportAdmin(ModelView):
 
             new_hot_dogs = form.hot_dogs.data
             old_hot_dogs = model.hot_dogs
+            
+            new_shop = form.shop.data
+            old_shop = model.shop
 
             form.populate_obj(model)
             self._on_model_change(form, model, False)
@@ -813,6 +819,9 @@ class ReportAdmin(ModelView):
 
             return False
         else:
+            if new_remainder_of_day != old_remainder_of_day:
+                form.remainder_of_day.data = old_remainder_of_day
+                
             if new_cash_balance != old_cash_balance:
                 form.cash_balance.data = old_cash_balance
 
@@ -854,27 +863,29 @@ class ReportAdmin(ModelView):
 
             if new_hot_dogs != old_hot_dogs:
                 form.hot_dogs.data = old_hot_dogs
+            
+            if new_shop != old_shop:
+                form.shop.data = old_shop
 
             self.after_model_change(form, model, False)
         return True
 
     def on_model_change(self, form, model, is_created):
+        print('-'*10, 'Start', '-'*10)
         expanses = model.expenses
         expanses = sum([e.money for e in expanses if e.type_cost == 'cash'])
-        last_actual_balance = model.shop.cash + expanses
-        cash_balance = form.actual_balance.data - last_actual_balance
-        remainder_of_day = cash_balance + form.cashless.data
-        cashbox = remainder_of_day + expanses
-
-        model.cash_balance = cash_balance
-        model.remainder_of_day = remainder_of_day
-        model.cashbox = cashbox
-
+        last_actual_balance = model.shop.cash
+        balance = form.actual_balance.data - last_actual_balance
+        model.cashbox = balance + form.cashless.data
+        model.remainder_of_day = model.cashbox - expanses
+        model.cash_balance = model.remainder_of_day - model.cashless
+        
+        print(model.cash_balance)
         if form.backdating.data:
             model.backdating = form.backdating.data
             return
-        # model.shop.cash += cash_balance + expanses
-        # model.shop.cashless += form.cashless.data
+        model.shop.cash += model.cash_balance
+        model.shop.cashless += model.cashless
 
         model.consumption_coffee_arabika = model.shop.storage.coffee_arabika - float(form.coffee_arabika.data)
         model.consumption_coffee_blend = model.shop.storage.coffee_blend - float(form.coffee_blend.data)
@@ -887,29 +898,40 @@ class ReportAdmin(ModelView):
         model.shop.storage.milk -= model.consumption_milk
         model.shop.storage.panini -= model.consumption_panini
         model.shop.storage.hot_dogs -= model.consumption_hot_dogs
+        #print('On model change', form.cash_balance.data)
+        print('-'*10, 'END', '-'*10)
 
     def after_model_change(self, form, model, is_created):
+        print('-'*10, 'Start', '-'*10)
+        if form.backdating.data:
+            return
         if not is_created:
-            # TODO некоректно обрабатываются расходы
-            # expanses = form.expenses.data
-            # expanses = sum([e.money for e in expanses if e.type_cost == 'cash'])
-
-            # model.shop.cash -= form.cash_balance.data
-            # model.shop.cashless -= form.cashless.data
+            print('after_model_change work')
+            expanses = model.expenses
+            expanses = sum([e.money for e in expanses if e.type_cost == 'cash'])
+            shop = form.shop.data
+            last_actual_balance = shop.cash
+            balance = form.actual_balance.data - last_actual_balance
+            form.cashbox.data = balance + form.cashless.data
+            form.remainder_of_day.data = form.cashbox.data - expanses
+            form.cash_balance.data = form.remainder_of_day.data - form.cashless.data
+            
+            model.shop.cash -= form.cash_balance.data
+            model.shop.cashless -= form.cashless.data
             model.shop.storage.coffee_arabika += float(form.consumption_coffee_arabika.data)
             model.shop.storage.coffee_blend += float(form.consumption_coffee_blend.data)
             model.shop.storage.milk += float(form.consumption_milk.data)
             model.shop.storage.panini += int(form.consumption_panini.data)
             model.shop.storage.hot_dogs += int(form.consumption_hot_dogs.data)
             self.session.commit()
+        #print('Afeter model change', form.cash_balance.data)
+        print('-'*10, 'END', '-'*10)
 
     def on_model_delete(self, model):
         if model.backdating:
             return
-        # expanses = model.expenses
-        # expanses = sum([e.money for e in expanses if e.type_cost == 'cash'])
-        # model.shop.cash -= (model.cash_balance + expanse)
-        # model.shop.cashless -= model.cashless
+        model.shop.cash -= model.cash_balance
+        model.shop.cashless -= model.cashless
         model.shop.storage.coffee_arabika += model.consumption_coffee_arabika
         model.shop.storage.coffee_blend += model.consumption_coffee_blend
         model.shop.storage.milk += model.consumption_milk
