@@ -6,7 +6,7 @@ from flask_security import current_user
 from flask_admin import AdminIndexView, expose
 from flask_admin.contrib import sqla
 from flask_admin.model import typefmt
-from app.models import Shop, Report, Expense, Supply
+from app.models import Shop, Report, Expense, Supply, ByWeight, WriteOff, Barista, Category
 from wtforms import RadioField, SelectField, BooleanField
 from wtforms.validators import DataRequired, NumberRange, Required, InputRequired
 import logging
@@ -184,6 +184,8 @@ class ShopEquipmentAdmin(ModelView):
 
 class StorageAdmin(ModelView):
     column_labels = dict(
+        place_name=gettext('Название'),
+        address=gettext('Адрес'),
         coffee_arabika=gettext('Арабика'),
         coffee_blend=gettext('Бленд'),
         milk=gettext('Молоко'),
@@ -201,7 +203,7 @@ class StorageAdmin(ModelView):
         panini=lambda v, c, m, p: f'{m.panini} шт.',
         hot_dogs=lambda v, c, m, p: f'{m.hot_dogs} шт.',
     )
-    column_filters = ('shop',)
+    column_filters = (Shop.place_name, Shop.address)
     form_create_rules = ('coffee_arabika', 'coffee_blend', 'milk', 'panini', 'hot_dogs', 'shop')
     form_edit_rules = (
         'coffee_arabika',
@@ -284,10 +286,12 @@ class StorageAdmin(ModelView):
 
 
 class BaristaAdmin(ModelView):
-    column_filters = ('name', 'phone_number', 'email', 'shop')
+    column_filters = ('name', 'phone_number', 'email', Shop.place_name, Shop.address)
     column_searchable_list = ('name', 'phone_number', 'email')
-    column_exclude_list = ('password_hash', 'roles', 'reports', 'salary_rate')
+    column_exclude_list = ('password_hash', 'roles', 'reports', )
     column_labels = dict(
+        place_name=gettext('Назавание'),
+        address=gettext('Адрес'),
         name=gettext('Имя'),
         phone_number=gettext('Тел.'),
         email=gettext('Емейл'),
@@ -389,7 +393,7 @@ class ReportAdmin(ModelView):
     list_template = 'admin/model/report_list.html'
     can_view_details = True
     column_default_sort = ('timestamp', True)
-    column_searchable_list = ('timestamp',)
+    column_searchable_list = (Report.timestamp, )
     column_exclude_list = (
         'backdating',
         'last_edit',
@@ -404,8 +408,11 @@ class ReportAdmin(ModelView):
         'panini',
         'hot_dogs',
     )
-    column_filters = ('timestamp', 'barista', 'shop')
+    column_filters = (Report.timestamp, Barista.name, Shop.place_name, Shop.address)
     column_labels = dict(
+        place_name=gettext('Название'),
+        address=gettext('Адрес'),
+        name=gettext('Имя'),
         shop=gettext('Кофейня'),
         barista=gettext('Бариста'),
         timestamp=gettext('Дата'),
@@ -435,11 +442,6 @@ class ReportAdmin(ModelView):
         'expenses',
         'cashless',
         'actual_balance',
-        # 'consumption_coffee_arabika',
-        # 'consumption_coffee_blend',
-        # 'consumption_milk',
-        # 'consumption_panini',
-        # 'consumption_hot_dogs',
         'coffee_arabika',
         'coffee_blend',
         'milk',
@@ -754,15 +756,9 @@ class ReportAdmin(ModelView):
 
     def create_form(self, obj=None):
         form = super(ReportAdmin, self).create_form(obj)
+        form.timestamp.data = datetime.now()
         form.barista.data = current_user
-        print(form.data)
         return form
-
-    def on_form_prefill(self, form, id):
-        print('-'*10, 'Start', '-'*10)
-        print('on_form_prefill')
-        print('cash_balance form:', form.cash_balance.data)
-        print('-'*10, 'END', '-'*10)
 
     def update_model(self, form, model):
         try:
@@ -871,7 +867,6 @@ class ReportAdmin(ModelView):
         return True
 
     def on_model_change(self, form, model, is_created):
-        print('-'*10, 'Start', '-'*10)
         expanses = model.expenses
         expanses = sum([e.money for e in expanses if e.type_cost == 'cash'])
         last_actual_balance = model.shop.cash
@@ -898,15 +893,12 @@ class ReportAdmin(ModelView):
         model.shop.storage.milk -= model.consumption_milk
         model.shop.storage.panini -= model.consumption_panini
         model.shop.storage.hot_dogs -= model.consumption_hot_dogs
-        #print('On model change', form.cash_balance.data)
-        print('-'*10, 'END', '-'*10)
 
     def after_model_change(self, form, model, is_created):
-        print('-'*10, 'Start', '-'*10)
         if form.backdating.data:
             return
         if not is_created:
-            print('after_model_change work')
+            model.last_edit = datetime.now()
             expanses = model.expenses
             expanses = sum([e.money for e in expanses if e.type_cost == 'cash'])
             shop = form.shop.data
@@ -924,8 +916,6 @@ class ReportAdmin(ModelView):
             model.shop.storage.panini += int(form.consumption_panini.data)
             model.shop.storage.hot_dogs += int(form.consumption_hot_dogs.data)
             self.session.commit()
-        #print('Afeter model change', form.cash_balance.data)
-        print('-'*10, 'END', '-'*10)
 
     def on_model_delete(self, model):
         if model.backdating:
@@ -971,6 +961,7 @@ class ExpenseAdmin(ModelView):
         type_cost = '' if model.type_cost == 'cash' else ' (Безнал)'
         formatter = f'{model.money} грн.{type_cost}'
         return Markup(f'{formatter}')
+
     list_template = 'admin/model/expense_list.html'
     can_set_page_size = True
     column_list = ('timestamp', 'money', 'is_global', 'categories', 'shop')
@@ -981,7 +972,8 @@ class ExpenseAdmin(ModelView):
         'type_cost',
         'money',
         'categories',
-        'shop'
+        'shop',
+        'barista'
     )
     form_edit_rules = (
         'backdating',
@@ -992,15 +984,26 @@ class ExpenseAdmin(ModelView):
         'categories',
         'shop'
     )
-    column_filters = ('timestamp', 'is_global', 'type_cost', 'categories', 'shop')
-    column_searchable_list = ('timestamp',)
+    column_filters = (
+        'timestamp',
+        'is_global',
+        'type_cost',
+        Category.name,
+        Shop.place_name,
+        Shop.address,
+        Barista.name
+    )
+    column_searchable_list = (Expense.timestamp, )
     column_labels = dict(
+        category=gettext('Категория'),
         timestamp=gettext('Дата'),
+        last_edit=gettext('Последнее изменение'),
         is_global=gettext('Глобальная?'),
         type_cost=gettext('Тип траты'),
         money=gettext('Сумма траты'),
         categories=gettext('Категории'),
-        shop=gettext('Кофейня')
+        shop=gettext('Кофейня'),
+        barista=gettext('Бариста')
     )
     can_view_details = True
     column_default_sort = ('timestamp', True)
@@ -1071,47 +1074,61 @@ class ExpenseAdmin(ModelView):
 
     def sum_page(self, attr: str) -> int:
         _query = self.get_model_data()
-        return sum([p.__dict__[attr] for p in _query])
+        try:
+            return sum([p.__dict__[attr] for p in _query if p])
+        except:
+            return 0
 
     def sum_total(self, attr: str) -> int:
-        return self.session.query(func.sum(ExpenseAdmin.__dict__[attr])).scalar()
+        _query = self.session.query(func.sum(Expense.__dict__[attr])).scalar()
+        try:
+            return _query
+        except:
+            return 0
 
     def median_page(self, attr: str) -> int:
         _query = self.get_model_data()
-        data = [p.__dict__[attr] for p in _query]
-        if len(data) > 1:
+        data = [p.__dict__[attr] for p in _query if p]
+        try:
             return median(data)
-        return 0
+        except:
+            return 0
 
     def median_total(self, attr: str) -> int:
-        _query = self.session.query(func.avg(ExpenseAdmin.__dict__[attr])).scalar()
-        return round(_query)
+        _query = self.session.query(func.avg(Expense.__dict__[attr])).scalar()
+        try:
+            return round(_query)
+        except:
+            return 0
 
     def render(self, template, **kwargs):
         if template == 'admin/model/expense_list.html':
-            # append a summary_data dictionary into kwargs
             _current_page = kwargs['page']
             kwargs['column_labels'] = self.column_labels
             kwargs['summary_data'] = {
                 'on_page': {
                     'money': self.sum_page('money')
                 },
-                # TODO fix bug, key error 'money'
                 'total': {
-                    'money': 0
+                    'money': self.sum_total('money')
                 }
             }
             kwargs['median_data'] = {
-                'money': {
+                'on_page': {
                     'money': self.median_page('money')
                 },
-                # TODO fix bug, key error 'money'
                 'total': {
-                    'money': 0
+                    'money': self.median_total('money')
                 }
             }
 
         return super(ExpenseAdmin, self).render(template, **kwargs)
+
+    def create_form(self, obj=None):
+        form = super(ExpenseAdmin, self).create_form(obj)
+        form.timestamp.data = datetime.now()
+        form.barista.data = current_user
+        return form
 
     def update_model(self, form, model):
         try:
@@ -1132,7 +1149,10 @@ class ExpenseAdmin(ModelView):
         return True
 
     def on_model_change(self, form, model, is_created):
+        print('On model change')
+        print(form.data)
         if form.backdating.data:
+            model.backdating = form.backdating.data
             return
         money = model.money
         if model.type_cost == 'cash':
@@ -1141,7 +1161,10 @@ class ExpenseAdmin(ModelView):
             model.shop.cashless -= money
 
     def after_model_change(self, form, model, is_created):
+        if form.backdating.data:
+            return
         if not is_created:
+            model.last_edit = datetime.now()
             if form.type_cost.data == 'cash':
                 model.shop.cash += form.money.data
             else:
@@ -1187,20 +1210,41 @@ class SupplyAdmin(ModelView):
         )
         return Markup(f'{prettified[model.product_name]}')
 
+    list_template = 'admin/model/supply_list.html'
     can_set_page_size = True
     column_list = ('timestamp', 'product_name', 'amount', 'money', 'storage')
     column_labels = dict(
+        name=gettext('Имя'),
         timestamp=gettext('Дата'),
         product_name=gettext('Название товара'),
         amount=gettext('Количество'),
         type_cost=gettext('Тип траты'),
         money=gettext('Сумма'),
-        storage=gettext('Склад')
+        storage=gettext('Склад'),
+        barista=gettext('Бариста')
     )
-    column_filters = ('timestamp', 'type_cost', 'storage')
-    column_searchable_list = ('timestamp',)
-    form_create_rules = ('backdating', 'timestamp', 'product_name', 'amount', 'type_cost', 'money', 'storage')
-    form_edit_rules = ('backdating', 'timestamp', 'product_name', 'amount', 'type_cost', 'money', 'storage')
+    column_filters = ('timestamp', 'type_cost', 'product_name', Barista.name)
+    column_searchable_list = (Supply.timestamp, )
+    form_create_rules = (
+        'backdating',
+        'timestamp',
+        'product_name',
+        'amount',
+        'type_cost',
+        'money',
+        'storage',
+        'barista'
+    )
+    form_edit_rules = (
+        'backdating',
+        'timestamp',
+        'product_name',
+        'amount',
+        'type_cost',
+        'money',
+        'storage',
+        'barista'
+    )
     column_formatters = dict(
         type_cost=lambda v, c, m, p: 'Наличка' if m.type_cost == 'cash' else 'Безнал',
         product_name=_list_product_name,
@@ -1276,6 +1320,69 @@ class SupplyAdmin(ModelView):
         }
     }
 
+    def sum_page(self, attr: str) -> int:
+        _query = self.get_model_data()
+        try:
+            return sum([p.__dict__[attr] for p in _query if p])
+        except:
+            return 0
+
+    def sum_total(self, attr: str) -> int:
+        _query = self.session.query(func.sum(Supply.__dict__[attr])).scalar()
+        try:
+            return _query
+        except:
+            return 0
+
+    def median_page(self, attr: str) -> int:
+        _query = self.get_model_data()
+        data = [p.__dict__[attr] for p in _query if p]
+        try:
+            return median(data)
+        except:
+            return 0
+
+    def median_total(self, attr: str) -> int:
+        _query = self.session.query(func.avg(Supply.__dict__[attr])).scalar()
+        try:
+            return round(_query)
+        except:
+            return 0
+
+    def render(self, template, **kwargs):
+        if template == 'admin/model/supply_list.html':
+            _current_page = kwargs['page']
+            kwargs['column_labels'] = self.column_labels
+            kwargs['summary_data'] = {
+                'on_page': {
+                    'amount': self.sum_page('amount'),
+                    'money': self.sum_page('money'),
+                },
+                'total': {
+                    'amount': self.sum_total('amount'),
+                    'money': self.sum_total('money')
+
+                }
+            }
+            kwargs['median_data'] = {
+                'on_page': {
+                    'amount': self.median_page('amount'),
+                    'money': self.median_page('money')
+                },
+                'total': {
+                    'amount': self.median_total('amount'),
+                    'money': self.median_total('money')
+                }
+            }
+
+        return super(SupplyAdmin, self).render(template, **kwargs)
+
+    def create_form(self, obj=None):
+        form = super(SupplyAdmin, self).create_form(obj)
+        form.timestamp.data = datetime.now()
+        form.barista.data = current_user
+        return form
+
     def update_model(self, form, model):
         try:
             new_money = form.money.data
@@ -1326,7 +1433,10 @@ class SupplyAdmin(ModelView):
             model.storage.shop.cashless -= form.money.data
 
     def after_model_change(self, form, model, is_created):
+        if form.backdating.data:
+            return
         if not is_created:
+            model.last_edit = datetime.now()
             if form.type_cost.data == 'cash':
                 model.storage.shop.cash += form.money.data
             else:
@@ -1393,6 +1503,7 @@ class ByWeightAdmin(ModelView):
         )
         return Markup(f'{prettified[model.product_name]}')
 
+    list_template = 'admin/model/by_weight_list.html'
     can_set_page_size = True
     column_list = ('timestamp', 'product_name', 'amount', 'money', 'storage')
     column_labels = dict(
@@ -1401,17 +1512,37 @@ class ByWeightAdmin(ModelView):
         amount=gettext('Количество'),
         type_cost=gettext('Тип траты'),
         money=gettext('Сумма'),
-        storage=gettext('Склад')
+        storage=gettext('Склад'),
+        barista=gettext('Бариста')
     )
-    column_filters = ('timestamp', 'product_name', 'type_cost')
+    column_searchable_list = (ByWeight.timestamp, )
+    column_filters = ('timestamp', 'type_cost', 'product_name', Barista.name)
     column_formatters = dict(
         type_cost=lambda v, c, m, p: 'Наличка' if m.type_cost == 'cash' else 'Безнал',
         product_name=_list_product_name,
         money=_list_money,
         amount=_list_amount
     )
-    form_create_rules = ('backdating', 'timestamp', 'product_name', 'amount', 'type_cost', 'money', 'storage')
-    form_edit_rules = ('backdating', 'timestamp', 'product_name', 'amount', 'type_cost', 'money', 'storage')
+    form_create_rules = (
+        'backdating',
+        'timestamp',
+        'product_name',
+        'amount',
+        'type_cost',
+        'money',
+        'storage',
+        'barista'
+    )
+    form_edit_rules = (
+        'backdating',
+        'timestamp',
+        'product_name',
+        'amount',
+        'type_cost',
+        'money',
+        'storage',
+        'barista'
+    )
     form_args = dict(
         timestamp=dict(
             validators=[DataRequired()],
@@ -1474,6 +1605,69 @@ class ByWeightAdmin(ModelView):
         }
     }
 
+    def sum_page(self, attr: str) -> int:
+        _query = self.get_model_data()
+        try:
+            return sum([p.__dict__[attr] for p in _query if p])
+        except:
+            return 0
+
+    def sum_total(self, attr: str) -> int:
+        _query = self.session.query(func.sum(ByWeight.__dict__[attr])).scalar()
+        try:
+            return _query
+        except:
+            return 0
+
+    def median_page(self, attr: str) -> int:
+        _query = self.get_model_data()
+        data = [p.__dict__[attr] for p in _query if p]
+        try:
+            return median(data)
+        except:
+            return 0
+
+    def median_total(self, attr: str) -> int:
+        _query = self.session.query(func.avg(ByWeight.__dict__[attr])).scalar()
+        try:
+            return round(_query)
+        except:
+            return 0
+
+    def render(self, template, **kwargs):
+        if template == 'admin/model/by_weight_list.html':
+            _current_page = kwargs['page']
+            kwargs['column_labels'] = self.column_labels
+            kwargs['summary_data'] = {
+                'on_page': {
+                    'amount': self.sum_page('amount'),
+                    'money': self.sum_page('money'),
+                },
+                'total': {
+                    'amount': self.sum_total('amount'),
+                    'money': self.sum_total('money')
+
+                }
+            }
+            kwargs['median_data'] = {
+                'on_page': {
+                    'amount': self.median_page('amount'),
+                    'money': self.median_page('money')
+                },
+                'total': {
+                    'amount': self.median_total('amount'),
+                    'money': self.median_total('money')
+                }
+            }
+
+        return super(ByWeightAdmin, self).render(template, **kwargs)
+
+    def create_form(self, obj=None):
+        form = super(ByWeightAdmin, self).create_form(obj)
+        form.timestamp.data = datetime.now()
+        form.barista.data = current_user
+        return form
+
     def update_model(self, form, model):
         try:
             new_money = form.money.data
@@ -1508,6 +1702,7 @@ class ByWeightAdmin(ModelView):
 
     def on_model_change(self, form, model, is_created):
         if form.backdating.data:
+            model.backdating = form.backdating.data
             return
 
         if form.product_name.data == 'coffee_blend':
@@ -1521,7 +1716,10 @@ class ByWeightAdmin(ModelView):
             model.storage.shop.cashless += form.money.data
 
     def after_model_change(self, form, model, is_created):
+        if form.backdating.data:
+            return
         if not is_created:
+            model.last_edit = datetime.now()
             if form.type_cost.data == 'cash':
                 model.storage.shop.cash -= form.money.data
             else:
@@ -1569,22 +1767,25 @@ class WriteOffAdmin(ModelView):
         )
         return Markup(f'{prettified[model.product_name]}')
 
+    list_template = 'admin/model/write_off_list.html'
     can_set_page_size = True
     column_list = ('timestamp', 'product_name', 'amount', 'storage')
     column_labels = dict(
         timestamp=gettext('Дата'),
         product_name=gettext('Название товара'),
         amount=gettext('Количество'),
-        storage=gettext('Склад')
+        storage=gettext('Склад'),
+        barista=gettext('Бариста')
     )
-    column_filters = ('timestamp', 'product_name')
+    column_searchable_list = (WriteOff.timestamp, )
+    column_filters = ('timestamp', 'product_name', Barista.name)
     column_formatters = dict(
         timestamp=lambda v, c, m, p: m.timestamp.date().strftime("%d.%m.%Y"),
         product_name=_list_product_name,
         amount=_list_amount
     )
-    form_create_rules = ('timestamp', 'product_name', 'amount', 'storage')
-    form_edit_rules = ('timestamp', 'product_name', 'amount', 'storage')
+    form_create_rules = ('timestamp', 'product_name', 'amount', 'storage', 'barista')
+    form_edit_rules = ('timestamp', 'product_name', 'amount', 'storage', 'barista')
     form_args = dict(
         timestamp=dict(
             validators=[DataRequired()],
@@ -1626,6 +1827,65 @@ class WriteOffAdmin(ModelView):
         }
     }
 
+    def sum_page(self, attr: str) -> int:
+        _query = self.get_model_data()
+        try:
+            return sum([p.__dict__[attr] for p in _query if p])
+        except:
+            return 0
+
+    def sum_total(self, attr: str) -> int:
+        _query = self.session.query(func.sum(WriteOff.__dict__[attr])).scalar()
+        try:
+            return _query
+        except:
+            return 0
+
+    def median_page(self, attr: str) -> int:
+        _query = self.get_model_data()
+        data = [p.__dict__[attr] for p in _query if p]
+        try:
+            return median(data)
+        except:
+            return 0
+
+    def median_total(self, attr: str) -> int:
+        _query = self.session.query(func.avg(WriteOff.__dict__[attr])).scalar()
+        try:
+            return round(_query)
+        except:
+            return 0
+
+    def render(self, template, **kwargs):
+        if template == 'admin/model/write_off_list.html':
+            _current_page = kwargs['page']
+            kwargs['column_labels'] = self.column_labels
+            kwargs['summary_data'] = {
+                'on_page': {
+                    'amount': self.sum_page('amount')
+                },
+                'total': {
+                    'amount': self.sum_total('amount')
+
+                }
+            }
+            kwargs['median_data'] = {
+                'on_page': {
+                    'amount': self.median_page('amount')
+                },
+                'total': {
+                    'amount': self.median_total('amount')
+                }
+            }
+
+        return super(WriteOffAdmin, self).render(template, **kwargs)
+
+    def create_form(self, obj=None):
+        form = super(WriteOffAdmin, self).create_form(obj)
+        form.timestamp.data = datetime.now()
+        form.barista.data = current_user
+        return form
+
     def update_model(self, form, model):
         try:
             new_amount = form.amount.data
@@ -1654,6 +1914,9 @@ class WriteOffAdmin(ModelView):
         return True
 
     def on_model_change(self, form, model, is_created):
+        if form.backdating.data:
+            model.backdating = form.backdating.data
+            return
         if form.product_name.data == 'coffee_blend':
             model.storage.coffee_blend -= float(form.amount.data)
         elif form.product_name.data == 'coffee_arabika':
@@ -1666,7 +1929,10 @@ class WriteOffAdmin(ModelView):
             model.storage.hot_dogs -= int(form.amount.data)
 
     def after_model_change(self, form, model, is_created):
+        if form.backdating.data:
+            return
         if not is_created:
+            model.last_edit = datetime.now()
             if form.product_name.data == 'coffee_blend':
                 model.storage.coffee_blend += float(form.amount.data)
             elif form.product_name.data == 'coffee_arabika':
