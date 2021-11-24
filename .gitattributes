@@ -1,2 +1,2 @@
-# Specify filepatterns you want to assign special attributes.
-
+* text=auto
+*.sh text eol=lf

@@ -40,3 +40,4 @@ Werkzeug==2.0.1
 WTForms==2.3.3
 Flask-Modals==0.4.1
 flask-babelex
+gunicorn

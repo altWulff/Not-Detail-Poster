@@ -988,7 +988,7 @@ class ExpenseAdmin(ModelView):
         'timestamp',
         'is_global',
         'type_cost',
-        Category.name,
+        'categories',
         Shop.place_name,
         Shop.address,
         Barista.name
