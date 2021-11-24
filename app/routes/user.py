@@ -18,7 +18,7 @@ def profile(user_name):
 @user.route('/edit_profile', methods=('GET', 'POST'))
 @login_required
 def edit():
-    form = EditProfileForm()
+    form = EditProfileForm(current_user.name, current_user.phone_number, current_user.email)
     if form.validate_on_submit():
         current_user.name = form.name.data
         current_user.phone_number = form.phone_number.data

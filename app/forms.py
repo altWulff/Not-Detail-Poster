@@ -73,7 +73,31 @@ class EditProfileForm(FlaskForm):
     name = StringField(_l('Имя'), validators=[DataRequired()])
     phone_number = IntegerField(_l('Тел.'), validators=[DataRequired()])
     email = StringField(_l('Емейл'), validators=[DataRequired(), Email()])
-    submit = SubmitField(_l('Сохранить'))
+    submit = SubmitField(_l('С'Сохранить'
+
+    def __init__(self, original_name, original_phone_number, original_email, *args, **kwargs):
+        super(EditProfileForm, self).__init__(*args, **kwargs)
+        self.original_name = original_name
+        self.original_phone_number = original_phone_number
+        self.original_email = original_email
+
+    def validate_name(self, name):
+        if name.data != self.original_name:
+            user = Barista.query.filter_by(name=self.name.data).first()
+            if user is not None:
+                raise ValidationError(_('Пожалуйста используйте другое имя, такое имя уже существует.'))
+                
+    def validate_phone_number(self, phone_number):
+        if phone_number.data != self.original_phone_number:
+            p_number = Barista.query.filter_by(phone_number=self.phone_number.data).first()
+            if p_number is not None:
+                raise ValidationError(_('Пожалуйста используйте другой номер телефона, такой номер уже есть.'))
+    
+    def validate_email(self, email):
+        if email.data != self.original_email:
+            user_email = Barista.query.filter_by(email=self.email.data).first()
+            if user_email is not None:
+                raise ValidationError(_('Пожалуйста используйте другое имя, такое имя уже существует.'))
 
 
 class ExpanseForm(FlaskForm):
