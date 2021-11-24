@@ -73,7 +73,7 @@ class EditProfileForm(FlaskForm):
     name = StringField(_l('Имя'), validators=[DataRequired()])
     phone_number = IntegerField(_l('Тел.'), validators=[DataRequired()])
     email = StringField(_l('Емейл'), validators=[DataRequired(), Email()])
-    submit = SubmitField(_l('С'Сохранить'
+    submit = SubmitField(_l('Сохранить'))
 
     def __init__(self, original_name, original_phone_number, original_email, *args, **kwargs):
         super(EditProfileForm, self).__init__(*args, **kwargs)

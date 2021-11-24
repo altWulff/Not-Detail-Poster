@@ -1,8 +1,10 @@
 .flaskenv
 __pycache__/**
+app/__pycache__/**
 app/**/*.py[cod]
-migrations/**
-
+migrations/__pycache__/**
+.idea/**
+.python-version
 *.py[cod]
 
 # C extensions

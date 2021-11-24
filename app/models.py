@@ -26,6 +26,7 @@ class Shop(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     place_name = db.Column(db.String(64), index=True, unique=True)
     address = db.Column(db.String(64), index=True, unique=True)
+    timestamp = db.Column(db.DateTime(timezone=True), server_default=func.now())
     cash = db.Column(db.Integer)
     cashless = db.Column(db.Integer)
     storage = db.relationship("Storage", back_populates="shop", uselist=False)
