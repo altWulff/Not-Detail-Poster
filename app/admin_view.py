@@ -109,6 +109,7 @@ class ShopAdmin(ModelView):
     column_labels = dict(
         place_name=gettext('Название'),
         address=gettext('Адрес'),
+        timestamp=gettext('Дата создания'),
         cash=gettext('Наличка'),
         cashless=gettext('Безнал'),
         storage=gettext('Склад'),
@@ -117,8 +118,8 @@ class ShopAdmin(ModelView):
         expenses=gettext('Расходы'),
         baristas=gettext('Баристы')
     )
-    form_create_rules = ('place_name', 'address', 'cash', 'cashless', 'storage', 'shop_equipment', 'baristas')
-    form_edit_rules = ('place_name', 'address', 'cash', 'cashless', 'storage', 'shop_equipment', 'baristas')
+    form_create_rules = ('place_name', 'address', 'timestamp', 'cash', 'cashless', 'storage', 'shop_equipment', 'baristas')
+    form_edit_rules = ('place_name', 'address', 'timestamp', 'cash', 'cashless', 'storage', 'shop_equipment', 'baristas')
     form_args = dict(
         place_name=dict(
             validators=[DataRequired()]
@@ -160,6 +161,11 @@ class ShopAdmin(ModelView):
             'placeholder': gettext('Безнал в гривне')
         }
     }
+
+    def create_form(self, obj=None):
+        form = super(ShopAdmin, self).create_form(obj)
+        form.timestamp.data = datetime.now()
+        return form
 
 
 class ShopEquipmentAdmin(ModelView):
