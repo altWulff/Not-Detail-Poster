@@ -34,8 +34,10 @@ def categories():
     db.create_all()
     categories_names = ('Зарплата', 'Аренда помещения', 'Аренда оборудования', 'Запупка', 'Вода')
     for name in categories_names:
-        category = Category(name=name)
-        db.session.add(category)
+        is_exist = Category.query.filter_by(name=nane).first()
+        if is_exist:
+            category = Category(name=name)
+            db.session.add(category)
     db.session.commit()
     click.echo(f'Create categories:  {categories_names}')
 
