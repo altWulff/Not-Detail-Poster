@@ -125,13 +125,11 @@ class TransactionHandler:
     def create_report(self, form):
         expanses = Expense.get_local(self.shop.id, True)
         expanses = sum([e.money for e in expanses if e.type_cost == 'cash'])
-        last_actual_balance = self.shop.cash + expanses
-        cash_balance = form.actual_balance.data - last_actual_balance
-        remainder_of_day = cash_balance + form.cashless.data
-        cashbox = remainder_of_day + expanses
-        print(last_actual_balance, cash_balance, remainder_of_day, cashbox, expanses)
-        self.cash_flow(cash_balance + expanses, 'cash')
-        self.cash_flow(form.cashless.data, 'cashless')
+        last_actual_balance = self.shop.cash
+        balance = form.actual_balance.data - last_actual_balance
+        cashbox = balance + form.cashless.data
+        remainder_of_day = cashbox - expanses
+        cash_balance = remainder_of_day - form.cashless.data
         report = Report(
             cashbox=cashbox,
             cash_balance=cash_balance,
@@ -147,6 +145,8 @@ class TransactionHandler:
             panini=form.panini.data,
             hot_dogs=form.hot_dogs.data
         )
+        self.cash_flow(cash_balance, 'cash')
+        self.cash_flow(form.cashless.data, 'cashless')
         report.consumption_coffee_arabika = self.storage.coffee_arabika - form.coffee_arabika.data
         report.consumption_coffee_blend = self.storage.coffee_blend - form.coffee_blend.data
         report.consumption_milk = self.storage.milk - form.milk.data

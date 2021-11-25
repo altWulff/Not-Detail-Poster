@@ -880,8 +880,7 @@ class ReportAdmin(ModelView):
         model.cashbox = balance + form.cashless.data
         model.remainder_of_day = model.cashbox - expanses
         model.cash_balance = model.remainder_of_day - model.cashless
-        
-        print(model.cash_balance)
+
         if form.backdating.data:
             model.backdating = form.backdating.data
             return

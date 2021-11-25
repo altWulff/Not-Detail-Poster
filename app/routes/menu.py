@@ -18,7 +18,7 @@ def expense():
     form = ExpanseForm()
     transaction = TransactionHandler(form.coffee_shop.data)
     if form.validate_on_submit():
-        if transaction.is_report_send(form.shop.data):
+        if transaction.is_report_send(form.coffee_shop.data):
             flash(_('Сегодняшний отчет уже был отправлен!'))
         else:
             transaction.create_expense(form)
@@ -35,7 +35,7 @@ def by_weight():
     form = ByWeightForm(request.form)
     transaction = TransactionHandler(form.coffee_shop.data)
     if form.validate_on_submit():
-        if transaction.is_report_send(form.shop.data):
+        if transaction.is_report_send(form.coffee_shop.data):
             flash(_('Сегодняшний отчет уже был отправлен!'))
         else:
             transaction.crete_by_weight(form)
@@ -52,7 +52,7 @@ def write_off():
     form = WriteOffForm(request.form)
     transaction = TransactionHandler(form.coffee_shop.data)
     if form.validate_on_submit():
-        if transaction.is_report_send(form.shop.data):
+        if transaction.is_report_send(form.coffee_shop.data):
             flash(_('Сегодняшний отчет уже был отправлен!'))
         else:
             transaction.create_write_off(form)
@@ -69,7 +69,7 @@ def supply():
     form = SupplyForm(request.form)
     transaction = TransactionHandler(form.coffee_shop.data)
     if form.validate_on_submit():
-        if transaction.is_report_send(form.shop.data):
+        if transaction.is_report_send(form.coffee_shop.data):
             flash(_('Сегодняшний отчет уже был отправлен!'))
         else:
             transaction.create_supply(form)

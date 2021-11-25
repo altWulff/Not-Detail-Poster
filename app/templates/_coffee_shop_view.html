@@ -26,9 +26,9 @@
                     </h2>
                     <div id="collapseEquipment_{{coffee_shop.id}}" class="accordion-collapse collapse" aria-labelledby="headingEquipment_{{coffee_shop.id}}" data-bs-parent="#accordion_{{coffee_shop.id}}">
                         <div class="accordion-body">
-                            <p class="card-text">{{ _('Кофе Машина') }}: {{cs_equip.query.filter_by(id=coffee_shop.id).first().coffee_machine}}</p>
-                            <p class="card-text">{{ _('Кофемолка') }} 1: {{cs_equip.query.filter_by(id=coffee_shop.id).first().grinder_1}}</p>
-                            <p class="card-text">{{ _('Кофемолка') }} 2: {{cs_equip.query.filter_by(id=coffee_shop.id).first().grinder_2}}</p>
+                            <p class="card-text">{{ _('Кофе Машина') }}: {{ coffee_shop.shop_equipment.coffee_machine }}</p>
+                            <p class="card-text">{{ _('Кофемолка') }} 1: {{ coffee_shop.shop_equipment.grinder_1 }}</p>
+                            <p class="card-text">{{ _('Кофемолка') }} 2: {{ coffee_shop.shop_equipment.grinder_2 }}</p>
                         </div>
                     </div>
                 </div>
@@ -40,11 +40,11 @@
                     </h2>
                     <div id="collapseStorage_{{coffee_shop.id}}" class="accordion-collapse collapse" aria-labelledby="headingStorage_{{coffee_shop.id}}" data-bs-parent="#accordion_{{coffee_shop.id}}">
                         <div class="accordion-body">
-                            <p class="card-text">{{ _('Арабика') }}: {{warehouse.query.filter_by(id=coffee_shop.id).first().coffee_arabika}} кг</p>
-                            <p class="card-text">{{ _('Купаж') }}: {{warehouse.query.filter_by(id=coffee_shop.id).first().coffee_blend}} кг</p>
-                            <p class="card-text">{{ _('Молоко') }}: {{warehouse.query.filter_by(id=coffee_shop.id).first().milk}} л</p>
-                            <p class="card-text">{{ _('Панини') }}: {{warehouse.query.filter_by(id=coffee_shop.id).first().panini}} шт.</p>
-                            <p class="card-text">{{ _('Хот-доги') }}: {{warehouse.query.filter_by(id=coffee_shop.id).first().hot_dogs}} шт.</p>
+                            <p class="card-text">{{ _('Арабика') }}: {{ coffee_shop.storage.coffee_arabika }} кг</p>
+                            <p class="card-text">{{ _('Купаж') }}: {{coffee_shop.storage.coffee_blend}} кг</p>
+                            <p class="card-text">{{ _('Молоко') }}: {{ coffee_shop.storage.milk }} л</p>
+                            <p class="card-text">{{ _('Панини') }}: {{ coffee_shop.storage.panini }} шт.</p>
+                            <p class="card-text">{{ _('Хот-доги') }}: {{ coffee_shop.storage.hot_dogs }} шт.</p>
                         </div>
                     </div>
                 </div>
