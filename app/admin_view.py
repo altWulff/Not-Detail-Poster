@@ -17,8 +17,20 @@ log = logging.getLogger("flask-admin.sqla")
 
 
 class IndexAdmin(AdminIndexView):
+    @property
+    def can_view(self):
+        try:
+            is_admin = current_user.has_role('admin')
+            is_active = current_user.is_active and current_user.is_authenticated
+            return is_active and is_admin
+        except:
+            pass
+        return False
+
     @expose('/', methods=('GET', 'POST'))
     def index(self):
+        if not self.can_view:
+            return redirect(url_for('home'))
         template = 'admin/index.html'
         _query_exp_cash = Expense.query.filter_by(type_cost='cash').all()
         _query_exp_cashless = Expense.query.filter_by(type_cost='cashless').all()
@@ -294,7 +306,7 @@ class StorageAdmin(ModelView):
 class BaristaAdmin(ModelView):
     column_filters = ('name', 'phone_number', 'email', Shop.place_name, Shop.address)
     column_searchable_list = ('name', 'phone_number', 'email')
-    column_exclude_list = ('password_hash', 'roles', 'reports', )
+    column_exclude_list = ('password_hash', 'reports', )
     column_labels = dict(
         place_name=gettext('Назавание'),
         address=gettext('Адрес'),
@@ -303,10 +315,10 @@ class BaristaAdmin(ModelView):
         email=gettext('Емейл'),
         shop=gettext('Кофейня'),
         reports=gettext('Отчеты'),
-        roles=gettext('Доступ'),
         active=gettext('Активный'),
         confirmed_at=gettext('Дата найма'),
         password=gettext('Пароль'),
+        roles=gettext('Роли'),
         expenses=gettext('Расходы'),
         supplies=gettext('Поступления'),
         by_weights=gettext('Развес'),
@@ -318,6 +330,7 @@ class BaristaAdmin(ModelView):
         'email',
         'password',
         'shop',
+        'roles',
         'confirmed_at',
         'active',
         'reports',
@@ -333,7 +346,8 @@ class BaristaAdmin(ModelView):
         'password',
         'shop',
         'confirmed_at',
-        'active'
+        'active',
+        'roles'
     )
     form_edit_rules = (
         'name',
@@ -343,6 +357,7 @@ class BaristaAdmin(ModelView):
         'shop',
         'confirmed_at',
         'active',
+        'roles',
         'reports',
         'expenses',
         'supplies',
@@ -416,6 +431,7 @@ class ReportAdmin(ModelView):
     )
     column_filters = (Report.timestamp, Barista.name, Shop.place_name, Shop.address)
     column_labels = dict(
+        last_cash='ВФО',
         place_name=gettext('Название'),
         address=gettext('Адрес'),
         name=gettext('Имя'),
@@ -448,6 +464,7 @@ class ReportAdmin(ModelView):
         'expenses',
         'cashless',
         'actual_balance',
+        'last_cash',
         'coffee_arabika',
         'coffee_blend',
         'milk',
@@ -465,6 +482,7 @@ class ReportAdmin(ModelView):
         'cashless',
         'cash_balance',
         'actual_balance',
+        'last_cash',
         'consumption_coffee_arabika',
         'consumption_coffee_blend',
         'consumption_milk',
@@ -722,7 +740,6 @@ class ReportAdmin(ModelView):
 
     def render(self, template, **kwargs):
         if template == 'admin/model/report_list.html':
-            # append a summary_data dictionary into kwargs
             _current_page = kwargs['page']
             kwargs['column_labels'] = self.column_labels
             kwargs['summary_data'] = {
@@ -769,6 +786,7 @@ class ReportAdmin(ModelView):
     def update_model(self, form, model):
         try:
             new_remainder_of_day, old_remainder_of_day = form.remainder_of_day.data, model.remainder_of_day
+            new_last_cash, old_last_cash = form.last_cash.data, model.last_cash
             new_cash_balance, old_cash_balance = form.cash_balance.data, model.cash_balance
             new_cashless, old_cashless = form.cashless.data, model.cashless
             new_actual_balance, old_actual_balance = form.actual_balance.data, model.actual_balance
@@ -810,6 +828,8 @@ class ReportAdmin(ModelView):
             old_shop = model.shop
 
             form.populate_obj(model)
+            print('Model change')
+            print(form.last_cash.data, model.last_cash)
             self._on_model_change(form, model, False)
             self.session.commit()
         except Exception as ex:
@@ -826,6 +846,9 @@ class ReportAdmin(ModelView):
                 
             if new_cash_balance != old_cash_balance:
                 form.cash_balance.data = old_cash_balance
+                
+            if new_last_cash != old_last_cash:
+                form.last_cash.data = old_last_cash
 
             if new_cashless != old_cashless:
                 form.cashless.data = old_cashless
@@ -866,25 +889,24 @@ class ReportAdmin(ModelView):
             if new_hot_dogs != old_hot_dogs:
                 form.hot_dogs.data = old_hot_dogs
             
-            if new_shop != old_shop:
-                form.shop.data = old_shop
-
+            
+            print('After model after_model_change')
+            print(form.last_cash.data, model.last_cash)
             self.after_model_change(form, model, False)
         return True
 
     def on_model_change(self, form, model, is_created):
-        expanses = model.expenses
+        expanses = form.expenses.data
         expanses = sum([e.money for e in expanses if e.type_cost == 'cash'])
-        last_actual_balance = model.shop.cash
-        balance = form.actual_balance.data - last_actual_balance
-        model.cashbox = balance + form.cashless.data
-        model.remainder_of_day = model.cashbox - expanses
-        model.cash_balance = model.remainder_of_day - model.cashless
+        last_actual_balance = model.shop.cash + expanses
+        model.cash_balance = form.actual_balance.data - last_actual_balance
+        model.remainder_of_day = model.cash_balance + form.cashless.data
+        model.cashbox = model.remainder_of_day + expanses
 
         if form.backdating.data:
             model.backdating = form.backdating.data
             return
-        model.shop.cash += model.cash_balance
+        model.shop.cash += model.cash_balance + expanses
         model.shop.cashless += model.cashless
 
         model.consumption_coffee_arabika = model.shop.storage.coffee_arabika - float(form.coffee_arabika.data)
@@ -906,14 +928,15 @@ class ReportAdmin(ModelView):
             model.last_edit = datetime.now()
             expanses = model.expenses
             expanses = sum([e.money for e in expanses if e.type_cost == 'cash'])
-            shop = form.shop.data
-            last_actual_balance = shop.cash
-            balance = form.actual_balance.data - last_actual_balance
-            form.cashbox.data = balance + form.cashless.data
-            form.remainder_of_day.data = form.cashbox.data - expanses
-            form.cash_balance.data = form.remainder_of_day.data - form.cashless.data
-            
-            model.shop.cash -= form.cash_balance.data
+            last_actual_balance = form.shop.data.cash + expanses
+            last_actual_balance = last_actual_balance - model.shop.cash
+            print("new last_actual_balance", last_actual_balance)
+            form.cash_balance.data = last_actual_balance
+            form.remainder_of_day.data = form.cash_balance.data + form.cashless.data
+            form.cashbox.data = form.remainder_of_day.data + expanses
+            print('in after change', last_actual_balance, form.last_cash.data == model.last_cash)
+      
+            model.shop.cash -= form.cash_balance.data + expanses
             model.shop.cashless -= form.cashless.data
             model.shop.storage.coffee_arabika += float(form.consumption_coffee_arabika.data)
             model.shop.storage.coffee_blend += float(form.consumption_coffee_blend.data)
@@ -925,7 +948,9 @@ class ReportAdmin(ModelView):
     def on_model_delete(self, model):
         if model.backdating:
             return
-        model.shop.cash -= model.cash_balance
+        expanses = model.expenses
+        expanses = sum([e.money for e in expanses if e.type_cost == 'cash'])
+        model.shop.cash -= model.cash_balance + expanses
         model.shop.cashless -= model.cashless
         model.shop.storage.coffee_arabika += model.consumption_coffee_arabika
         model.shop.storage.coffee_blend += model.consumption_coffee_blend
