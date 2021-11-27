@@ -8,7 +8,7 @@ from flask_admin.contrib import sqla
 from flask_admin.model import typefmt
 from app.models import Shop, Report, Expense, Supply, ByWeight, WriteOff, Barista
 from wtforms import RadioField, SelectField, BooleanField
-from wtforms.validators import DataRequired, NumberRange, Required, InputRequired
+from wtforms.validators import DataRequired, NumberRange, Required, InputRequired, Length
 import logging
 from flask import flash
 from flask_admin.babel import gettext
@@ -134,16 +134,17 @@ class ShopAdmin(ModelView):
     form_edit_rules = ('place_name', 'address', 'timestamp', 'cash', 'cashless', 'storage', 'shop_equipment', 'baristas')
     form_args = dict(
         place_name=dict(
-            validators=[DataRequired()]
+            validators=[DataRequired(), Length(max=25)]
         ),
         address=dict(
-            validators=[DataRequired()]
+            validators=[DataRequired(), Length(max=25)]
         ),
         cash=dict(
             validators=[
                 InputRequired(),
                 NumberRange(
                     min=-1,
+                    max=1000000000,
                     message=gettext('Сумма должна быть нулевой, либо больше нуля')
                 )
             ]
@@ -153,6 +154,7 @@ class ShopAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-1,
+                    max=1000000000,
                     message=gettext('Сумма должна быть нулевой, либо больше нуля')
                 )
             ]
@@ -190,6 +192,9 @@ class ShopEquipmentAdmin(ModelView):
         shop=gettext('Кофейня')
     )
     form_args = dict(
+        coffee_machine=dict(validators=[DataRequired(), Length(max=25)]),
+        grinder_1=dict(validators=[DataRequired(), Length(max=25)]),
+        grinder_2=dict(validators=[Length(max=25)]),
         shop=dict(
             validators=[
                 DataRequired(
@@ -237,6 +242,7 @@ class StorageAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-0.0001,
+                    max=1000000000.0,
                     message=gettext('Количество арабики должно быть нулевым, либо больше нуля'))
             ]
         ),
@@ -245,6 +251,7 @@ class StorageAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-0.0001,
+                    max=1000000000.0,
                     message=gettext('Количество бленда должно быть нулевым, либо больше нуля')
                 )
             ]
@@ -254,6 +261,7 @@ class StorageAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-0.0001,
+                    max=1000000000.0,
                     message=gettext('Количество молока должно быть нулевым, либо больше нуля')
                 )
             ]
@@ -263,6 +271,7 @@ class StorageAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-1,
+                    max=1000000000,
                     message=gettext('Количество панини должно быть нулевым, либо больше нуля')
                 )
             ]
@@ -272,6 +281,7 @@ class StorageAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-1,
+                    max=1000000000,
                     message=gettext('Количество хот-догов должно быть нулевым, либо больше нуля')
                 )
             ]
@@ -523,6 +533,7 @@ class ReportAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=0,
+                    max=1000000000,
                     message=gettext('Сумма не может быть нулевой, либо ниже нуля')
                 )
             ]
@@ -532,6 +543,7 @@ class ReportAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=0,
+                    max=1000000000,
                     message=gettext('Сумма не может быть нулевой, либо ниже нуля')
                 )
             ]
@@ -541,6 +553,7 @@ class ReportAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=0,
+                    max=1000000000,
                     message=gettext('Сумма не может быть нулевой, либо ниже нуля')
                 )
             ]
@@ -550,6 +563,7 @@ class ReportAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=0,
+                    max=1000000000,
                     message=gettext('Сумма не может быть нулевой, либо ниже нуля')
                 )
             ]
@@ -559,6 +573,7 @@ class ReportAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=0,
+                    max=1000000000,
                     message=gettext('Сумма не может быть нулевой, либо ниже нуля')
                 )
             ]
@@ -569,6 +584,7 @@ class ReportAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-0.0001,
+                    max=1000000000.0,
                     message=gettext('Расход за день не может быть ниже нуля')
                 )
             ]
@@ -579,6 +595,7 @@ class ReportAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-0.0001,
+                    max=1000000000.0,
                     message=gettext('Расход за день не может быть ниже нуля')
                 )
             ]
@@ -589,6 +606,7 @@ class ReportAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-0.0001,
+                    max=1000000000.0,
                     message=gettext('Расход за день не может быть ниже нуля')
                 )
             ]
@@ -599,6 +617,7 @@ class ReportAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-1,
+                    max=1000000000,
                     message=gettext('Расход за день не может быть ниже нуля')
                 )
             ]
@@ -609,6 +628,7 @@ class ReportAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-1,
+                    max=1000000000,
                     message=gettext('Расход за день не может быть ниже нуля')
                 )
             ]
@@ -618,6 +638,7 @@ class ReportAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-0.0001,
+                    max=1000000000.0,
                     message=gettext('Остаток арабики должен быть нулевым, либо больше нуля')
                 )
             ]
@@ -627,6 +648,7 @@ class ReportAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-0.0001,
+                    max=1000000000.0,
                     message=gettext('Остаток купажа должен быть нулевым, либо больше нуля')
                 )
             ]
@@ -636,6 +658,7 @@ class ReportAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-0.0001,
+                    max=1000000000.0,
                     message=gettext('Остаток молока должен быть нулевым, либо больше нуля')
                 )
             ]
@@ -645,6 +668,7 @@ class ReportAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-1,
+                    max=1000000000,
                     message=gettext('Остаток панини должен быть нулевым, либо больше нуля')
                 )
             ]
@@ -654,6 +678,7 @@ class ReportAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-1,
+                    max=1000000000,
                     message=gettext('Остаток хот-догов должен быть нулевым, либо больше нуля')
                 )
             ]
@@ -1077,6 +1102,7 @@ class ExpenseAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=0,
+                    max=1000000000,
                     message=gettext('Сумма не может быть нулевой, либо ниже нуля')
                 )
             ]
@@ -1279,6 +1305,7 @@ class SupplyAdmin(ModelView):
                 DataRequired(),
                 NumberRange(
                     min=0.0001,
+                    max=1000000000.0,
                     message=gettext('Количество не может быть нулевым, либо ниже нуля')
                 )
             ]
@@ -1288,6 +1315,7 @@ class SupplyAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-1,
+                    max=1000000000,
                     message=gettext('Сумма не может быть нулевой, либо ниже нуля')
                 )
             ]
@@ -1571,6 +1599,7 @@ class ByWeightAdmin(ModelView):
                 DataRequired(),
                 NumberRange(
                     min=0.0001,
+                    max=1000000000.0,
                     message=gettext('Количество не может быть нулевым, либо ниже нуля')
                 )
             ]
@@ -1580,6 +1609,7 @@ class ByWeightAdmin(ModelView):
                 InputRequired(),
                 NumberRange(
                     min=-1,
+                    max=1000000000,
                     message=gettext('Сумма не может быть нулевой, либо ниже нуля')
                 )
             ]
@@ -1802,8 +1832,8 @@ class WriteOffAdmin(ModelView):
         product_name=_list_product_name,
         amount=_list_amount
     )
-    form_create_rules = ('timestamp', 'product_name', 'amount', 'storage', 'barista')
-    form_edit_rules = ('timestamp', 'product_name', 'amount', 'storage', 'barista')
+    form_create_rules = ('backdating', 'timestamp', 'product_name', 'amount', 'storage', 'barista')
+    form_edit_rules = ('backdating', 'timestamp', 'product_name', 'amount', 'storage', 'barista')
     form_args = dict(
         timestamp=dict(
             validators=[DataRequired()],
@@ -1814,6 +1844,7 @@ class WriteOffAdmin(ModelView):
                 DataRequired(),
                 NumberRange(
                     min=0.0001,
+                    max=1000000000,
                     message=gettext('Количество не может быть нулевым, либо ниже нуля')
                 )
             ]

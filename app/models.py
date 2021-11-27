@@ -72,6 +72,11 @@ class ShopEquipment(db.Model):
             return f'<ShopEquipment: {self.shop.place_name}>'
         return f'<ShopEquipment_id: {self.id}>'
 
+    def __str__(self):
+        if self.shop:
+            return gettext(f'Оборудование: {self.shop.address}')
+        return gettext(f'Оборудование: id-{self.id}')
+
 
 class Storage(db.Model):
     __tablename__ = 'storage'
@@ -89,14 +94,14 @@ class Storage(db.Model):
 
     def __repr__(self):
         if self.shop_id:
-            return f'<Storage: {self.shop.place_name}>'
+            return f'<Storage: {self.shop.address}>'
         else:
             return f'<Storage_id: {self.id}>'
 
     def __str__(self):
         if self.shop:
-            return f'{self.shop.place_name} / {self.shop.address}'
-        return f'<Storage: id-{self.id}>'
+            return f'{self.shop.address}'
+        return gettext(f'Склад: id-{self.id}')
 
 
 roles = db.Table(
@@ -216,7 +221,7 @@ class Report(db.Model):
         return f'<Report: {self.timestamp}>'
 
     def __str__(self):
-        return gettext(f'Отчет за {self.timestamp.strftime("%d.%m.%y")}г.')
+        return f'{self.shop.address} / {self.timestamp.strftime("%d.%m.%y")}г.'
 
 
 categories = db.Table(
@@ -261,7 +266,10 @@ class Expense(db.Model):
         return f'<Expense: {self.money} {self.timestamp.strftime("%d.%m.%y")}г.>'
      
     def __str__(self):
-        return f'{self.money} грн.({self.type_cost}) / {self.categories} / {self.timestamp.strftime("%d.%m.%y")}г.'
+        if self.type_cost == 'cash':
+            return f'{self.money} грн. / {self.shop.address} / {self.timestamp.strftime("%d.%m.%y")}г.'
+        else:
+            return f'{self.money} грн.(Безнал) / {self.shop.address} / {self.timestamp.strftime("%d.%m.%y")}г.'
 
     @classmethod     
     def get_global(cls, shop_id, today=False):
@@ -311,8 +319,14 @@ class Supply(db.Model):
         _query = cls.query.filter_by(storage_id=storage.id).filter(cls.timestamp >= date_today)
         return _query
 
+    def __repr__(self):
+        return f'<Supply: {self.id} / {self.timestamp.strftime("%d.%m.%y")}'
+
     def __str__(self):
-        return f'{self.money} грн.({self.type_cost}) / {self.timestamp.strftime("%d.%m.%y")}г.'
+        if self.type_cost == 'cash':
+            return f'{self.money} грн. / {self.storage.shop.address} / {self.timestamp.strftime("%d.%m.%y")}г.'
+        else:
+            return f'{self.money} грн.(Безнал) / {self.storage.shop.address} / {self.timestamp.strftime("%d.%m.%y")}г.'
 
 
 class ByWeight(db.Model):
@@ -328,8 +342,14 @@ class ByWeight(db.Model):
     type_cost = db.Column(db.String(64), index=True)
     money = db.Column(db.Integer)
 
+    def __repr__(self):
+        return f'{self.money} / {self.timestamp.strftime("%d.%m.%y")}г.'
+
     def __str__(self):
-        return f'{self.money} грн.({self.type_cost}) / {self.timestamp.strftime("%d.%m.%y")}г.'
+        if self.type_cost == 'cash':
+            return f'{self.money} грн. / {self.storage.shop.address} / {self.timestamp.strftime("%d.%m.%y")}г.'
+        else:
+            return f'{self.money} грн.(Безнал) / {self.storage.shop.address} / {self.timestamp.strftime("%d.%m.%y")}г.'
 
 
 class WriteOff(db.Model):
@@ -343,8 +363,11 @@ class WriteOff(db.Model):
     amount = db.Column(db.Float(50))
     product_name = db.Column(db.String(80))
 
+    def __repr__(self):
+        return f'{self.product_name} / {self.timestamp.strftime("%d.%m.%y")}г.'
+
     def __str__(self):
-        return f'{self.product_name}: {self.amount} / {self.timestamp.strftime("%d.%m.%y")}г.'
+        return f'{self.product_name} / {self.storage.shop.address} / {self.timestamp.strftime("%d.%m.%y")}г.'
 
     @classmethod
     def get_local_by_shop(cls, shop_id):
