@@ -3,6 +3,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import func
 from sqlalchemy.ext.hybrid import hybrid_property
 from flask_security import UserMixin, RoleMixin
+from flask_admin.babel import gettext
 from app import db, login
 
 
@@ -134,7 +135,6 @@ class Barista(db.Model, UserMixin):
 
     @password.setter
     def password(self, new_pass):
-        """Salt/Hash and save the user's new password."""
         _password_hash = generate_password_hash(new_pass)
         self.password_hash = _password_hash
 
@@ -161,6 +161,9 @@ class Role(db.Model, RoleMixin):
 
     def __repr__(self):
         return f'<Role: {self.name}>'
+
+    def __str__(self):
+        return gettext(self.name.title())
 
 
 expenses = db.Table(
@@ -210,10 +213,10 @@ class Report(db.Model):
     hot_dogs = db.Column(db.Integer)
 
     def __repr__(self):
-        return f'<Report {self.timestamp}>'
+        return f'<Report: {self.timestamp}>'
 
     def __str__(self):
-        return f'Отчет за {self.timestamp.strftime("%d.%m.%y")}г.'
+        return gettext(f'Отчет за {self.timestamp.strftime("%d.%m.%y")}г.')
 
 
 categories = db.Table(
@@ -229,7 +232,10 @@ class Category(db.Model):
     name = db.Column(db.String(80))
 
     def __repr__(self):
-        return self.name.title()
+        return f'<Category: {self.name}>'
+
+    def __str__(self):
+        return gettext(self.name.title())
 
 
 class Expense(db.Model):

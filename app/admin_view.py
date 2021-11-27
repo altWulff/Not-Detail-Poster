@@ -6,7 +6,7 @@ from flask_security import current_user
 from flask_admin import AdminIndexView, expose
 from flask_admin.contrib import sqla
 from flask_admin.model import typefmt
-from app.models import Shop, Report, Expense, Supply, ByWeight, WriteOff, Barista, Category
+from app.models import Shop, Report, Expense, Supply, ByWeight, WriteOff, Barista
 from wtforms import RadioField, SelectField, BooleanField
 from wtforms.validators import DataRequired, NumberRange, Required, InputRequired
 import logging
@@ -431,13 +431,13 @@ class ReportAdmin(ModelView):
     )
     column_filters = (Report.timestamp, Barista.name, Shop.place_name, Shop.address)
     column_labels = dict(
-        last_cash='ВФО',
         place_name=gettext('Название'),
         address=gettext('Адрес'),
         name=gettext('Имя'),
         shop=gettext('Кофейня'),
         barista=gettext('Бариста'),
         timestamp=gettext('Дата'),
+        last_edit=gettext('Последнее изменение'),
         cashbox=gettext('Касса'),
         remainder_of_day=gettext('Остаток дня'),
         cashless=gettext('Б.Н'),
@@ -464,7 +464,6 @@ class ReportAdmin(ModelView):
         'expenses',
         'cashless',
         'actual_balance',
-        'last_cash',
         'coffee_arabika',
         'coffee_blend',
         'milk',
@@ -476,13 +475,12 @@ class ReportAdmin(ModelView):
     form_edit_rules = (
         'backdating',
         'timestamp',
-        'cashbox',
         'expenses',
+        'cashbox',
         'remainder_of_day',
         'cashless',
         'cash_balance',
         'actual_balance',
-        'last_cash',
         'consumption_coffee_arabika',
         'consumption_coffee_blend',
         'consumption_milk',
@@ -498,6 +496,10 @@ class ReportAdmin(ModelView):
     )
     form_args = dict(
         timestamp=dict(
+            validators=[DataRequired()],
+            format='%d.%m.%Y %H:%M'
+        ),
+        last_edit=dict(
             validators=[DataRequired()],
             format='%d.%m.%Y %H:%M'
         ),
@@ -662,6 +664,12 @@ class ReportAdmin(ModelView):
             'placeholder': gettext('Дата и время отправки отчета'),
             'data-date-format': u'DD.MM.YYYY HH:mm'
         },
+        'last_edit': {
+            'data-date-format': u'DD.MM.YYYY HH:mm'
+        },
+        'expenses': {
+            'placeholder': gettext('Расходы за день')
+        },
         'cashbox': {
             'placeholder': gettext('Касса')
         },
@@ -786,7 +794,6 @@ class ReportAdmin(ModelView):
     def update_model(self, form, model):
         try:
             new_remainder_of_day, old_remainder_of_day = form.remainder_of_day.data, model.remainder_of_day
-            new_last_cash, old_last_cash = form.last_cash.data, model.last_cash
             new_cash_balance, old_cash_balance = form.cash_balance.data, model.cash_balance
             new_cashless, old_cashless = form.cashless.data, model.cashless
             new_actual_balance, old_actual_balance = form.actual_balance.data, model.actual_balance
@@ -823,13 +830,11 @@ class ReportAdmin(ModelView):
 
             new_hot_dogs = form.hot_dogs.data
             old_hot_dogs = model.hot_dogs
-            
+
             new_shop = form.shop.data
             old_shop = model.shop
 
             form.populate_obj(model)
-            print('Model change')
-            print(form.last_cash.data, model.last_cash)
             self._on_model_change(form, model, False)
             self.session.commit()
         except Exception as ex:
@@ -843,12 +848,9 @@ class ReportAdmin(ModelView):
         else:
             if new_remainder_of_day != old_remainder_of_day:
                 form.remainder_of_day.data = old_remainder_of_day
-                
+
             if new_cash_balance != old_cash_balance:
                 form.cash_balance.data = old_cash_balance
-                
-            if new_last_cash != old_last_cash:
-                form.last_cash.data = old_last_cash
 
             if new_cashless != old_cashless:
                 form.cashless.data = old_cashless
@@ -888,10 +890,6 @@ class ReportAdmin(ModelView):
 
             if new_hot_dogs != old_hot_dogs:
                 form.hot_dogs.data = old_hot_dogs
-            
-            
-            print('After model after_model_change')
-            print(form.last_cash.data, model.last_cash)
             self.after_model_change(form, model, False)
         return True
 
@@ -929,20 +927,10 @@ class ReportAdmin(ModelView):
             expanses = model.expenses
             expanses = sum([e.money for e in expanses if e.type_cost == 'cash'])
             last_actual_balance = form.shop.data.cash + expanses
-            last_actual_balance = last_actual_balance - model.shop.cash
-            print("new last_actual_balance", last_actual_balance)
-            form.cash_balance.data = last_actual_balance
-            form.remainder_of_day.data = form.cash_balance.data + form.cashless.data
-            form.cashbox.data = form.remainder_of_day.data + expanses
-            print('in after change', last_actual_balance, form.last_cash.data == model.last_cash)
-      
-            model.shop.cash -= form.cash_balance.data + expanses
+            model.cash_balance += expanses
+            model.remainder_of_day = model.cash_balance + form.cashless.data
+            model.cashbox = model.remainder_of_day + expanses
             model.shop.cashless -= form.cashless.data
-            model.shop.storage.coffee_arabika += float(form.consumption_coffee_arabika.data)
-            model.shop.storage.coffee_blend += float(form.consumption_coffee_blend.data)
-            model.shop.storage.milk += float(form.consumption_milk.data)
-            model.shop.storage.panini += int(form.consumption_panini.data)
-            model.shop.storage.hot_dogs += int(form.consumption_hot_dogs.data)
             self.session.commit()
 
     def on_model_delete(self, model):
