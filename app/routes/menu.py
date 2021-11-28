@@ -122,7 +122,8 @@ def create_coffee_shop():
             coffee_blend=form.coffee_blend.data,
             milk=form.milk.data,
             panini=form.panini.data,
-            hot_dogs=form.hot_dogs.data
+            sausages=form.sausages.data,
+            buns=form.buns.data
         )
         equipment = ShopEquipment(
             coffee_machine=form.coffee_machine.data,

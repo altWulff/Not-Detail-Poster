@@ -213,7 +213,8 @@ class StorageAdmin(ModelView):
         coffee_blend=gettext('Бленд'),
         milk=gettext('Молоко'),
         panini=gettext('Панини'),
-        hot_dogs=gettext('Хот-доги'),
+        sausages=gettext('Колбаски'),
+        buns=gettext('Булочки'),
         shop=gettext('Кофейня'),
         supplies=gettext('Поступления'),
         by_weights=gettext('Развес'),
@@ -224,16 +225,18 @@ class StorageAdmin(ModelView):
         coffee_blend=lambda v, c, m, p: f'{m.coffee_blend} кг',
         milk=lambda v, c, m, p: f'{m.milk} л',
         panini=lambda v, c, m, p: f'{m.panini} шт.',
-        hot_dogs=lambda v, c, m, p: f'{m.hot_dogs} шт.',
+        sausages=lambda v, c, m, p: f'{m.sausages} шт.',
+        buns=lambda v, c, m, p: f'{m.buns} шт.',
     )
     column_filters = (Shop.place_name, Shop.address)
-    form_create_rules = ('coffee_arabika', 'coffee_blend', 'milk', 'panini', 'hot_dogs', 'shop')
+    form_create_rules = ('coffee_arabika', 'coffee_blend', 'milk', 'panini', 'sausages', 'buns', 'shop')
     form_edit_rules = (
         'coffee_arabika',
         'coffee_blend',
         'milk',
         'panini',
-        'hot_dogs',
+        'sausages',
+        'buns',
         'shop'
     )
     form_args = dict(
@@ -276,13 +279,23 @@ class StorageAdmin(ModelView):
                 )
             ]
         ),
-        hot_dogs=dict(
+        sausages=dict(
             validators=[
                 InputRequired(),
                 NumberRange(
                     min=-1,
                     max=1000000000,
-                    message=gettext('Количество хот-догов должно быть нулевым, либо больше нуля')
+                    message=gettext('Количество колбасок должно быть нулевым, либо больше нуля')
+                )
+            ]
+        ),
+        buns=dict(
+            validators=[
+                InputRequired(),
+                NumberRange(
+                    min=-1,
+                    max=1000000000,
+                    message=gettext('Количество булочек должно быть нулевым, либо больше нуля')
                 )
             ]
         ),
@@ -307,9 +320,13 @@ class StorageAdmin(ModelView):
         'panini': {
             'placeholder': gettext('Введите количество панини')
         },
-        'hot_dogs': {
-            'placeholder': gettext('Введите количество хот-догов (комплект булка-сосиска)')
+        'sausages': {
+            'placeholder': gettext('Введите количество колбасок')
+        },
+        'buns': {
+            'placeholder': gettext('Введите количество булочек')
         }
+
     }
 
 
@@ -432,12 +449,14 @@ class ReportAdmin(ModelView):
         'consumption_coffee_blend',
         'consumption_milk',
         'consumption_panini',
-        'consumption_hot_dogs',
+        'consumption_sausages',
+        'consumption_buns',
         'coffee_arabika',
         'coffee_blend',
         'milk',
         'panini',
-        'hot_dogs',
+        'sausages',
+        'buns',
     )
     column_filters = (Report.timestamp, Barista.name, Shop.place_name, Shop.address)
     column_labels = dict(
@@ -457,12 +476,14 @@ class ReportAdmin(ModelView):
         consumption_coffee_blend=gettext('Бленд/день'),
         consumption_milk=gettext('Молоко/день'),
         consumption_panini=gettext('Панини/день'),
-        consumption_hot_dogs=gettext('Хот-доги/день'),
+        consumption_sausages=gettext('Колбаски/день'),
+        consumption_buns=gettext('Булочки/день'),
         coffee_arabika=gettext('Арабика/ост.'),
         coffee_blend=gettext('Бленд/ост.'),
         milk=gettext('Молоко/ост.'),
         panini=gettext('Панини/ост.'),
-        hot_dogs=gettext('Хот-доги/ост.'),
+        sausages=gettext('Колбаски/ост.'),
+        buns=gettext('Булочки/ост.'),
         expenses=gettext('Расходы')
     )
     form_extra_fields = {
@@ -478,7 +499,8 @@ class ReportAdmin(ModelView):
         'coffee_blend',
         'milk',
         'panini',
-        'hot_dogs',
+        'sausages',
+        'buns',
         'shop',
         'barista'
     )
@@ -495,12 +517,14 @@ class ReportAdmin(ModelView):
         'consumption_coffee_blend',
         'consumption_milk',
         'consumption_panini',
-        'consumption_hot_dogs',
+        'consumption_sausages',
+        'consumption_buns',
         'coffee_arabika',
         'coffee_blend',
         'milk',
         'panini',
-        'hot_dogs',
+        'sausages',
+        'buns',
         'shop',
         'barista'
     )
@@ -622,7 +646,18 @@ class ReportAdmin(ModelView):
                 )
             ]
         ),
-        consumption_hot_dogs=dict(
+        consumption_sausages=dict(
+            default=0,
+            validators=[
+                InputRequired(),
+                NumberRange(
+                    min=-1,
+                    max=1000000000,
+                    message=gettext('Расход за день не может быть ниже нуля')
+                )
+            ]
+        ),
+        consumption_buns=dict(
             default=0,
             validators=[
                 InputRequired(),
@@ -673,13 +708,23 @@ class ReportAdmin(ModelView):
                 )
             ]
         ),
-        hot_dogs=dict(
+        sausages=dict(
             validators=[
                 InputRequired(),
                 NumberRange(
                     min=-1,
                     max=1000000000,
-                    message=gettext('Остаток хот-догов должен быть нулевым, либо больше нуля')
+                    message=gettext('Остаток колбасок должен быть нулевым, либо больше нуля')
+                )
+            ]
+        ),
+        buns=dict(
+            validators=[
+                InputRequired(),
+                NumberRange(
+                    min=-1,
+                    max=1000000000,
+                    message=gettext('Остаток булочек должен быть нулевым, либо больше нуля')
                 )
             ]
         ),
@@ -722,8 +767,11 @@ class ReportAdmin(ModelView):
         'consumption_panini': {
             'placeholder': gettext('Расход панини за день')
         },
-        'consumption_hot_dogs': {
-            'placeholder': gettext('Расход хот-догов (комплект булка-сосиска) за день')
+        'consumption_sausages': {
+            'placeholder': gettext('Расход колбасок за день')
+        },
+        'consumption_buns': {
+            'placeholder': gettext('Расход булочек за день')
         },
         'coffee_arabika': {
             'placeholder': gettext('Количество арабики в кг, остаток на следующий день')
@@ -737,8 +785,11 @@ class ReportAdmin(ModelView):
         'panini': {
             'placeholder': gettext('Количество панини, остаток на следующий день')
         },
-        'hot_dogs': {
-            'placeholder': gettext('Количество хот-догов (комплект булка-сосиска), остаток на следующий день')
+        'sausages': {
+            'placeholder': gettext('Количество колбасок, остаток на следующий день')
+        },
+        'buns': {
+            'placeholder': gettext('Количество булок, остаток на следующий день')
         }
     }
 
@@ -838,8 +889,11 @@ class ReportAdmin(ModelView):
             new_consumption_panini = form.consumption_panini.data
             old_consumption_panini = model.consumption_panini
 
-            new_consumption_hot_dogs = form.consumption_hot_dogs.data
-            old_consumption_hot_dogs = model.consumption_hot_dogs
+            new_consumption_sausages = form.consumption_sausages.data
+            old_consumption_sausages = model.consumption_sausages
+
+            new_consumption_buns = form.consumption_buns.data
+            old_consumption_buns = model.consumption_buns
 
             new_coffee_arabika = form.coffee_arabika.data
             old_coffee_arabika = model.coffee_arabika
@@ -853,8 +907,11 @@ class ReportAdmin(ModelView):
             new_panini = form.panini.data
             old_panini = model.panini
 
-            new_hot_dogs = form.hot_dogs.data
-            old_hot_dogs = model.hot_dogs
+            new_sausages = form.sausages.data
+            old_sausages = model.sausages
+
+            new_buns = form.buns.data
+            old_buns = model.buns
 
             new_shop = form.shop.data
             old_shop = model.shop
@@ -898,8 +955,11 @@ class ReportAdmin(ModelView):
             if new_consumption_panini != old_consumption_panini:
                 form.consumption_panini.data = old_consumption_panini
 
-            if new_consumption_hot_dogs != old_consumption_hot_dogs:
-                form.consumption_hot_dogs.data = old_consumption_hot_dogs
+            if new_consumption_sausages != old_consumption_sausages:
+                form.consumption_sausages.data = old_consumption_sausages
+
+            if new_consumption_buns != old_consumption_buns:
+                form.consumption_buns.data = old_consumption_buns
 
             if new_coffee_arabika != old_coffee_arabika:
                 form.coffee_arabika.data = old_coffee_arabika
@@ -913,8 +973,11 @@ class ReportAdmin(ModelView):
             if new_panini != old_panini:
                 form.panini.data = old_panini
 
-            if new_hot_dogs != old_hot_dogs:
-                form.hot_dogs.data = old_hot_dogs
+            if new_sausages != old_sausages:
+                form.sausages.data = old_sausages
+
+            if new_buns != old_buns:
+                form.buns.data = old_buns
             self.after_model_change(form, model, False)
         return True
 
@@ -936,13 +999,15 @@ class ReportAdmin(ModelView):
         model.consumption_coffee_blend = model.shop.storage.coffee_blend - float(form.coffee_blend.data)
         model.consumption_milk = model.shop.storage.milk - float(form.milk.data)
         model.consumption_panini = model.shop.storage.panini - int(form.panini.data)
-        model.consumption_hot_dogs = model.shop.storage.hot_dogs - int(form.hot_dogs.data)
+        model.consumption_sausages = model.shop.storage.sausages - int(form.sausages.data)
+        model.consumption_buns = model.shop.storage.buns - int(form.buns.data)
 
         model.shop.storage.coffee_arabika -= model.consumption_coffee_arabika
         model.shop.storage.coffee_blend -= model.consumption_coffee_blend
         model.shop.storage.milk -= model.consumption_milk
         model.shop.storage.panini -= model.consumption_panini
-        model.shop.storage.hot_dogs -= model.consumption_hot_dogs
+        model.shop.storage.sausages -= model.consumption_sausages
+        model.shop.storage.buns -= model.consumption_buns
 
     def after_model_change(self, form, model, is_created):
         if form.backdating.data:
@@ -969,7 +1034,8 @@ class ReportAdmin(ModelView):
         model.shop.storage.coffee_blend += model.consumption_coffee_blend
         model.shop.storage.milk += model.consumption_milk
         model.shop.storage.panini += model.consumption_panini
-        model.shop.storage.hot_dogs += model.consumption_hot_dogs
+        model.shop.storage.sausages += model.consumption_sausages
+        model.shop.storage.buns += model.consumption_buns
 
 
 class RoleAdmin(ModelView):
@@ -1193,8 +1259,6 @@ class ExpenseAdmin(ModelView):
         return True
 
     def on_model_change(self, form, model, is_created):
-        print('On model change')
-        print(form.data)
         if form.backdating.data:
             model.backdating = form.backdating.data
             return
@@ -1250,7 +1314,8 @@ class SupplyAdmin(ModelView):
             coffee_blend=gettext('купаж'),
             milk=gettext('молоко'),
             panini=gettext('панини'),
-            hot_dogs=gettext('хот-доги')
+            sausages=gettext('колбаски'),
+            buns=gettext('булочки')
         )
         return Markup(f'{prettified[model.product_name]}')
 
@@ -1346,7 +1411,8 @@ class SupplyAdmin(ModelView):
                 ('coffee_blend', gettext('Купаж')),
                 ('milk', gettext('Молоко')),
                 ('panini', gettext('Панини')),
-                ('hot_dogs', gettext('Хот-доги'))
+                ('sausages', gettext('Колбаски')),
+                ('buns', gettext('Булочки'))
             ],
             validators=[Required()],
         )
@@ -1470,8 +1536,10 @@ class SupplyAdmin(ModelView):
             model.storage.milk += float(form.amount.data)
         elif form.product_name.data == 'panini':
             model.storage.panini += int(form.amount.data)
+        elif form.product_name.data == 'sausages':
+            model.storage.sausages += int(form.amount.data)
         else:
-            model.storage.hot_dogs += int(form.amount.data)
+            model.storage.buns += int(form.amount.data)
 
         if form.type_cost.data == 'cash':
             model.storage.shop.cash -= form.money.data
@@ -1496,8 +1564,11 @@ class SupplyAdmin(ModelView):
                 model.storage.milk -= float(form.amount.data)
             elif form.product_name.data == 'panini':
                 model.storage.panini -= int(form.amount.data)
+            elif form.product_name.data == 'sausages':
+                model.storage.sausages -= int(form.amount.data)
             else:
-                model.storage.hot_dogs -= int(form.amount.data)
+                model.storage.buns += int(form.amount.data)
+
             self.session.commit()
 
     def on_model_delete(self, model):
@@ -1511,8 +1582,10 @@ class SupplyAdmin(ModelView):
             model.storage.milk -= model.amount
         elif model.product_name == 'panini':
             model.storage.panini -= model.amount
+        elif model.product_name == 'sausages':
+            model.storage.sausages -= model.amount
         else:
-            model.storage.hot_dogs -= model.amount
+            model.storage.buns -= model.amount
 
         if model.type_cost == 'cash':
             model.storage.shop.cash += model.money
@@ -1545,7 +1618,8 @@ class ByWeightAdmin(ModelView):
             coffee_blend=gettext('купаж'),
             milk=gettext('молоко'),
             panini=gettext('панини'),
-            hot_dogs=gettext('хот-доги')
+            sausages=gettext('колбаски'),
+            buns=gettext('булочки')
         )
         return Markup(f'{prettified[model.product_name]}')
 
@@ -1811,7 +1885,8 @@ class WriteOffAdmin(ModelView):
             coffee_blend=gettext('купаж'),
             milk=gettext('молоко'),
             panini=gettext('панини'),
-            hot_dogs=gettext('хот-доги')
+            sausages=gettext('колбаски'),
+            buns=gettext('булочки')
         )
         return Markup(f'{prettified[model.product_name]}')
 
@@ -1862,7 +1937,8 @@ class WriteOffAdmin(ModelView):
                 ('coffee_blend', gettext('Купаж')),
                 ('milk', gettext('Молоко')),
                 ('panini', gettext('Панини')),
-                ('hot_dogs', gettext('Хот-доги'))
+                ('sausages', gettext('Колбаски')),
+                ('buns', gettext('Булочки'))
             ],
             validators=[Required()],
         )
@@ -1974,8 +2050,10 @@ class WriteOffAdmin(ModelView):
             model.storage.milk -= float(form.amount.data)
         elif form.product_name.data == 'panini':
             model.storage.panini -= int(form.amount.data)
+        elif form.product_name.data == 'sausages':
+            model.storage.sausages -= int(form.amount.data)
         else:
-            model.storage.hot_dogs -= int(form.amount.data)
+            model.storage.buns -= int(form.amount.data)
 
     def after_model_change(self, form, model, is_created):
         if form.backdating.data:
@@ -1990,8 +2068,10 @@ class WriteOffAdmin(ModelView):
                 model.storage.milk += float(form.amount.data)
             elif form.product_name.data == 'panini':
                 model.storage.panini += int(form.amount.data)
+            elif form.product_name.data == 'sausages':
+                model.storage.sausages += int(form.amount.data)
             else:
-                model.storage.hot_dogs += int(form.amount.data)
+                model.storage.buns += int(form.amount.data)
             self.session.commit()
 
     def on_model_delete(self, model):
@@ -2005,8 +2085,10 @@ class WriteOffAdmin(ModelView):
             model.storage.milk += model.amount
         elif model.product_name == 'panini':
             model.storage.panini += model.amount
+        elif model.product_name == 'sausages':
+            model.storage.sausages += model.amount
         else:
-            model.storage.hot_dogs += model.amount
+            model.storage.buns += model.amount
 
 
 class CategoryAdmin(ModelView):

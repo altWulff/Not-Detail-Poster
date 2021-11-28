@@ -24,15 +24,19 @@
                     </div>
                     <div class="col-sm-4">
                         <h5 class="text-muted">{{_('Расход за день')}}</h5>
-                        <p>КА: {{ "%.2f"|format(day_report.consumption_coffee_arabika) }} кг</p>
-                        <p>КБ: {{ "%.2f"|format(day_report.consumption_coffee_blend) }} кг</p>
-                        <p>М: {{ "%.2f"|format(day_report.consumption_milk) }} л</p>
-                        <p>П: {{day_report.consumption_panini}} шт.</p>
-                        <p>К: {{day_report.consumption_hot_dogs}} шт.</p>
+                        <p>{{_('КА')}}: {{ "%.2f"|format(day_report.consumption_coffee_arabika) }} кг</p>
+                        <p>{{_('КБ')}}: {{ "%.2f"|format(day_report.consumption_coffee_blend) }} кг</p>
+                        <p>{{_('М')}}: {{ "%.2f"|format(day_report.consumption_milk) }} л</p>
+                        <p>{{_('П')}}: {{day_report.consumption_panini}} шт.</p>
+                        <p>{{_('КК')}}: {{day_report.consumption_sausages}} шт.</p>
+                        <p>{{_('Б')}}: {{day_report.consumption_buns}} шт.</p>
                         <h5 class="text-muted">Отстаток дня</h5>
-                        <p>КА: {{"%.2f"|format(day_report.coffee_arabika)}} кг, КБ: {{ "%.2f"|format(day_report.coffee_blend) }} кг</p>
-                        <p>М: {{ "%.2f"|format(day_report.milk) }} л</p>
-                        <p>П: {{day_report.panini}} шт., К: {{day_report.hot_dogs}} шт.</p>
+                        <p>{{_('КА')}}: {{"%.2f"|format(day_report.coffee_arabika)}} кг</p>
+                        <p>{{_('КБ')}}: {{ "%.2f"|format(day_report.coffee_blend) }} кг</p>
+                        <p>{{_('М')}}: {{ "%.2f"|format(day_report.milk) }} л</p>
+                        <p>{{_('П')}}: {{day_report.panini}} шт.</p>
+                        <p>{{_('КК')}}: {{day_report.sausages}} шт.</p>
+                        <p>{{_('Б')}}: {{day_report.buns}} шт.</p>
                     </div>
                 </div>
             </div>

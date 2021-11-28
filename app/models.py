@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import func
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -87,7 +87,8 @@ class Storage(db.Model):
     coffee_blend = db.Column(db.Float(50))
     milk = db.Column(db.Float(50))
     panini = db.Column(db.Integer)
-    hot_dogs = db.Column(db.Integer)
+    sausages = db.Column(db.Integer)
+    buns = db.Column(db.Integer)
     supplies = db.relationship('Supply', backref='storage', lazy=True)
     by_weights = db.relationship('ByWeight', backref='storage', lazy=True)
     write_offs = db.relationship('WriteOff', backref='storage', lazy=True)
@@ -209,13 +210,15 @@ class Report(db.Model):
     consumption_coffee_blend = db.Column(db.Float(50))
     consumption_milk = db.Column(db.Float(50))
     consumption_panini = db.Column(db.Integer)
-    consumption_hot_dogs = db.Column(db.Integer)
+    consumption_sausages = db.Column(db.Integer)
+    consumption_buns = db.Column(db.Integer)
     # остаток продукции в конце дня
     coffee_arabika = db.Column(db.Float(50))
     coffee_blend = db.Column(db.Float(50))
     milk = db.Column(db.Float(50))
     panini = db.Column(db.Integer)
-    hot_dogs = db.Column(db.Integer)
+    sausages = db.Column(db.Integer)
+    buns = db.Column(db.Integer)
 
     def __repr__(self):
         return f'<Report: {self.timestamp}>'
@@ -287,11 +290,8 @@ class Expense(db.Model):
         
     @classmethod
     def by_timestamp(cls, shop_id, timestamp):
-        # TODO сделать фильтр по значениям как ниже
-        # >>> e.timestamp.timetuple()[:3]
-        # (2021, 11, 16)
         _query = cls.query.filter_by(shop_id=shop_id).filter(cls.is_global==False)
-        _query = _query.filter(cls.timestamp >= timestamp)
+        _query = _query.filter(func.date(cls.timestamp) == date.today()).all()
         return _query
     
 

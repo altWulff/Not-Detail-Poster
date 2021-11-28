@@ -192,7 +192,8 @@ class WriteOffForm(FlaskForm):
             ('coffee_arabika', _l('Арабика')),
             ('milk', _l('Молоко')),
             ('panini', _l('Панини')),
-            ('hot_dogs', _l('Хот-доги'))
+            ('sausages', _l('Колбаски')),
+            ('buns', _l('Булочки'))
         ]
     )
     amount = MyFloatField(
@@ -227,7 +228,8 @@ class SupplyForm(FlaskForm):
             ('coffee_arabika', _l('Арабика')),
             ('milk', _l('Молоко')),
             ('panini', _l('Панини')),
-            ('hot_dogs', _l('Хот-доги'))
+            ('sausages', _l('Колбаски')),
+            ('buns', _l('Булочки'))
         ]
     )
     amount = MyFloatField(_l('Количество'), default=0.0)
@@ -329,18 +331,29 @@ class ReportForm(FlaskForm):
             InputRequired(),
             NumberRange(
                 min=-1,
-                message=_l('Остаток хот-догов должен быть нулевым, либо больше нуля')
+                message=_l('Остаток панини должен быть нулевым, либо больше нуля')
             )
         ]
     )
-    hot_dogs = IntegerField(
-        _l('Хот-доги'),
+    sausages = IntegerField(
+        _l('Колбаски'),
         default=0,
         validators=[
             InputRequired(),
             NumberRange(
                 min=-1,
-                message=_l('Остаток хот-догов должен быть нулевым, либо больше нуля')
+                message=_l('Остаток колбасок должен быть нулевым, либо больше нуля')
+            )
+        ]
+    )
+    buns = IntegerField(
+        _l('Булочки'),
+        default=0,
+        validators=[
+            InputRequired(),
+            NumberRange(
+                min=-1,
+                message=_l('Остаток булочек должен быть нулевым, либо больше нуля')
             )
         ]
     )
@@ -428,14 +441,25 @@ class CoffeeShopForm(FlaskForm):
             )
         ]
     )
-    hot_dogs = IntegerField(
-        _l('Хот-доги'),
+    sausages = IntegerField(
+        _l('Колбаски'),
         default=0,
         validators=[
             InputRequired(),
             NumberRange(
                 min=-1,
-                message=_l('Количество хот-догов должно быть нулевым, либо больше нуля')
+                message=_l('Количество колбасок должно быть нулевым, либо больше нуля')
+            )
+        ]
+    )
+    buns = IntegerField(
+        _l('Булочки'),
+        default=0,
+        validators=[
+            InputRequired(),
+            NumberRange(
+                min=-1,
+                message=_l('Количество булочек должно быть нулевым, либо больше нуля')
             )
         ]
     )

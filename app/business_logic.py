@@ -89,8 +89,10 @@ class TransactionHandler:
             self.storage.milk -= form.amount.data
         elif form.write_off_choice.data == 'panini':
             self.storage.panini -= int(form.amount.data)
+        elif form.write_off_choice.data == 'sausages':
+            self.storage.sausages -= int(form.amount.data)
         else:
-            self.storage.hot_dogs -= int(form.amount.data)
+            self.storage.buns -= int(form.amount.data)
         write_off = WriteOff(
             storage=self.storage, 
             amount=form.amount.data, 
@@ -108,8 +110,10 @@ class TransactionHandler:
             self.storage.milk += form.amount.data
         elif form.supply_choice.data == 'panini':
             self.storage.panini += int(form.amount.data)
+        elif form.supply_choice.data == 'sausages':
+            self.storage.sausages += int(form.amount.data)
         else:
-            self.storage.hot_dogs += int(form.amount.data)
+            self.storage.buns += int(form.amount.data)
             
         self.funds_expenditure(form.money.data, form.type_cost.data)
         supply = Supply(
@@ -131,7 +135,6 @@ class TransactionHandler:
         cashbox = remainder_of_day + expanses
         
         report = Report(
-            last_cash=self.shop.cash,
             cashbox=cashbox,
             cash_balance=cash_balance,
             cashless=form.cashless.data,
@@ -144,7 +147,8 @@ class TransactionHandler:
             coffee_blend=form.coffee_blend.data,
             milk=form.milk.data,
             panini=form.panini.data,
-            hot_dogs=form.hot_dogs.data
+            sausages=form.sausages.data,
+            buns=form.buns.data
         )
         self.cash_flow(cash_balance + expanses, 'cash')
         self.cash_flow(form.cashless.data, 'cashless')
@@ -152,11 +156,13 @@ class TransactionHandler:
         report.consumption_coffee_blend = self.storage.coffee_blend - form.coffee_blend.data
         report.consumption_milk = self.storage.milk - form.milk.data
         report.consumption_panini = self.storage.panini - form.panini.data
-        report.consumption_hot_dogs = self.storage.hot_dogs - form.hot_dogs.data
+        report.consumption_sausages = self.storage.sausages - form.sausages.data
+        report.consumption_buns = self.storage.buns - form.buns.data
 
         self.storage.coffee_arabika -= report.consumption_coffee_arabika
         self.storage.coffee_blend -= report.consumption_coffee_blend
         self.storage.milk -= report.consumption_milk
         self.storage.panini -= report.consumption_panini
-        self.storage.hot_dogs -= report.consumption_hot_dogs
+        self.storage.sausages -= report.consumption_sausages
+        self.storage.buns -= report.consumption_buns
         self.write_to_db(report)
