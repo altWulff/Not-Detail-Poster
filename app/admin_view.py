@@ -1016,11 +1016,24 @@ class ReportAdmin(ModelView):
             model.last_edit = datetime.now()
             expanses = model.expenses
             expanses = sum([e.money for e in expanses if e.type_cost == 'cash'])
-            last_actual_balance = form.shop.data.cash + expanses
-            model.cash_balance += expanses
-            model.remainder_of_day = model.cash_balance + form.cashless.data
+            diff_actual_balance = model.actual_balance - form.actual_balance.data
+            model.cash_balance = diff_actual_balance + form.actual_balance.data
+            model.remainder_of_day = model.cash_balance + model.cashless
             model.cashbox = model.remainder_of_day + expanses
             model.shop.cashless -= form.cashless.data
+
+            if float(form.consumption_coffee_arabika.data):
+                model.consumption_coffee_arabika += float(form.consumption_coffee_arabika.data)
+            if float(form.consumption_coffee_blend.data):
+                model.consumption_coffee_blend += float(form.consumption_coffee_blend.data)
+            if int(form.consumption_milk.data):
+                model.consumption_milk += int(form.consumption_milk.data)
+            if int(form.consumption_panini.data):
+                model.consumption_panini += int(form.consumption_panini.data)
+            if int(form.consumption_sausages.data):
+                model.consumption_sausages += int(form.consumption_sausages.data)
+            if int(form.consumption_buns.data):
+                model.consumption_buns += int(form.consumption_buns.data)
             self.session.commit()
 
     def on_model_delete(self, model):
