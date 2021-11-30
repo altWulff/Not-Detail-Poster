@@ -20,7 +20,7 @@ class IndexAdmin(AdminIndexView):
     @property
     def can_view(self):
         try:
-            is_admin = current_user.has_role('admin')
+            is_admin = current_user.has_role('admin') or current_user.has_role('moderator')
             is_active = current_user.is_active and current_user.is_authenticated
             return is_active and is_admin
         except:
