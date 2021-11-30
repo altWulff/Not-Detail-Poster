@@ -11,7 +11,7 @@ from wtforms import (
     RadioField,
     SelectMultipleField
 )
-from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, NumberRange, Required, InputRequired
+from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, NumberRange, Required, InputRequired, Length
 from flask_babelex import _
 from flask_babelex import lazy_gettext as _l
 from app.models import Barista, Shop, Category
@@ -68,6 +68,16 @@ class RegistrationForm(FlaskForm):
         if user is not None:
             raise ValidationError(_('Пожалуйста ипользуйте другой емейл адрес.'))
 
+class NewPassword(FlaskForm):
+    password = PasswordField(_l('Новый Пароль'), validators=[DataRequired(), Length(min=8)])
+    password2 = PasswordField(
+        _l('Повторение пароля'),
+        validators=[
+            DataRequired(),
+            EqualTo('password', message=_l('Пароли не совпадают'))
+        ]
+    )
+    submit = SubmitField(_l('Подтвердить'))
 
 class EditProfileForm(FlaskForm):
     name = StringField(_l('Имя'), validators=[DataRequired()])
