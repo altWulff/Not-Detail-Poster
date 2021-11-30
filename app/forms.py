@@ -71,7 +71,7 @@ class RegistrationForm(FlaskForm):
 
 class EditProfileForm(FlaskForm):
     name = StringField(_l('Имя'), validators=[DataRequired()])
-    phone_number = IntegerField(_l('Тел.'), validators=[DataRequired()])
+    phone_number = StringField(_l('Тел.'), validators=[DataRequired()])
     email = StringField(_l('Емейл'), validators=[DataRequired(), Email()])
     submit = SubmitField(_l('Сохранить'))
 

@@ -19,7 +19,7 @@
             {% endfor %}
         </ul>
         {% if current_user == user %}
-            <a href="{{ url_for('user.edit', user_name=current_user.name) }} ">{{_('Редактировать профиль')}}</a>
+            <a href="{{ url_for('user.edit') }} ">{{_('Редактировать профиль')}}</a>
         {% endif %}
     </div>
 </div>
