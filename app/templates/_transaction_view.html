@@ -3,6 +3,9 @@
         <button class="nav-link active" id="pills-expansion-tab" data-bs-toggle="pill" data-bs-target="#pills-expansion" type="button" role="tab" aria-controls="pills-expansion" aria-selected="true">{{ _('Расходы') }}</button>
     </li>
     <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-g-expansion-tab" data-bs-toggle="pill" data-bs-target="#pills-g-expansion" type="button" role="tab" aria-controls="pills-g-expansion" aria-selected="false">{{ _('Глобальные расходы') }}</button>
+    </li>
+    <li class="nav-item" role="presentation">
         <button class="nav-link" id="pills-supply-tab" data-bs-toggle="pill" data-bs-target="#pills-supply" type="button" role="tab" aria-controls="pills-supply" aria-selected="false">{{ _('Поступления') }}</button>
     </li>
     <li class="nav-item" role="presentation">
@@ -12,6 +15,9 @@
 <div class="tab-content" id="pills-tabContent">
     <div class="tab-pane fade show active" id="pills-expansion" role="tabpanel" aria-labelledby="pills-expansion-tab">
         {{ render_expansion_by_day(expense.get_local(coffee_shop.id, True)) }}
+    </div>
+    <div class="tab-pane fade" id="pills-g-expansion" role="tabpanel" aria-labelledby="pills-g-expansion-tab">
+        {{ render_expansion_by_day(expense.get_global(coffee_shop.id, True)) }}
     </div>
     <div class="tab-pane fade" id="pills-supply" role="tabpanel" aria-labelledby="pills-supply-tab">
         {{ render_supply_by_day(supply.get_local_by_shop(coffee_shop.id)) }}
