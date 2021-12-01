@@ -344,8 +344,8 @@ class BaristaAdmin(ModelView):
         reports=gettext('Отчеты'),
         active=gettext('Активный'),
         confirmed_at=gettext('Дата найма'),
-        password=gettext('Пароль'),
-        roles=gettext('Роли'),
+        password_hash=gettext('Пароль'),
+        roles=gettext('Роли, уровень доступа'),
         expenses=gettext('Расходы'),
         supplies=gettext('Поступления'),
         by_weights=gettext('Развес'),
@@ -421,6 +421,15 @@ class BaristaAdmin(ModelView):
         },
         'email': {
             'placeholder': gettext('Емейл')
+        },
+        'password': {
+            'placeholder': gettext('Пароль для входа')
+        },
+        'shop': {
+            'placeholder': gettext('Выберите места работы сотрудника')
+        },
+        'roles': {
+            'placeholder': gettext('Выберите уровень доступа для сотрудника')
         },
         'confirmed_at': {
             'data-date-format': u'DD.MM.YYYY HH:mm'
