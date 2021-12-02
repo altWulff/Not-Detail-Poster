@@ -34,8 +34,8 @@ def on_address(shop_address):
     if not (current_user.has_role('admin') or current_user.has_role('moderator')):
         reports = reports.limit(app.config['REPORTS_USER_VIEW']).from_self()
         
-    global_expense = Expense.get_global(shop.id, True)
-    local_expense = Expense.get_local(shop.id, True)
+    global_expense = Expense.get_global(shop.id)
+    local_expense = Expense.get_local(shop.id)
     supply = Supply.get_local(storage.id)
     page = request.args.get('page', 1, type=int)
     reports = reports.paginate(
