@@ -51,6 +51,8 @@ class Shop(db.Model):
         backref=db.backref('shop', lazy=True)
     )
     expenses = db.relationship('Expense', backref='shop', lazy=True)
+    collection_funds = db.relationship('CollectionFund', backref='shop', lazy=True)
+    deposit_funds = db.relationship('DepositFund', backref='shop', lazy=True)
 
     def __repr__(self):
         return f'<Shop: {self.place_name}>'
@@ -76,8 +78,10 @@ class ShopEquipment(db.Model):
     shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'))
     shop = db.relationship("Shop", back_populates="shop_equipment")
     coffee_machine = db.Column(db.String(64), index=True)
+    last_cleaning_coffee_machine = db.Column(db.DateTime(timezone=True), server_default=func.now())
     grinder_1 = db.Column(db.String(64), index=True)
     grinder_2 = db.Column(db.String(64), index=True)
+    last_cleaning_grinder = db.Column(db.DateTime(timezone=True), server_default=func.now())
 
     def __repr__(self):
         if self.shop_id:
@@ -132,6 +136,8 @@ class Barista(db.Model, UserMixin):
     shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'))
     reports = db.relationship('Report', backref='barista', lazy=True)
     expenses = db.relationship('Expense', backref='barista', lazy=True)
+    collection_funds = db.relationship('CollectionFund', backref='barista', lazy=True)
+    deposit_funds = db.relationship('DepositFund', backref='barista', lazy=True)
     supplies = db.relationship('Supply', backref='barista', lazy=True)
     by_weights = db.relationship('ByWeight', backref='barista', lazy=True)
     write_offs = db.relationship('WriteOff', backref='barista', lazy=True)
@@ -187,6 +193,18 @@ class Role(db.Model, RoleMixin):
 expenses = db.Table(
     'expenses',
     db.Column('expense_id', db.Integer, db.ForeignKey('expense.id'), primary_key=True),
+    db.Column('report_id', db.Integer, db.ForeignKey('report.id'), primary_key=True)
+)
+
+collection_funds = db.Table(
+    'collection_funds',
+    db.Column('collection_fund_id', db.Integer, db.ForeignKey('collection_fund.id'), primary_key=True),
+    db.Column('shop_id', db.Integer, db.ForeignKey('shop.id'), primary_key=True)
+)
+
+deposit_funds = db.Table(
+    'deposit_funds',
+    db.Column('deposit_fund_id', db.Integer, db.ForeignKey('deposit_fund.id'), primary_key=True),
     db.Column('report_id', db.Integer, db.ForeignKey('report.id'), primary_key=True)
 )
 
@@ -388,6 +406,31 @@ class WriteOff(db.Model):
         storage = Storage.query.filter_by(shop_id=shop_id).first_or_404()
         _query = cls.query.filter_by(storage_id=storage.id).filter(cls.timestamp >= date_today)
         return _query
+
+
+class DepositFund(db.Model):
+    __tablename__ = 'deposit_fund'
+    id = db.Column(db.Integer, primary_key=True)
+    barista_id = db.Column(db.Integer, db.ForeignKey('barista.id'))
+    shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'))
+    backdating = db.Column(db.Boolean, default=False)
+    timestamp = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    last_edit = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    type_cost = db.Column(db.String(64), index=True)
+    money = db.Column(db.Integer)
+
+
+class CollectionFund(db.Model):
+    __tablename__ = 'collection_fund'
+    id = db.Column(db.Integer, primary_key=True)
+    barista_id = db.Column(db.Integer, db.ForeignKey('barista.id'))
+    shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'))
+    backdating = db.Column(db.Boolean, default=False)
+    timestamp = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    last_edit = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    type_cost = db.Column(db.String(64), index=True)
+    money = db.Column(db.Integer)
+
 
 # Товар:
     # ид

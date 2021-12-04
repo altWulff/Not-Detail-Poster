@@ -44,6 +44,8 @@ from app.admin_view import (
     BaristaAdmin,
     RoleAdmin,
     ExpenseAdmin,
+    DepositFundsAdmin,
+    CollectionFundsAdmin,
     ByWeightAdmin,
     SupplyAdmin,
     WriteOffAdmin,
@@ -66,6 +68,8 @@ admin.add_view(SupplyAdmin(models.Supply, db.session,  name=_l('Поступле
 admin.add_view(ByWeightAdmin(models.ByWeight, db.session,  name=_l('Развес'), category=_l("Движения товаров")))
 admin.add_view(WriteOffAdmin(models.WriteOff, db.session,  name=_l('Списания'), category=_l("Движения товаров")))
 admin.add_view(ExpenseAdmin(models.Expense, db.session, name=_l('Расходы'), category=_l('Кассовые средства')))
+admin.add_view(DepositFundsAdmin(models.DepositFund, db.session, name=_l('Внесение'), category=_l('Кассовые средства')))
+admin.add_view(CollectionFundsAdmin(models.CollectionFund, db.session, name=_l('Инкасация'), category=_l('Кассовые средства')))
 admin.add_view(BaristaAdmin(models.Barista, db.session, name=_l('Сотрудники')))
 admin.add_view(CategoryAdmin(models.Category, db.session, name=_l('Категории'), category=_l('Разное')))
 admin.add_view(RoleAdmin(models.Role, db.session, name=_l('Доступ'), category=_l('Разное')))

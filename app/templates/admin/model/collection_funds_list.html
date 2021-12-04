@@ -1,0 +1,66 @@
+{% extends 'admin/model/list.html' %}
+{% block model_list_table %}
+{{ super() }}
+<h3>{{_('Сумма')}}</h3>
+<div class="table-responsive">
+    <table class="table table-striped table-bordered table-hover model-list">
+        <thead>
+            <tr>
+                <td colspan="2"></td>
+                {% for name in summary_data['on_page'] %}
+                    <td class="col-1">
+                        <strong>{{ column_labels.get(name, name) }}</strong>
+                    </td>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tr>
+            <td colspan="2"><strong>{{_('На странице')}}</strong></td>
+            {% for name in summary_data['on_page'] %}
+                <td class="col-1">
+                    {{ summary_data['on_page'][name] }}
+                </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td colspan="2"><strong>{{_('Полная сумма')}}</strong></td>
+            {% for name in summary_data['total'] %}
+                <td class="col-1">
+                    {{ summary_data['total'][name] }}
+                </td>
+            {% endfor %}
+        </tr>
+    </table>
+</div>
+<h3>{{_('Медиана')}}</h3>
+<div class="table-responsive">
+    <table class="table table-striped table-bordered table-hover model-list">
+        <thead>
+            <tr>
+                <td colspan="2"></td>
+                {% for name in median_data['on_page'] %}
+                    <td class="col-1">
+                        <strong>{{ column_labels.get(name, name) }}</strong>
+                    </td>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tr>
+            <td colspan="2"><strong>{{_('На странице')}}</strong></td>
+            {% for name in median_data['on_page'] %}
+                <td class="col-1">
+                    {{ median_data['on_page'][name] }}
+                </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td colspan="2"><strong>{{_('Полное среднее')}}</strong></td>
+            {% for name in median_data['total'] %}
+                <td class="col-1">
+                    {{ median_data['total'][name] }}
+                </td>
+            {% endfor %}
+        </tr>
+    </table>
+</div>
+{% endblock %}
