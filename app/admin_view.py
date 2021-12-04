@@ -2143,7 +2143,7 @@ class DepositFundsAdmin(ModelView):
 
     list_template = 'admin/model/deposit_funds_list.html'
     can_set_page_size = True
-    column_list = ('timestamp', 'money', 'shop')
+    column_list = ('timestamp', 'money', 'shop', 'barista')
     form_create_rules = (
         'backdating',
         'timestamp',
@@ -2354,7 +2354,7 @@ class CollectionFundsAdmin(ModelView):
 
     list_template = 'admin/model/collection_funds_list.html'
     can_set_page_size = True
-    column_list = ('timestamp', 'money', 'shop')
+    column_list = ('timestamp', 'money', 'shop', 'barista')
     form_create_rules = (
         'backdating',
         'timestamp',
