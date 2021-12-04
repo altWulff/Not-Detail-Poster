@@ -3,7 +3,7 @@ from flask_security import login_required, current_user
 from flask_babelex import _
 from app import db, app
 from app.forms import ReportForm
-from app.models import Shop, Report, Storage, Expense, Supply, baristas, Barista
+from app.models import Shop, Report, Storage, Expense, Supply, DepositFund, CollectionFund
 from app.business_logic import TransactionHandler
 
 
@@ -37,6 +37,8 @@ def on_address(shop_address):
     global_expense = Expense.get_global(shop.id)
     local_expense = Expense.get_local(shop.id)
     supply = Supply.get_local(storage.id)
+    deposit_fund = DepositFund.get_local_by_shop(shop.id)
+    collection_fund = CollectionFund.get_local_by_shop(shop.id)
     page = request.args.get('page', 1, type=int)
     reports = reports.paginate(
         page,
@@ -58,6 +60,8 @@ def on_address(shop_address):
         daily_reports=reports.items,
         global_expense=global_expense,
         local_expense=local_expense,
+        deposit_fund=deposit_fund,
+        collection_fund=collection_fund,
         supply=supply,
         next_url=next_url,
         prev_url=prev_url

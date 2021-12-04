@@ -18,8 +18,10 @@
                         <h5 data-bs-toggle="tooltip" data-bs-html="true" title="Фактический остаток">{{_('Ф.О.')}} {{day_report.actual_balance}} грн.</h5>
                     </div>
                     <div class="col-sm-4">
-                        <h5 class="text-muted">{{_('Глобальные траты')}}</h5>
+                        <h5 class="text-muted">{{_('Глобальные траты и поступления')}}</h5>
                         {{ render_expansion(global_expense, day_report) }}
+                        {{ render_deposit_fund(deposit_fund, day_report) }}
+                        {{ render_collection_fund(collection_fund, day_report) }}
                         {{ render_supply(supply, day_report)}}
                     </div>
                     <div class="col-sm-4">
@@ -30,7 +32,7 @@
                         <p>{{_('П')}}: {{day_report.consumption_panini}} шт.</p>
                         <p>{{_('КК')}}: {{day_report.consumption_sausages}} шт.</p>
                         <p>{{_('Б')}}: {{day_report.consumption_buns}} шт.</p>
-                        <h5 class="text-muted">Отстаток дня</h5>
+                        <h5 class="text-muted">{{_('Отстаток дня')}}</h5>
                         <p>{{_('КА')}}: {{"%.2f"|format(day_report.coffee_arabika)}} кг</p>
                         <p>{{_('КБ')}}: {{ "%.2f"|format(day_report.coffee_blend) }} кг</p>
                         <p>{{_('М')}}: {{ "%.2f"|format(day_report.milk) }} л</p>

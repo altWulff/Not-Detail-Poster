@@ -81,6 +81,42 @@
     </ul>
 {% endmacro %}
 
+{% macro render_deposit_fund(deposit, report) %}
+    <ul class="list-group">
+        {% for d in deposit %}
+            {% if d.timestamp.date() == report.timestamp.date() %}
+            <li class="list-group-item d-flex justify-content-between align-items-start">
+                <div class="ms-2 me-auto">
+                    <div class="fw-bold">
+                        + {{d.money}} грн.
+                    </div>
+                    <span class="badge bg-secondary">{{ d.barista.name }}</span>
+                </div>
+                <span class="badge bg-primary rounded-pill"> {{d.type_cost}}</span>
+            </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+{% endmacro %}
+
+{% macro render_collection_fund(collection, report) %}
+    <ul class="list-group">
+        {% for c in collection %}
+            {% if c.timestamp.date() == report.timestamp.date() %}
+            <li class="list-group-item d-flex justify-content-between align-items-start">
+                <div class="ms-2 me-auto">
+                    <div class="fw-bold">
+                        - {{c.money}} грн.
+                    </div>
+                    <span class="badge bg-secondary">{{ c.barista.name }}</span>
+                </div>
+                <span class="badge bg-primary rounded-pill"> {{c.type_cost}}</span>
+            </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+{% endmacro %}
+
 {% macro render_supply(supply, report) %}
    <ul class="list-group">
         {% for s in supply %}
@@ -88,9 +124,10 @@
         <li class="list-group-item d-flex justify-content-between align-items-start">
             <div class="ms-2 me-auto">
                 <div class="fw-bold">
-                    {{s.money}} грн.
+                    - {{s.money}} грн.
                 </div>
                 <span class="badge bg-secondary">{{ s.product_name }}</span>
+                <span class="badge bg-secondary">+ {{ s.amount }}</span>
             </div>
             <span class="badge bg-primary rounded-pill"> {{s.type_cost}}</span>
         </li>
@@ -128,6 +165,7 @@
                     + {{ d.money }} грн.
                 </div>
             </div>
+            <span class="badge bg-secondary">{{ d.barista.name }}</span>
             <span class="badge bg-primary rounded-pill"> {{ d.type_cost }}</span>
         </li>
         {% else %}
@@ -145,6 +183,7 @@
                     - {{ c.money }} грн.
                 </div>
             </div>
+            <span class="badge bg-secondary">{{ c.barista.name }}</span>
             <span class="badge bg-primary rounded-pill"> {{ c.type_cost }}</span>
         </li>
         {% else %}
