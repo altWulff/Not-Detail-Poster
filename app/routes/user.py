@@ -32,6 +32,7 @@ def edit():
         form.email.data = current_user.email
     return render_template('user/user_edit.html', user=current_user, form=form)
 
+
 @user.route('/new_password', methods=('POST',  'GET'))
 @login_required
 def change_password():

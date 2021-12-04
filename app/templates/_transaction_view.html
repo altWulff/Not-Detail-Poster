@@ -3,13 +3,29 @@
         <button class="nav-link active" id="pills-expansion-tab" data-bs-toggle="pill" data-bs-target="#pills-expansion" type="button" role="tab" aria-controls="pills-expansion" aria-selected="true">{{ _('Расходы') }}</button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="pills-g-expansion-tab" data-bs-toggle="pill" data-bs-target="#pills-g-expansion" type="button" role="tab" aria-controls="pills-g-expansion" aria-selected="false">{{ _('Глобальные расходы') }}</button>
+        <button class="nav-link" id="pills-g-expansion-tab" data-bs-toggle="pill" data-bs-target="#pills-g-expansion" type="button" role="tab" aria-controls="pills-g-expansion" aria-selected="false">
+            {{ _('Глобальные расходы') }}
+        </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="pills-supply-tab" data-bs-toggle="pill" data-bs-target="#pills-supply" type="button" role="tab" aria-controls="pills-supply" aria-selected="false">{{ _('Поступления') }}</button>
+        <button class="nav-link" id="pills-supply-tab" data-bs-toggle="pill" data-bs-target="#pills-supply" type="button" role="tab" aria-controls="pills-supply" aria-selected="false">
+            {{ _('Поступления') }}
+        </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="pills-write_off-tab" data-bs-toggle="pill" data-bs-target="#pills-write_off" type="button" role="tab" aria-controls="pills-write_off" aria-selected="false">{{ _('Списания') }}</button>
+        <button class="nav-link" id="pills-deposit-fund-tab" data-bs-toggle="pill" data-bs-target="#pills-deposit-fund" type="button" role="tab" aria-controls="pills-deposit-fund" aria-selected="false">
+            {{ _('Внесение средств') }}
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-collection-fund-tab" data-bs-toggle="pill" data-bs-target="#pills-collection-fund" type="button" role="tab" aria-controls="pills-collection-fund" aria-selected="false">
+            {{ _('Инкасация') }}
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-write_off-tab" data-bs-toggle="pill" data-bs-target="#pills-write_off" type="button" role="tab" aria-controls="pills-write_off" aria-selected="false">
+            {{ _('Списания') }}
+        </button>
     </li>
 </ul>
 <div class="tab-content" id="pills-tabContent">
@@ -21,6 +37,12 @@
     </div>
     <div class="tab-pane fade" id="pills-supply" role="tabpanel" aria-labelledby="pills-supply-tab">
         {{ render_supply_by_day(supply.get_local_by_shop(coffee_shop.id)) }}
+    </div>
+    <div class="tab-pane fade" id="pills-deposit-fund" role="tabpanel" aria-labelledby="pills-deposit-fund-tab">
+        {{ render_deposit_fund_by_day(deposit_fund.get_local_by_shop(coffee_shop.id)) }}
+    </div>
+    <div class="tab-pane fade" id="pills-collection-fund" role="tabpanel" aria-labelledby="pills-collection-fund-tab">
+        {{ render_collection_fund_by_day(collection_fund.get_local_by_shop(coffee_shop.id)) }}
     </div>
     <div class="tab-pane fade" id="pills-write_off" role="tabpanel" aria-labelledby="pills-write_off-tab">
         {{ render_write_off_on_day(write_off.get_local_by_shop(coffee_shop.id)) }}

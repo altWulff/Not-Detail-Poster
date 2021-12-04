@@ -1,6 +1,6 @@
 from datetime import datetime
 from flask import render_template, redirect, url_for, flash, Blueprint, request
-from flask_security import login_required
+from flask_security import login_required, roles_accepted
 from flask_modals import render_template_modal
 from app import db
 from app.forms import ExpanseForm, ByWeightForm, WriteOffForm, SupplyForm, CoffeeShopForm, TransferForm
@@ -107,6 +107,7 @@ def transfer():
 
 @menu.route('/create_coffee_shop', methods=('GET', 'POST'))
 @login_required
+@roles_accepted('admin', 'moderator')
 def create_coffee_shop():
     form = CoffeeShopForm()
     if form.validate_on_submit():

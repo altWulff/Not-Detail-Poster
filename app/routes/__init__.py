@@ -2,7 +2,7 @@ from flask import g
 from flask_babelex import get_locale
 from app import app
 from app.forms import ExpanseForm, ByWeightForm, WriteOffForm, SupplyForm, TransferForm
-from app.models import Shop, Expense, Supply, WriteOff
+from app.models import Shop, Expense, DepositFund, CollectionFund, Supply, WriteOff
 from app.business_logic import is_report_send as is_send
 
 
@@ -35,5 +35,7 @@ def inject_models():
         supply=Supply,
         write_off=WriteOff,
         expense=Expense,
+        deposit_fund=DepositFund,
+        collection_fund=CollectionFund,
         is_report_send=is_send
     )

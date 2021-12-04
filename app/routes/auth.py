@@ -1,6 +1,6 @@
 from datetime import datetime
 from flask import render_template, redirect, url_for, flash
-from flask_security import login_required, login_user, logout_user
+from flask_security import login_required, roles_accepted, login_user, logout_user
 from flask_modals import render_template_modal
 from flask_babelex import _
 from app import app, db
@@ -31,6 +31,7 @@ def login():
 
 @app.route('/new_staff', methods=('GET', 'POST'))
 @login_required
+@roles_accepted('admin', 'moderator')
 def create_new_staff():
     form = RegistrationForm()
     if form.validate_on_submit():

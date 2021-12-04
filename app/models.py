@@ -419,6 +419,11 @@ class DepositFund(db.Model):
     type_cost = db.Column(db.String(64), index=True)
     money = db.Column(db.Integer)
 
+    @classmethod
+    def get_local_by_shop(cls, shop_id):
+        _query = cls.query.filter_by(shop_id=shop_id).filter(cls.timestamp >= date_today)
+        return _query
+
 
 class CollectionFund(db.Model):
     __tablename__ = 'collection_fund'
@@ -430,6 +435,11 @@ class CollectionFund(db.Model):
     last_edit = db.Column(db.DateTime(timezone=True), server_default=func.now())
     type_cost = db.Column(db.String(64), index=True)
     money = db.Column(db.Integer)
+
+    @classmethod
+    def get_local_by_shop(cls, shop_id):
+        _query = cls.query.filter_by(shop_id=shop_id).filter(cls.timestamp >= date_today)
+        return _query
 
 
 # Товар:
