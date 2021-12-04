@@ -6,7 +6,7 @@ from flask_security import current_user
 from flask_admin import AdminIndexView, expose
 from flask_admin.contrib import sqla
 from flask_admin.model import typefmt
-from app.models import Shop, Report, Expense, Supply, ByWeight, WriteOff, Barista
+from app.models import Shop, ShopEquipment, Storage, Barista, Report, Expense, Supply, ByWeight, WriteOff
 from wtforms import RadioField, SelectField, BooleanField
 from wtforms.validators import DataRequired, NumberRange, Required, InputRequired, Length
 import logging
@@ -1048,9 +1048,7 @@ class ReportAdmin(ModelView):
     def on_model_delete(self, model):
         if model.backdating:
             return
-        expanses = model.expenses
-        expanses = sum([e.money for e in expanses if e.type_cost == 'cash'])
-        model.shop.cash -= model.cash_balance + expanses
+        model.shop.cash -= model.cash_balance
         model.shop.cashless -= model.cashless
         model.shop.storage.coffee_arabika += model.consumption_coffee_arabika
         model.shop.storage.coffee_blend += model.consumption_coffee_blend

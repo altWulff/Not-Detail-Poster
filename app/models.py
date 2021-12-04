@@ -30,8 +30,20 @@ class Shop(db.Model):
     timestamp = db.Column(db.DateTime(timezone=True), server_default=func.now())
     cash = db.Column(db.Integer)
     cashless = db.Column(db.Integer)
-    storage = db.relationship("Storage", back_populates="shop", uselist=False)
-    shop_equipment = db.relationship("ShopEquipment", back_populates="shop", uselist=False)
+    storage = db.relationship(
+        "Storage",
+        back_populates="shop",
+        uselist=False,
+        cascade="all, delete-orphan",
+        single_parent=True
+    )
+    shop_equipment = db.relationship(
+        "ShopEquipment",
+        back_populates="shop",
+        uselist=False,
+        cascade="all, delete-orphan",
+        single_parent=True
+    )
     reports = db.relationship('Report', backref='shop', lazy=True)
     baristas = db.relationship(
         'Barista',
@@ -195,7 +207,9 @@ class Report(db.Model):
         'Expense',
         secondary=expenses,
         lazy='subquery',
-        backref=db.backref('reports', lazy=True)
+        backref=db.backref('reports', lazy=True),
+        cascade="all, delete-orphan",
+        single_parent=True
     )
     # О.Д. - сумма нала и безнала за день
     remainder_of_day = db.Column(db.Integer)
