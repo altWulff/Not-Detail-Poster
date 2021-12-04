@@ -127,8 +127,8 @@ class TransactionHandler:
         self.write_to_db(supply)
         
     def create_report(self, form):
-        expanses = Expense.get_local(self.shop.id, True)
-        expanses = sum([e.money for e in expanses if e.type_cost == 'cash'])
+        day_expanses = Expense.get_local(self.shop.id, True)
+        expanses = sum([e.money for e in day_expanses if e.type_cost == 'cash'])
         last_actual_balance = self.shop.cash + expanses
         cash_balance = form.actual_balance.data - last_actual_balance
         remainder_of_day = cash_balance + form.cashless.data
@@ -150,6 +150,7 @@ class TransactionHandler:
             sausages=form.sausages.data,
             buns=form.buns.data
         )
+        report.expenses = day_expanses.all()
         self.cash_flow(cash_balance + expanses, 'cash')
         self.cash_flow(form.cashless.data, 'cashless')
         report.consumption_coffee_arabika = self.storage.coffee_arabika - form.coffee_arabika.data
