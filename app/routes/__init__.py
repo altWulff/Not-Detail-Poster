@@ -3,7 +3,7 @@ from flask_babelex import lazy_gettext as _l
 from flask import g
 from app import app
 from app.forms import ExpanseForm, ByWeightForm, WriteOffForm, SupplyForm, TransferForm
-from app.models import Shop, Expense, DepositFund, CollectionFund, Supply, WriteOff
+from app.models import Shop, Expense, DepositFund, CollectionFund, Supply, WriteOff, TransferProduct
 from app.business_logic import is_report_send as is_send
 
 
@@ -53,5 +53,6 @@ def inject_models():
         expense=Expense,
         deposit_fund=DepositFund,
         collection_fund=CollectionFund,
+        transfer=TransferProduct,
         is_report_send=is_send
     )

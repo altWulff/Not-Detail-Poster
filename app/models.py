@@ -454,3 +454,8 @@ class TransferProduct(db.Model):
     last_edit = db.Column(db.DateTime(timezone=True), server_default=func.now())
     product_name = db.Column(db.String(80))
     amount = db.Column(db.Float(50))
+
+    @classmethod
+    def get_shop(cls, shop_id):
+        _query = Shop.query.filter_by(id=shop_id).filter(cls.timestamp >= date_today)
+        return _query

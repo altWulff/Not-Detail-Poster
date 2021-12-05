@@ -1,50 +1,59 @@
-<ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+<ul class="nav nav-pills mb-3" id="pills-tab-{{coffee_shop.id}}" role="tablist">
     <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="pills-expansion-tab" data-bs-toggle="pill" data-bs-target="#pills-expansion" type="button" role="tab" aria-controls="pills-expansion" aria-selected="true">{{ _('Расходы') }}</button>
+        <button class="nav-link active" id="pills-expansion-tab-{{coffee_shop.id}}" data-bs-toggle="pill" data-bs-target="#pills-expansion-{{coffee_shop.id}}" type="button" role="tab" aria-controls="pills-expansion-{{coffee_shop.id}}" aria-selected="true">
+            {{ _('Расходы') }}</button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="pills-g-expansion-tab" data-bs-toggle="pill" data-bs-target="#pills-g-expansion" type="button" role="tab" aria-controls="pills-g-expansion" aria-selected="false">
+        <button class="nav-link" id="pills-g-expansion-tab-{{coffee_shop.id}}" data-bs-toggle="pill" data-bs-target="#pills-g-expansion-{{coffee_shop.id}}" type="button" role="tab" aria-controls="pills-g-expansion-{{coffee_shop.id}}" aria-selected="false">
             {{ _('Глобальные расходы') }}
         </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="pills-supply-tab" data-bs-toggle="pill" data-bs-target="#pills-supply" type="button" role="tab" aria-controls="pills-supply" aria-selected="false">
+        <button class="nav-link" id="pills-supply-tab-{{coffee_shop.id}}" data-bs-toggle="pill" data-bs-target="#pills-supply-{{coffee_shop.id}}" type="button" role="tab" aria-controls="pills-supply-{{coffee_shop.id}}" aria-selected="false">
             {{ _('Поступления') }}
         </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="pills-deposit-fund-tab" data-bs-toggle="pill" data-bs-target="#pills-deposit-fund" type="button" role="tab" aria-controls="pills-deposit-fund" aria-selected="false">
+        <button class="nav-link" id="pills-deposit-fund-tab-{{coffee_shop.id}}" data-bs-toggle="pill" data-bs-target="#pills-deposit-fund-{{coffee_shop.id}}" type="button" role="tab" aria-controls="pills-deposit-fund-{{coffee_shop.id}}" aria-selected="false">
             {{ _('Внесение средств') }}
         </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="pills-collection-fund-tab" data-bs-toggle="pill" data-bs-target="#pills-collection-fund" type="button" role="tab" aria-controls="pills-collection-fund" aria-selected="false">
+        <button class="nav-link" id="pills-collection-fund-tab-{{coffee_shop.id}}" data-bs-toggle="pill" data-bs-target="#pills-collection-fund-{{coffee_shop.id}}" type="button" role="tab" aria-controls="pills-collection-fund-{{coffee_shop.id}}" aria-selected="false">
             {{ _('Инкасация') }}
         </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="pills-write_off-tab" data-bs-toggle="pill" data-bs-target="#pills-write_off" type="button" role="tab" aria-controls="pills-write_off" aria-selected="false">
+        <button class="nav-link" id="pills-write_off-tab-{{coffee_shop.id}}" data-bs-toggle="pill" data-bs-target="#pills-write_off-{{coffee_shop.id}}" type="button" role="tab" aria-controls="pills-write_off-{{coffee_shop.id}}" aria-selected="false">
             {{ _('Списания') }}
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-transfer-tab-{{coffee_shop.id}}" data-bs-toggle="pill" data-bs-target="#pills-transfer-{{coffee_shop.id}}" type="button" role="tab" aria-controls="pills-transfer-{{coffee_shop.id}}" aria-selected="false">
+            {{ _('Перемещения') }}
         </button>
     </li>
 </ul>
 <div class="tab-content" id="pills-tabContent">
-    <div class="tab-pane fade show active" id="pills-expansion" role="tabpanel" aria-labelledby="pills-expansion-tab">
+    <div class="tab-pane fade show active" id="pills-expansion-{{coffee_shop.id}}" role="tabpanel" aria-labelledby="pills-expansion-tab-{{coffee_shop.id}}">
         {{ render_expansion_by_day(expense.get_local(coffee_shop.id, True)) }}
     </div>
-    <div class="tab-pane fade" id="pills-g-expansion" role="tabpanel" aria-labelledby="pills-g-expansion-tab">
+    <div class="tab-pane fade" id="pills-g-expansion-{{coffee_shop.id}}" role="tabpanel" aria-labelledby="pills-g-expansion-tab-{{coffee_shop.id}}">
         {{ render_expansion_by_day(expense.get_global(coffee_shop.id, True)) }}
     </div>
-    <div class="tab-pane fade" id="pills-supply" role="tabpanel" aria-labelledby="pills-supply-tab">
+    <div class="tab-pane fade" id="pills-supply-{{coffee_shop.id}}" role="tabpanel" aria-labelledby="pills-supply-tab-{{coffee_shop.id}}">
         {{ render_supply_by_day(supply.get_local_by_shop(coffee_shop.id)) }}
     </div>
-    <div class="tab-pane fade" id="pills-deposit-fund" role="tabpanel" aria-labelledby="pills-deposit-fund-tab">
+    <div class="tab-pane fade" id="pills-deposit-fund-{{coffee_shop.id}}" role="tabpanel" aria-labelledby="pills-deposit-fund-tab-{{coffee_shop.id}}">
         {{ render_deposit_fund_by_day(deposit_fund.get_local_by_shop(coffee_shop.id)) }}
     </div>
-    <div class="tab-pane fade" id="pills-collection-fund" role="tabpanel" aria-labelledby="pills-collection-fund-tab">
+    <div class="tab-pane fade" id="pills-collection-fund-{{coffee_shop.id}}" role="tabpanel" aria-labelledby="pills-collection-fund-tab-{{coffee_shop.id}}">
         {{ render_collection_fund_by_day(collection_fund.get_local_by_shop(coffee_shop.id)) }}
     </div>
-    <div class="tab-pane fade" id="pills-write_off" role="tabpanel" aria-labelledby="pills-write_off-tab">
+    <div class="tab-pane fade" id="pills-write_off-{{coffee_shop.id}}" role="tabpanel" aria-labelledby="pills-write_off-tab-{{coffee_shop.id}}">
         {{ render_write_off_on_day(write_off.get_local_by_shop(coffee_shop.id)) }}
+    </div>
+    <div class="tab-pane fade" id="pills-transfer-{{coffee_shop.id}}" role="tabpanel" aria-labelledby="pills-transfer-{{coffee_shop.id}}">
+        {{ render_transfer_on_day(transfer, coffee_shop.id) }}
     </div>
 </div>
