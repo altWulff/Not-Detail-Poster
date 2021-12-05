@@ -136,6 +136,28 @@
     </ul>
 {% endmacro %}
 
+{% macro render_transfer(transfer, shop_id, report) %}
+    <ul class="list-group">
+        {% for t in transfer.query.all() %}
+        {% if t.timestamp.date() == report.timestamp.date() %}
+        <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div class="ms-2 me-auto">
+                <div class="fw-bold">
+                    {% if t.where_shop|int == shop_id %}
+                    {{ _('Перемещено на')}} {{ t.get_shop(t.to_shop).first_or_404() }}
+                    {% else %}
+                    {{ _('Получено с')}} {{ t.get_shop(t.where_shop).first_or_404() }}
+                    {% endif %}
+                </div>
+                <span class="badge bg-secondary">{{ t.product_name|translate }}</span>
+                <span class="badge bg-secondary">{{ t.amount }}</span>
+            </div>
+        </li>
+        {% endif %}
+        {% endfor %}
+    </ul>
+{% endmacro %}
+
 {% macro render_expansion_by_day(expansion) %}
     <ul class="list-group">
         {% for expanse in expansion %}
