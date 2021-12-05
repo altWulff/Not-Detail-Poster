@@ -138,6 +138,7 @@ class Barista(db.Model, UserMixin):
     expenses = db.relationship('Expense', backref='barista', lazy=True)
     collection_funds = db.relationship('CollectionFund', backref='barista', lazy=True)
     deposit_funds = db.relationship('DepositFund', backref='barista', lazy=True)
+    transfer_products = db.relationship('TransferProduct', backref='barista', lazy=True)
     supplies = db.relationship('Supply', backref='barista', lazy=True)
     by_weights = db.relationship('ByWeight', backref='barista', lazy=True)
     write_offs = db.relationship('WriteOff', backref='barista', lazy=True)
@@ -205,7 +206,7 @@ collection_funds = db.Table(
 deposit_funds = db.Table(
     'deposit_funds',
     db.Column('deposit_fund_id', db.Integer, db.ForeignKey('deposit_fund.id'), primary_key=True),
-    db.Column('report_id', db.Integer, db.ForeignKey('report.id'), primary_key=True)
+    db.Column('shop_id', db.Integer, db.ForeignKey('shop.id'), primary_key=True)
 )
 
 
@@ -442,11 +443,14 @@ class CollectionFund(db.Model):
         return _query
 
 
-# Товар:
-    # ид
-    # наименование
-    # количество
-    # единица измерения (кг, л, шт в форме)
-    # описание (необязательно)
-    # в продаже(дефолт=Нет)
-    # отношение к складу
+class TransferProduct(db.Model):
+    __tablename__ = 'transfer_product'
+    id = db.Column(db.Integer, primary_key=True)
+    barista_id = db.Column(db.Integer, db.ForeignKey('barista.id'))
+    where_shop = db.Column(db.String(64), index=True)
+    to_shop = db.Column(db.String(64), index=True)
+    backdating = db.Column(db.Boolean, default=False)
+    timestamp = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    last_edit = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    product_name = db.Column(db.String(80))
+    amount = db.Column(db.Float(50))

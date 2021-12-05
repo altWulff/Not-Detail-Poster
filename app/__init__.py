@@ -49,6 +49,7 @@ from app.admin_view import (
     ByWeightAdmin,
     SupplyAdmin,
     WriteOffAdmin,
+    TransferProductAdmin,
     CategoryAdmin
 )
 user_datastore = SQLAlchemyUserDatastore(db, models.Barista, models.Role)
@@ -67,6 +68,7 @@ admin.add_view(ReportAdmin(models.Report, db.session, name=_l('Отчеты'), c
 admin.add_view(SupplyAdmin(models.Supply, db.session,  name=_l('Поступления'), category=_l("Движения товаров")))
 admin.add_view(ByWeightAdmin(models.ByWeight, db.session,  name=_l('Развес'), category=_l("Движения товаров")))
 admin.add_view(WriteOffAdmin(models.WriteOff, db.session,  name=_l('Списания'), category=_l("Движения товаров")))
+admin.add_view(TransferProductAdmin(models.TransferProduct, db.session, name=_l('Перемещение'), category=_l('Движения товаров')))
 admin.add_view(ExpenseAdmin(models.Expense, db.session, name=_l('Расходы'), category=_l('Кассовые средства')))
 admin.add_view(DepositFundsAdmin(models.DepositFund, db.session, name=_l('Внесение'), category=_l('Кассовые средства')))
 admin.add_view(CollectionFundsAdmin(models.CollectionFund, db.session, name=_l('Инкасация'), category=_l('Кассовые средства')))

@@ -68,6 +68,7 @@ class RegistrationForm(FlaskForm):
         if user is not None:
             raise ValidationError(_('Пожалуйста ипользуйте другой емейл адрес.'))
 
+
 class NewPassword(FlaskForm):
     password = PasswordField(_l('Новый Пароль'), validators=[DataRequired(), Length(min=8)])
     password2 = PasswordField(
@@ -78,6 +79,7 @@ class NewPassword(FlaskForm):
         ]
     )
     submit = SubmitField(_l('Подтвердить'))
+
 
 class EditProfileForm(FlaskForm):
     name = StringField(_l('Имя'), validators=[DataRequired()])
