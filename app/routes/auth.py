@@ -5,7 +5,7 @@ from flask_modals import render_template_modal
 from flask_babelex import _
 from app import app, db
 from app.forms import LoginForm, RegistrationForm
-from app.models import Barista
+from app.models import Barista, Role, Shop
 
 
 @app.route('/')
@@ -35,14 +35,20 @@ def login():
 def create_new_staff():
     form = RegistrationForm()
     if form.validate_on_submit():
+        role = Role.query.filter_by(name='user').first()
+        work_place_id = form.work_place.data
+        work_place = Shop.query.filter_by(id=work_place_id).first()
         user = Barista(
             name=form.name.data,
             phone_number=form.phone_number.data,
             email=form.email.data,
             password=form.password.data,
             confirmed_at=datetime.now(),
-            active=True
+            active=True,
+            roles=[role],
+            shop=[work_place]
         )
+        
         db.session.add(user)
         db.session.commit()
         flash(_('Вы добавили нового ссотрудника!'))
