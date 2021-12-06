@@ -1,7 +1,7 @@
 from datetime import datetime, date
 from sqlalchemy import func
 from flask_security import current_user
-from app.models import Shop, Report, Expense, Storage, Category, WriteOff, Supply, ByWeight
+from app.models import Shop, ShopEquipment, Report, Expense, Storage, Category, WriteOff, Supply, ByWeight
 from app import app, db
 
 date_today = datetime(datetime.today().year, datetime.today().month, datetime.today().day)
@@ -21,6 +21,7 @@ class TransactionHandler:
     def __init__(self, shop_id=None):
         self.shop = self.get_shop_from_id(shop_id)
         self.storage = self.get_storage_from_id(shop_id)
+        self.equipment = self.get_equipment_from_id(shop_id)
 
     def get_shop_from_id(self, shop_id):
         query = Shop.query.filter_by(id=shop_id).first_or_404()
@@ -28,6 +29,10 @@ class TransactionHandler:
     
     def get_storage_from_id(self, shop_id):
         query = Storage.query.filter_by(shop_id=shop_id).first_or_404()
+        return query
+
+    def get_equipment_from_id(self, shop_id):
+        query = ShopEquipment.query.filter_by(shop_id=shop_id).first_or_404()
         return query
 
     def is_report_send(self, shop_id: int) -> bool:
@@ -133,7 +138,10 @@ class TransactionHandler:
         cash_balance = form.actual_balance.data - last_actual_balance
         remainder_of_day = cash_balance + form.cashless.data
         cashbox = remainder_of_day + expanses
-        
+        if form.cleaning_coffee_machine.data:
+            self.equipment.last_cleaning_coffee_machine = datetime.utcnow()
+        if form.cleaning_grinder.data:
+           self.equipment.last_cleaning_grinder = datetime.utcnow()
         report = Report(
             cashbox=cashbox,
             cash_balance=cash_balance,

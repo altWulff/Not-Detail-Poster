@@ -369,6 +369,8 @@ class ReportForm(FlaskForm):
             )
         ]
     )
+    cleaning_coffee_machine = BooleanField(_('Проведена чистка кофе машины '), default=False)
+    cleaning_grinder = BooleanField(_('Проведена чистка кофемолок'), default=False)
     submit = SubmitField(_l('Подтвердить'))
     
     def __init__(self, *args, **kwargs):

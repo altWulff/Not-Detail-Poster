@@ -15,6 +15,10 @@
     {{ render_field(form.panini) }}
     {{ render_field(form.sausages) }}
     {{ render_field(form.buns) }}
+    {{ render_check_field(form.cleaning_coffee_machine) }}
+    {{ render_check_field(form.cleaning_grinder) }}
+    <br />
+    <br />
     <p>{{ form.submit(class="w-100 btn btn-lg btn-primary") }}</p>
     </form>
 {% endblock %}

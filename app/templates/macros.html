@@ -42,6 +42,14 @@
 </div>
 {% endmacro %}
 
+{% macro render_check_field(field) %}
+<div class="form-check">
+    {{ field(class="form-check-input", placeholder=' ', type="checkbox", id="flexCheckDefault") }}
+    {{ field.label(class="form-check-label", for="flexCheckDefault") }}
+    {{ with_errors(field) }}
+</div>
+{% endmacro %}
+
 {% macro pagination(prev_url, next_url) %}
 <ul class="pagination">
     {% if prev_url %}
