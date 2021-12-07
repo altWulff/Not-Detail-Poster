@@ -59,7 +59,8 @@ class TransactionHandler:
             type_cost=form.type_cost.data,
             money=form.money.data,
             is_global=form.is_global.data,
-            timestamp=datetime.now()
+            timestamp=datetime.now(),
+            barista=current_user
         )
         self.funds_expenditure(form.money.data, form.type_cost.data)
         for c_id in form.categories.data:
@@ -81,7 +82,8 @@ class TransactionHandler:
             product_name=form.by_weight_choice.data,
             type_cost=form.type_cost.data, 
             money=form.money.data,
-            timestamp=datetime.now()
+            timestamp=datetime.now(),
+            barista=current_user
         )
         self.write_to_db(by_weight)
         
@@ -102,7 +104,8 @@ class TransactionHandler:
             storage=self.storage, 
             amount=form.amount.data, 
             product_name=form.write_off_choice.data,
-            timestamp=datetime.now()
+            timestamp=datetime.now(),
+            barista=current_user
         )
         self.write_to_db(write_off)
     
@@ -127,7 +130,8 @@ class TransactionHandler:
             amount=form.amount.data,
             type_cost=form.type_cost.data,
             money=form.money.data,
-            timestamp=datetime.now()
+            timestamp=datetime.now(),
+            barista=current_user
         )
         self.write_to_db(supply)
         
@@ -156,7 +160,8 @@ class TransactionHandler:
             milk=form.milk.data,
             panini=form.panini.data,
             sausages=form.sausages.data,
-            buns=form.buns.data
+            buns=form.buns.data,
+            barista=current_user
         )
         report.expenses = day_expanses.all()
         self.cash_flow(cash_balance + expanses, 'cash')
