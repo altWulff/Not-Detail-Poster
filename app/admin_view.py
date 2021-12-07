@@ -452,6 +452,14 @@ class ReportAdmin(ModelView):
     list_template = 'admin/model/report_list.html'
     can_view_details = True
     column_default_sort = ('timestamp', True)
+    column_formatters = dict(
+        expenses = lambda v, c, m, p: sum(
+            [
+                e.money 
+                for e in m.expenses 
+                if e.type_cost == 'cash']
+        )
+    )
     column_searchable_list = (Report.timestamp, )
     column_exclude_list = (
         'backdating',
@@ -469,6 +477,7 @@ class ReportAdmin(ModelView):
         'sausages',
         'buns',
     )
+    column_list = ('timestamp', 'cashbox', 'expenses', 'remainder_of_day', 'cashless',  'cash_balance', 'actual_balance', 'shop', 'barista')
     column_filters = (Report.timestamp, Barista.name, Shop.place_name, Shop.address)
     column_labels = dict(
         place_name=gettext('Название'),
