@@ -29,6 +29,8 @@
           <li class="nav-item">
               <a class="nav-link" href="{{ url_for('admin.index') }}">{{ _('Администрирование') }}</a>
           </li>
+          {% endif %}
+          {% if current_user.has_role('admin') %}
           <li class="nav-item">
               <a class="nav-link" href="{{ url_for('menu.create_coffee_shop') }}">{{ _('Создать Кофейню') }}</a>
               <a class="nav-link" href="{{ url_for('create_new_staff') }}">{{ _('Добавить сотрудника') }}</a>
