@@ -3,8 +3,8 @@ from flask_security import login_required, current_user
 from flask_babelex import _
 from app import db, app
 from app.forms import ReportForm
-from app.models import Shop, Report, Storage, Expense, Supply, DepositFund, CollectionFund, TransferProduct
-from app.business_logic import TransactionHandler
+from app.models import Shop, Report, Storage, Expense, Supply, DepositFund, CollectionFund, TransferProduct, Category
+from app.business_logic import TransactionHandler, date_today
 
 
 report = Blueprint('reports', __name__, url_prefix='/report')
@@ -14,8 +14,14 @@ report = Blueprint('reports', __name__, url_prefix='/report')
 @login_required
 def create():
     form = ReportForm(request.form)
+    find_salary_exp = Expense.query.select_from(Category)
+    find_salary_exp = find_salary_exp.filter(Category.name=='Зарплата')
+    find_salary_exp = find_salary_exp.filter(Expense.timestamp >= date_today).first()
+    if not find_salary_exp:
+        flash(_('Возьмите зарплату за сегодняшний день!'))
     if form.validate_on_submit():
         transaction = TransactionHandler(form.shop.data)
+        
         if transaction.is_report_send(form.shop.data):
             flash(_('Сегодняшний отчет уже был отправлен!'))
         else:
