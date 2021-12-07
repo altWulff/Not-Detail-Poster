@@ -160,8 +160,7 @@ class TransactionHandler:
             milk=form.milk.data,
             panini=form.panini.data,
             sausages=form.sausages.data,
-            buns=form.buns.data,
-            barista=current_user
+            buns=form.buns.data
         )
         report.expenses = day_expanses.all()
         self.cash_flow(cash_balance + expanses, 'cash')
