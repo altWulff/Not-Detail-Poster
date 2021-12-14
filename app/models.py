@@ -342,8 +342,10 @@ class Supply(db.Model):
     money = db.Column(db.Integer)
     
     @classmethod
-    def get_local(cls, storage_id):
-        _query = cls.query.filter_by(storage_id=storage_id).filter(cls.timestamp >= date_today)
+    def get_local(cls, storage_id, today=True):
+        _query = cls.query.filter_by(storage_id=storage_id)
+        if today:
+            _query = _query.filter(cls.timestamp >= date_today)
         return _query
         
     @classmethod
@@ -421,8 +423,10 @@ class DepositFund(db.Model):
     money = db.Column(db.Integer)
 
     @classmethod
-    def get_local_by_shop(cls, shop_id):
-        _query = cls.query.filter_by(shop_id=shop_id).filter(cls.timestamp >= date_today)
+    def get_local_by_shop(cls, shop_id, today=True):
+        _query = cls.query.filter_by(shop_id=shop_id)
+        if today:
+            _query = _query.filter(cls.timestamp >= date_today)
         return _query
 
 
@@ -438,8 +442,10 @@ class CollectionFund(db.Model):
     money = db.Column(db.Integer)
 
     @classmethod
-    def get_local_by_shop(cls, shop_id):
-        _query = cls.query.filter_by(shop_id=shop_id).filter(cls.timestamp >= date_today)
+    def get_local_by_shop(cls, shop_id, today=True):
+        _query = cls.query.filter_by(shop_id=shop_id)
+        if today:
+            _query = _query.filter(cls.timestamp >= date_today)
         return _query
 
 
@@ -456,6 +462,8 @@ class TransferProduct(db.Model):
     amount = db.Column(db.Float(50))
 
     @classmethod
-    def get_shop(cls, shop_id):
-        _query = Shop.query.filter_by(id=shop_id).filter(cls.timestamp >= date_today)
+    def get_shop(cls, shop_id, today=True):
+        _query = Shop.query.filter_by(id=shop_id)
+        if today:
+            _query = _query.filter(cls.timestamp >= date_today)
         return _query

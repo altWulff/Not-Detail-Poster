@@ -42,9 +42,9 @@ def on_address(shop_address):
         
     global_expense = Expense.get_global(shop.id)
     local_expense = Expense.get_local(shop.id)
-    supply = Supply.get_local(storage.id)
-    deposit_fund = DepositFund.get_local_by_shop(shop.id)
-    collection_fund = CollectionFund.get_local_by_shop(shop.id)
+    supply = Supply.get_local(storage.id, False)
+    deposit_fund = DepositFund.get_local_by_shop(shop.id, False)
+    collection_fund = CollectionFund.get_local_by_shop(shop.id, False)
     transfer = TransferProduct
     page = request.args.get('page', 1, type=int)
     reports = reports.paginate(
