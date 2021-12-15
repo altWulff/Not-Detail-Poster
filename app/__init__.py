@@ -34,7 +34,7 @@ from app.routes.user import user
 from app.routes.menu import menu
 from app.routes.report import report
 from app.routes.errors import errors
-from app.admin_view import (
+from app.admin_panel import (
     IndexAdmin,
     ModelView,
     ShopAdmin,
