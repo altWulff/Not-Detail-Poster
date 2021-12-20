@@ -1,10 +1,10 @@
 from datetime import datetime
 from flask_admin.babel import gettext
 from wtforms.validators import DataRequired, NumberRange, InputRequired, Length
-from . import ModelView
+from . import ModeratorView
 
 
-class ShopAdmin(ModelView):
+class ShopAdmin(ModeratorView):
     can_view_details = True
     column_searchable_list = ('place_name', 'address')
     column_labels = dict(

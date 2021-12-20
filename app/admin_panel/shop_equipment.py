@@ -1,9 +1,10 @@
+from datetime import datetime
 from flask_admin.babel import gettext
 from wtforms.validators import DataRequired, Length
-from . import ModelView
+from . import ModeratorView
 
 
-class ShopEquipmentAdmin(ModelView):
+class ShopEquipmentAdmin(ModeratorView):
     can_view_details = True
     column_searchable_list = ('coffee_machine',)
     column_labels = dict(
@@ -26,3 +27,13 @@ class ShopEquipmentAdmin(ModelView):
             ]
         )
     )
+    
+    @property 
+    def shop_id(self):
+        return self.model.shop_id
+    
+    def create_form(self, obj=None):
+        form = super(ShopEquipmentAdmin, self).create_form(obj)
+        form.last_cleaning_coffee_machine.data = datetime.utcnow()
+        form.last_cleaning_grinder.data = datetime.utcnow()
+        return form

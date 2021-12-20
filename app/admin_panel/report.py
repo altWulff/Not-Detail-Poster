@@ -7,10 +7,10 @@ from flask_security import current_user
 from wtforms import BooleanField
 from wtforms.validators import DataRequired, NumberRange, InputRequired
 from app.models import Shop, Barista, Report
-from . import ModelView, log
+from . import ModeratorView, log
 
 
-class ReportAdmin(ModelView):
+class ReportAdmin(ModeratorView):
     list_template = 'admin/model/report_list.html'
     can_view_details = True
     column_default_sort = ('timestamp', True)
@@ -374,6 +374,10 @@ class ReportAdmin(ModelView):
             'placeholder': gettext('Количество булок, остаток на следующий день')
         }
     }
+    
+    @property 
+    def shop_id(self):
+        return self.model.shop_id
 
     def sum_page(self, attr: str) -> int:
         _query = self.get_model_data()

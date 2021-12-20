@@ -7,10 +7,10 @@ from flask_security import current_user
 from wtforms import BooleanField, RadioField
 from wtforms.validators import DataRequired, Required, NumberRange, InputRequired
 from app.models import Shop, Barista, Expense
-from . import ModelView, log
+from . import ModeratorView, log
 
 
-class ExpenseAdmin(ModelView):
+class ExpenseAdmin(ModeratorView):
     def _list_money(view, context, model, name):
         if not model.money:
             return ''
@@ -128,6 +128,10 @@ class ExpenseAdmin(ModelView):
             ]
         )
     )
+    
+    @property 
+    def shop_id(self):
+        return self.model.shop_id
 
     def sum_page(self, attr: str) -> int:
         _query = self.get_model_data()

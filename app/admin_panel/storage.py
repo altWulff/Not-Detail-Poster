@@ -1,10 +1,10 @@
 from flask_admin.babel import gettext
 from wtforms.validators import DataRequired, NumberRange, InputRequired
 from app.models import Shop
-from . import ModelView
+from . import ModeratorView
 
 
-class StorageAdmin(ModelView):
+class StorageAdmin(ModeratorView):
     column_labels = dict(
         place_name=gettext('Название'),
         address=gettext('Адрес'),
@@ -127,3 +127,9 @@ class StorageAdmin(ModelView):
         }
 
     }
+    
+    @property 
+    def shop_id(self):
+        return self.model.shop_id
+    
+    

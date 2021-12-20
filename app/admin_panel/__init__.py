@@ -69,6 +69,33 @@ class ModelView(sqla.ModelView):
         return data
 
 
+class ModeratorView(ModelView):
+    @property 
+    def shop_id(self):
+        """
+        Необходимо переопределить в дочернем классе, от shop_id зависит корректное выполнение get_query и get_count_query.
+        """
+        return self.model.id
+
+    def staff_shops_id(self):
+        shop_ids = (shop.id for shop in current_user.shop)
+        return shop_ids
+        
+    def get_query(self):
+        shop_id=self.shop_id
+        _query = super(ModeratorView, self).get_query()
+        if not current_user.has_role('admin'):
+            _query = _query.filter(shop_id.in_(self.staff_shops_id()))
+        return _query
+       
+    def get_count_query(self):
+        shop_id=self.shop_id
+        _query = super(ModeratorView, self).get_count_query()
+        if not current_user.has_role('admin'):
+            _query = _query.filter(shop_id.in_(self.staff_shops_id()))
+        return _query
+
+
 from .barista import BaristaAdmin
 from .by_weight import ByWeightAdmin
 from .category import CategoryAdmin

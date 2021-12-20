@@ -6,7 +6,7 @@ from flask_admin.babel import gettext
 from flask_security import current_user
 from wtforms import SelectField, BooleanField, RadioField
 from wtforms.validators import DataRequired, Required, NumberRange, InputRequired
-from app.models import Barista, Supply
+from app.models import Barista, Supply, Storage
 from . import ModelView, log
 
 
@@ -152,7 +152,6 @@ class SupplyAdmin(ModelView):
             'placeholder': gettext('Количество в кг, л, и поштучно')
         }
     }
-
     def sum_page(self, attr: str) -> int:
         _query = self.get_model_data()
         try:
