@@ -1,4 +1,5 @@
 from datetime import datetime
+from sqlalchemy import or_
 from flask import Markup, flash
 from flask_admin.babel import gettext
 from flask_security import current_user
@@ -112,6 +113,26 @@ class TransferProductAdmin(ModelView):
             validators=[Required()]
         )
     }
+
+    def staff_shops_id(self):
+        shop_ids = (str(shop.id) for shop in current_user.shop)
+        return shop_ids
+
+    def get_query(self):
+        where_shop_id = self.model.where_shop
+        to_shop_id = self.model.to_shop
+        _query = super(TransferProductAdmin, self).get_query()
+        if not current_user.has_role('admin'):
+            _query = _query.filter(or_(where_shop_id.in_(self.staff_shops_id()), to_shop_id.in_(self.staff_shops_id())))
+        return _query
+
+    def get_count_query(self):
+        where_shop_id = self.model.where_shop
+        to_shop_id = self.model.to_shop
+        _query = super(TransferProductAdmin, self).get_count_query()
+        if not current_user.has_role('admin'):
+            _query = _query.filter(or_(where_shop_id.in_(self.staff_shops_id()), to_shop_id.in_(self.staff_shops_id())))
+        return _query
 
     def create_form(self, obj=None):
         form = super(TransferProductAdmin, self).create_form(obj)

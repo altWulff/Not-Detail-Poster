@@ -82,14 +82,14 @@ class ModeratorView(ModelView):
         return shop_ids
         
     def get_query(self):
-        shop_id=self.shop_id
+        shop_id = self.shop_id
         _query = super(ModeratorView, self).get_query()
         if not current_user.has_role('admin'):
             _query = _query.filter(shop_id.in_(self.staff_shops_id()))
         return _query
        
     def get_count_query(self):
-        shop_id=self.shop_id
+        shop_id = self.shop_id
         _query = super(ModeratorView, self).get_count_query()
         if not current_user.has_role('admin'):
             _query = _query.filter(shop_id.in_(self.staff_shops_id()))
