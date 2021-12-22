@@ -187,7 +187,7 @@ class ExpenseAdmin(ModeratorView):
 
     def create_form(self, obj=None):
         form = super(ExpenseAdmin, self).create_form(obj)
-        form.timestamp.data = datetime.now()
+        form.timestamp.data = datetime.utcnow()
         form.barista.data = current_user
         return form
 

@@ -7,6 +7,7 @@ from . import ModelView
 
 
 class BaristaAdmin(ModelView):
+    can_set_page_size = True
     column_filters = ('name', 'phone_number', 'email', Shop.place_name, Shop.address)
     column_searchable_list = ('name', 'phone_number', 'email')
     column_exclude_list = ('password_hash', 'reports', )

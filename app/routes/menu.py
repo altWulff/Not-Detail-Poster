@@ -114,7 +114,7 @@ def create_coffee_shop():
         shop = Shop(
             place_name=form.place_name.data,
             address=form.address.data,
-            timestamp=datetime.now(),
+            timestamp=datetime.utcnow(),
             cash=form.cash.data,
             cashless=form.cashless.data
         )

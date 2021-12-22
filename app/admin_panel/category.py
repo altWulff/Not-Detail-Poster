@@ -5,6 +5,7 @@ from . import ModelView
 
 class CategoryAdmin(ModelView):
     can_view_details = True
+    can_set_page_size = True
     column_labels = dict(
         name=gettext('Название категории'),
         expense=gettext('Расходы')

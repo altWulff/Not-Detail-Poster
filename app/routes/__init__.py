@@ -14,6 +14,7 @@ def before_request():
 
 @app.template_filter('translate')
 def translate_filter(s):
+    default = s
     dict_translate = dict(
         cash=_l('наличка'),
         cashless=_l('безнал'),
@@ -24,7 +25,7 @@ def translate_filter(s):
         sausages=_l('колбаски'),
         buns=_l('булочки'),
     )
-    return dict_translate.get(s, s).title()
+    return dict_translate.get(s, default).title()
 
 
 @app.context_processor

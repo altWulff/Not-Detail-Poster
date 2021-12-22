@@ -13,6 +13,8 @@ class ModelView(sqla.ModelView):
     column_type_formatters.update({
         date: lambda view, value: value.strftime('%d.%m.%Y')
     })
+    
+    details_template = "admin/model/details.html"
 
     @property
     def can_delete(self):

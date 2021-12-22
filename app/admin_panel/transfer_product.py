@@ -33,6 +33,7 @@ class TransferProductAdmin(ModelView):
         return Markup(f'{formatter}')
 
     can_edit = False
+    can_set_page_size = True
     column_list = ('timestamp', 'where_shop', 'to_shop', 'product_name', 'amount', 'barista')
     column_filters = (
         'timestamp',
@@ -220,29 +221,29 @@ class TransferProductAdmin(ModelView):
             return
         where_shop = Shop.query.filter_by(id=model.where_shop).first()
         to_shop = Shop.query.filter_by(id=model.to_shop).first()
-
-        if model.product_name == 'coffee_blend':
-            where_shop.storage.coffee_blend += float(model.amount)
-        elif model.product_name == 'coffee_arabika':
-            where_shop.storage.coffee_arabika += float(model.amount)
-        elif model.product_name == 'milk':
-            where_shop.storage.milk += float(model.amount)
-        elif model.product_name == 'panini':
-            where_shop.storage.panini += int(model.amount)
-        elif model.product_name == 'sausages':
-            where_shop.storage.sausages += int(model.amount)
-        else:
-            where_shop.storage.buns += int(model.amount)
-
-        if model.product_name == 'coffee_blend':
-            to_shop.storage.coffee_blend -= float(model.amount)
-        elif model.product_name == 'coffee_arabika':
-            to_shop.storage.coffee_arabika -= float(model.amount)
-        elif model.product_name == 'milk':
-            to_shop.storage.milk -= float(model.amount)
-        elif model.product_name == 'panini':
-            to_shop.storage.panini -= int(model.amount)
-        elif model.product_name == 'sausages':
-            to_shop.storage.sausages -= int(model.amount)
-        else:
-            to_shop.storage.buns -= int(model.amount)
+        if where_shop:
+            if model.product_name == 'coffee_blend':
+                where_shop.storage.coffee_blend += float(model.amount)
+            elif model.product_name == 'coffee_arabika':
+                where_shop.storage.coffee_arabika += float(model.amount)
+            elif model.product_name == 'milk':
+                where_shop.storage.milk += float(model.amount)
+            elif model.product_name == 'panini':
+                where_shop.storage.panini += int(model.amount)
+            elif model.product_name == 'sausages':
+                where_shop.storage.sausages += int(model.amount)
+            else:
+                where_shop.storage.buns += int(model.amount)
+        if to_shop:
+            if model.product_name == 'coffee_blend':
+                to_shop.storage.coffee_blend -= float(model.amount)
+            elif model.product_name == 'coffee_arabika':
+                to_shop.storage.coffee_arabika -= float(model.amount)
+            elif model.product_name == 'milk':
+                to_shop.storage.milk -= float(model.amount)
+            elif model.product_name == 'panini':
+                to_shop.storage.panini -= int(model.amount)
+            elif model.product_name == 'sausages':
+                to_shop.storage.sausages -= int(model.amount)
+            else:
+                to_shop.storage.buns -= int(model.amount)

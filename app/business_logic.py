@@ -59,7 +59,6 @@ class TransactionHandler:
             type_cost=form.type_cost.data,
             money=form.money.data,
             is_global=form.is_global.data,
-            timestamp=datetime.now(),
             barista=current_user
         )
         self.funds_expenditure(form.money.data, form.type_cost.data)
@@ -82,7 +81,6 @@ class TransactionHandler:
             product_name=form.by_weight_choice.data,
             type_cost=form.type_cost.data, 
             money=form.money.data,
-            timestamp=datetime.now(),
             barista=current_user
         )
         self.write_to_db(by_weight)
@@ -104,7 +102,6 @@ class TransactionHandler:
             storage=self.storage, 
             amount=form.amount.data, 
             product_name=form.write_off_choice.data,
-            timestamp=datetime.now(),
             barista=current_user
         )
         self.write_to_db(write_off)
@@ -130,7 +127,6 @@ class TransactionHandler:
             amount=form.amount.data,
             type_cost=form.type_cost.data,
             money=form.money.data,
-            timestamp=datetime.now(),
             barista=current_user
         )
         self.write_to_db(supply)
@@ -154,7 +150,6 @@ class TransactionHandler:
             remainder_of_day=remainder_of_day,
             barista=current_user,
             shop=self.shop,
-            timestamp=datetime.now(),
             coffee_arabika=form.coffee_arabika.data,
             coffee_blend=form.coffee_blend.data,
             milk=form.milk.data,

@@ -43,7 +43,7 @@ def create_new_staff():
             phone_number=form.phone_number.data,
             email=form.email.data,
             password=form.password.data,
-            confirmed_at=datetime.now(),
+            confirmed_at=datetime.utcnow(),
             active=True,
             roles=[role],
             shop=[work_place]

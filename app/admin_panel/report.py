@@ -13,6 +13,7 @@ from . import ModeratorView, log
 class ReportAdmin(ModeratorView):
     list_template = 'admin/model/report_list.html'
     can_view_details = True
+    can_set_page_size = True
     column_default_sort = ('timestamp', True)
     column_formatters = dict(
         expenses=lambda v, c, m, p: sum(
@@ -625,11 +626,12 @@ class ReportAdmin(ModeratorView):
     def on_model_delete(self, model):
         if model.backdating:
             return
-        model.shop.cash -= model.cash_balance
-        model.shop.cashless -= model.cashless
-        model.shop.storage.coffee_arabika += model.consumption_coffee_arabika
-        model.shop.storage.coffee_blend += model.consumption_coffee_blend
-        model.shop.storage.milk += model.consumption_milk
-        model.shop.storage.panini += model.consumption_panini
-        model.shop.storage.sausages += model.consumption_sausages
-        model.shop.storage.buns += model.consumption_buns
+        if model.shop:
+            model.shop.cash -= model.cash_balance
+            model.shop.cashless -= model.cashless
+            model.shop.storage.coffee_arabika += model.consumption_coffee_arabika
+            model.shop.storage.coffee_blend += model.consumption_coffee_blend
+            model.shop.storage.milk += model.consumption_milk
+            model.shop.storage.panini += model.consumption_panini
+            model.shop.storage.sausages += model.consumption_sausages
+            model.shop.storage.buns += model.consumption_buns
