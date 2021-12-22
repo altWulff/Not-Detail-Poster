@@ -137,7 +137,7 @@ class TransferProductAdmin(ModelView):
 
     def create_form(self, obj=None):
         form = super(TransferProductAdmin, self).create_form(obj)
-        form.timestamp.data = datetime.now()
+        form.timestamp.data = datetime.utcnow()
         form.barista.data = current_user
         form.where_shop.choices = [(c.id, c) for c in Shop.query.all()]
         form.to_shop.choices = [(c.id, c) for c in Shop.query.all()]

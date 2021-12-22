@@ -223,7 +223,7 @@ class ExpenseAdmin(ModeratorView):
         if form.backdating.data:
             return
         if not is_created:
-            model.last_edit = datetime.now()
+            model.last_edit = datetime.utcnow()
             if form.type_cost.data == 'cash':
                 model.shop.cash += form.money.data
             else:

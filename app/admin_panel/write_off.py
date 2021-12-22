@@ -150,7 +150,7 @@ class WriteOffAdmin(ModelView):
 
     def create_form(self, obj=None):
         form = super(WriteOffAdmin, self).create_form(obj)
-        form.timestamp.data = datetime.now()
+        form.timestamp.data = datetime.utcnow()
         form.barista.data = current_user
         return form
 
@@ -202,7 +202,7 @@ class WriteOffAdmin(ModelView):
         if form.backdating.data:
             return
         if not is_created:
-            model.last_edit = datetime.now()
+            model.last_edit = datetime.utcnow()
             if form.product_name.data == 'coffee_blend':
                 model.storage.coffee_blend += float(form.amount.data)
             elif form.product_name.data == 'coffee_arabika':

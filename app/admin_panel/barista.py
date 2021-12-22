@@ -73,7 +73,7 @@ class BaristaAdmin(ModelView):
             validators=[DataRequired()]
         ),
         confirmed_at=dict(
-            default=datetime.now(),
+            default=datetime.utcnow(),
             validators=[DataRequired()],
             format='%d.%m.%Y %H:%M'
         ),

@@ -172,7 +172,7 @@ class DepositFundsAdmin(ModeratorView):
 
     def create_form(self, obj=None):
         form = super(DepositFundsAdmin, self).create_form(obj)
-        form.timestamp.data = datetime.now()
+        form.timestamp.data = datetime.utcnow()
         form.barista.data = current_user
         return form
 
@@ -208,7 +208,7 @@ class DepositFundsAdmin(ModeratorView):
         if form.backdating.data:
             return
         if not is_created:
-            model.last_edit = datetime.now()
+            model.last_edit = datetime.utcnow()
             if form.type_cost.data == 'cash':
                 model.shop.cash -= form.money.data
             else:

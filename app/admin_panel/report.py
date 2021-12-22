@@ -450,7 +450,7 @@ class ReportAdmin(ModeratorView):
 
     def create_form(self, obj=None):
         form = super(ReportAdmin, self).create_form(obj)
-        form.timestamp.data = datetime.now()
+        form.timestamp.data = datetime.utcnow()
         form.barista.data = current_user
         return form
 
@@ -600,7 +600,7 @@ class ReportAdmin(ModeratorView):
         if form.backdating.data:
             return
         if not is_created:
-            model.last_edit = datetime.now()
+            model.last_edit = datetime.utcnow()
             expanses = model.expenses
             expanses = sum([e.money for e in expanses if e.type_cost == 'cash'])
             diff_actual_balance = model.actual_balance - form.actual_balance.data

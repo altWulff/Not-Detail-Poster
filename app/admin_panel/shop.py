@@ -67,5 +67,5 @@ class ShopAdmin(ModeratorView):
 
     def create_form(self, obj=None):
         form = super(ShopAdmin, self).create_form(obj)
-        form.timestamp.data = datetime.now()
+        form.timestamp.data = datetime.utcnow()
         return form
