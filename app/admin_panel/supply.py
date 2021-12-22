@@ -41,11 +41,14 @@ class SupplyAdmin(ModelView):
         return Markup(f'{prettified[model.product_name]}')
 
     list_template = 'admin/model/supply_list.html'
+    can_view_details = True
     can_set_page_size = True
     column_list = ('timestamp', 'product_name', 'amount', 'money', 'storage')
     column_labels = dict(
         name=gettext('Имя'),
         timestamp=gettext('Дата'),
+        last_edit=gettext('Последнее изменение'),
+        backdating=gettext('Обработка задним числом'),
         product_name=gettext('Название товара'),
         amount=gettext('Количество'),
         type_cost=gettext('Тип траты'),

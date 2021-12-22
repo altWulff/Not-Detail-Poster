@@ -54,6 +54,7 @@ class ExpenseAdmin(ModeratorView):
         category=gettext('Категория'),
         timestamp=gettext('Дата'),
         last_edit=gettext('Последнее изменение'),
+        backdating=gettext('Обработка задним числом'),
         is_global=gettext('Глобальная?'),
         type_cost=gettext('Тип траты'),
         money=gettext('Сумма траты'),

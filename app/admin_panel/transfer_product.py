@@ -33,6 +33,7 @@ class TransferProductAdmin(ModelView):
         return Markup(f'{formatter}')
 
     can_edit = False
+    can_view_details = True
     can_set_page_size = True
     column_list = ('timestamp', 'where_shop', 'to_shop', 'product_name', 'amount', 'barista')
     column_filters = (

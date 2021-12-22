@@ -50,6 +50,7 @@ class ReportAdmin(ModeratorView):
         barista=gettext('Бариста'),
         timestamp=gettext('Дата'),
         last_edit=gettext('Последнее изменение'),
+        backdating=gettext('Обработка задним числом'),
         cashbox=gettext('Касса'),
         remainder_of_day=gettext('Остаток дня'),
         cashless=gettext('Б.Н'),

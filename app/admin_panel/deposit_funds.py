@@ -19,6 +19,7 @@ class DepositFundsAdmin(ModeratorView):
         return Markup(f'{formatter}')
 
     list_template = 'admin/model/deposit_funds_list.html'
+    can_view_details = True
     can_set_page_size = True
     column_list = ('timestamp', 'money', 'shop', 'barista')
     form_create_rules = (
@@ -47,6 +48,7 @@ class DepositFundsAdmin(ModeratorView):
     column_labels = dict(
         timestamp=gettext('Дата'),
         last_edit=gettext('Последнее изменение'),
+        backdating=gettext('Обработка задним числом'),
         type_cost=gettext('Тип траты'),
         money=gettext('Сумма внесения'),
         shop=gettext('Кофейня'),
