@@ -98,6 +98,30 @@ class ModeratorView(ModelView):
         return _query
 
 
+class StorageModeratorView(ModelView):
+    @property
+    def storage_id(self):
+        return self.model.id
+
+    def staff_storage_id(self):
+        storage_ids = (storage.id for storage in current_user.storage)
+        return storage_ids
+
+    def get_query(self):
+        storage_id = self.storage_id
+        _query = super(StorageModeratorView, self).get_query()
+        if not current_user.has_role('admin'):
+            _query = _query.filter(storage_id.in_(self.staff_storage_id()))
+        return _query
+
+    def get_count_query(self):
+        storage_id = self.storage_id
+        _query = super(StorageModeratorView, self).get_count_query()
+        if not current_user.has_role('admin'):
+            _query = _query.filter(storage_id.in_(self.staff_storage_id()))
+        return _query
+
+
 from .barista import BaristaAdmin
 from .by_weight import ByWeightAdmin
 from .category import CategoryAdmin

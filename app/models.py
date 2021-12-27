@@ -171,6 +171,13 @@ class Barista(db.Model, UserMixin):
     def has_moderator_rights(self):
         return self.has_role('moderator')
 
+    @hybrid_property
+    def storage(self):
+        shop_ids = [shop.id for shop in self.shop]
+        storage_query = Storage.query.filter_by
+        storage_list = [storage_query(shop_id=id).first() for id in shop_ids]
+        return storage_list
+
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 

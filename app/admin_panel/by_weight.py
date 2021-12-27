@@ -7,10 +7,10 @@ from flask_security import current_user
 from wtforms import SelectField, BooleanField, RadioField
 from wtforms.validators import DataRequired, Required, NumberRange, InputRequired
 from app.models import Barista, ByWeight
-from . import ModelView, log
+from . import StorageModeratorView, log
 
 
-class ByWeightAdmin(ModelView):
+class ByWeightAdmin(StorageModeratorView):
     def _list_amount(view, context, model, name):
         if not model.amount:
             return ''

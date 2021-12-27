@@ -7,10 +7,10 @@ from flask_security import current_user
 from wtforms import SelectField, BooleanField
 from wtforms.validators import DataRequired, Required, NumberRange
 from app.models import Barista, WriteOff
-from . import ModelView, log
+from . import StorageModeratorView, log
 
 
-class WriteOffAdmin(ModelView):
+class WriteOffAdmin(StorageModeratorView):
     def _list_amount(view, context, model, name):
         if not model.amount:
             return ''
