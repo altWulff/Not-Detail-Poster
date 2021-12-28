@@ -3,7 +3,7 @@ from flask_security import login_required, current_user
 from flask_babelex import _
 from app import db, app
 from app.forms import ReportForm
-from app.models import Shop, Report, Storage, Expense, Supply, DepositFund, CollectionFund, TransferProduct, Category
+from app.models import Shop, Report, Storage, Expense, Supply, ByWeight, DepositFund, CollectionFund, TransferProduct, Category
 from app.business_logic import TransactionHandler, date_today
 
 
@@ -43,6 +43,7 @@ def on_address(shop_address):
     global_expense = Expense.get_global(shop.id)
     local_expense = Expense.get_local(shop.id)
     supply = Supply.get_local(storage.id, False)
+    by_weight = ByWeight.get_local(storage.id, False)
     deposit_fund = DepositFund.get_local_by_shop(shop.id, False)
     collection_fund = CollectionFund.get_local_by_shop(shop.id, False)
     transfer = TransferProduct
@@ -71,6 +72,7 @@ def on_address(shop_address):
         collection_fund=collection_fund,
         transfer=transfer,
         supply=supply,
+        by_weight=by_weight,
         next_url=next_url,
         prev_url=prev_url
     )

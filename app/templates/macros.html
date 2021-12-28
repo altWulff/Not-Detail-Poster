@@ -144,6 +144,25 @@
     </ul>
 {% endmacro %}
 
+{% macro render_by_weight(by_weight, report) %}
+   <ul class="list-group">
+        {% for s in by_weight %}
+        {% if s.timestamp.date() == report.timestamp.date() %}
+        <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div class="ms-2 me-auto">
+                <div class="fw-bold">
+                    {{s.money}} грн.
+                </div>
+                <span class="badge bg-secondary">{{ s.product_name|translate }}</span>
+                <span class="badge bg-secondary">- {{ s.amount }}</span>
+            </div>
+            <span class="badge bg-primary rounded-pill"> {{ s.type_cost|translate }}</span>
+        </li>
+        {% endif %}
+        {% endfor %}
+    </ul>
+{% endmacro %}
+
 {% macro render_transfer(transfer, shop_id, report) %}
     <ul class="list-group">
         {% for t in transfer.query.all() %}
@@ -232,6 +251,25 @@
                 </div>
                 <span class="badge bg-secondary">{{ s.product_name|translate }}</span>
                 <span class="badge bg-secondary">+ {{ s.amount }}</span>
+            </div>
+            <span class="badge bg-primary rounded-pill"> {{ s.type_cost|translate }}</span>
+        </li>
+        {% else %}
+        <p>{{ _('Отсутствуют') }}</p>
+        {% endfor %}
+    </ul>
+{% endmacro %}
+
+{% macro render_by_weight_by_day(by_weight) %}
+    <ul class="list-group">
+        {% for s in by_weight %}
+        <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div class="ms-2 me-auto">
+                <div class="fw-bold">
+                    + {{s.money}} грн.
+                </div>
+                <span class="badge bg-secondary">{{ s.product_name|translate }}</span>
+                <span class="badge bg-secondary">- {{ s.amount }}</span>
             </div>
             <span class="badge bg-primary rounded-pill"> {{ s.type_cost|translate }}</span>
         </li>
