@@ -6,7 +6,7 @@ from flask_admin.babel import gettext
 from flask_security import current_user
 from wtforms import BooleanField
 from wtforms.validators import DataRequired, NumberRange, InputRequired
-from app.models import Shop, Barista, Report
+from app.models import Shop, Report, Barista, ByWeight
 from . import ModeratorView, log
 
 
@@ -569,10 +569,23 @@ class ReportAdmin(ModeratorView):
             self.after_model_change(form, model, False)
         return True
 
+    def weight_count(self, model, get_sum=False):
+        day_by_weight = ByWeight.get_local_by_shop(model.shop.id)
+        by_weight = sum([e.money for e in day_by_weight if e.type_cost == 'cash'])
+        if get_sum:
+            return by_weight
+            
+        def weight_amount(product_name):
+            weight = [w.amount for w in day_by_weight if w.product_name==product_name]
+            return sum(weight)
+        if get_sum == False:
+            return weight_amount
+
     def on_model_change(self, form, model, is_created):
         expanses = form.expenses.data
         expanses = sum([e.money for e in expanses if e.type_cost == 'cash'])
-        last_actual_balance = model.shop.cash + expanses
+        by_weight = self.weight_count(model, get_sum=True)
+        last_actual_balance = model.shop.cash + expanses - by_weight
         model.cash_balance = form.actual_balance.data - last_actual_balance
         model.remainder_of_day = model.cash_balance + form.cashless.data
         model.cashbox = model.remainder_of_day + expanses
@@ -580,15 +593,15 @@ class ReportAdmin(ModeratorView):
         if form.backdating.data:
             model.backdating = form.backdating.data
             return
-        model.shop.cash += model.cash_balance + expanses
+        model.shop.cash += model.cash_balance + expanses - by_weight
         model.shop.cashless += model.cashless
-
-        model.consumption_coffee_arabika = model.shop.storage.coffee_arabika - float(form.coffee_arabika.data)
-        model.consumption_coffee_blend = model.shop.storage.coffee_blend - float(form.coffee_blend.data)
-        model.consumption_milk = model.shop.storage.milk - float(form.milk.data)
-        model.consumption_panini = model.shop.storage.panini - int(form.panini.data)
-        model.consumption_sausages = model.shop.storage.sausages - int(form.sausages.data)
-        model.consumption_buns = model.shop.storage.buns - int(form.buns.data)
+        weight_amount = self.weight_count(model)
+        model.consumption_coffee_arabika = model.shop.storage.coffee_arabika - float(form.coffee_arabika.data) + weight_amount('coffee_arabika')
+        model.consumption_coffee_blend = model.shop.storage.coffee_blend - float(form.coffee_blend.data) + weight_amount('coffee_blend')
+        model.consumption_milk = model.shop.storage.milk - float(form.milk.data) + weight_amount('milk')
+        model.consumption_panini = model.shop.storage.panini - int(form.panini.data) + weight_amount('panini')
+        model.consumption_sausages = model.shop.storage.sausages - int(form.sausages.data) + weight_amount('sausages')
+        model.consumption_buns = model.shop.storage.buns - int(form.buns.data) + weight_amount('buns')
 
         model.shop.storage.coffee_arabika -= model.consumption_coffee_arabika
         model.shop.storage.coffee_blend -= model.consumption_coffee_blend
@@ -628,7 +641,8 @@ class ReportAdmin(ModeratorView):
         if model.backdating:
             return
         if model.shop:
-            model.shop.cash -= model.cash_balance
+            by_weight = self.weight_count(model, get_sum=True)
+            model.shop.cash -= model.cash_balance - by_weight
             model.shop.cashless -= model.cashless
             model.shop.storage.coffee_arabika += model.consumption_coffee_arabika
             model.shop.storage.coffee_blend += model.consumption_coffee_blend

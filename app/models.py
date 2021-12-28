@@ -264,7 +264,11 @@ class Report(db.Model):
         return f'<Report: {self.timestamp}>'
 
     def __str__(self):
-        return f'{self.shop.address} / {self.timestamp.strftime("%d.%m.%y")}г.'
+        if self.shop:
+            return f'{self.shop.address} / {self.timestamp.strftime("%d.%m.%y")}г.'
+        else:
+            return f'{self.timestamp.strftime("%d.%m.%y")}г.'
+            
 
 
 categories = db.Table(
@@ -383,6 +387,19 @@ class ByWeight(db.Model):
     amount = db.Column(db.Float(50))
     type_cost = db.Column(db.String(64), index=True)
     money = db.Column(db.Integer)
+    
+    @classmethod
+    def get_local(cls, storage_id, today=True):
+        _query = cls.query.filter_by(storage_id=storage_id)
+        if today:
+            _query = _query.filter(cls.timestamp >= date_today)
+        return _query
+    
+    @classmethod
+    def get_local_by_shop(cls, shop_id):
+        storage = Storage.query.filter_by(shop_id=shop_id).first_or_404()
+        _query = cls.query.filter_by(storage_id=storage.id).filter(cls.timestamp >= date_today)
+        return _query
 
     def __repr__(self):
         return f'{self.money} / {self.timestamp.strftime("%d.%m.%y")}г.'

@@ -38,7 +38,8 @@ class ExpenseAdmin(ModeratorView):
         'type_cost',
         'money',
         'categories',
-        'shop'
+        'shop',
+        'barista'
     )
     column_filters = (
         'timestamp',

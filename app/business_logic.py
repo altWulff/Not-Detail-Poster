@@ -133,8 +133,10 @@ class TransactionHandler:
         
     def create_report(self, form):
         day_expanses = Expense.get_local(self.shop.id, True)
+        day_by_weight = ByWeight.get_local_by_shop(self.shop.id)
         expanses = sum([e.money for e in day_expanses if e.type_cost == 'cash'])
-        last_actual_balance = self.shop.cash + expanses
+        by_weight = sum([e.money for e in day_by_weight if e.type_cost == 'cash'])
+        last_actual_balance = self.shop.cash + expanses - by_weight 
         cash_balance = form.actual_balance.data - last_actual_balance
         remainder_of_day = cash_balance + form.cashless.data
         cashbox = remainder_of_day + expanses
@@ -158,14 +160,19 @@ class TransactionHandler:
             buns=form.buns.data
         )
         report.expenses = day_expanses.all()
-        self.cash_flow(cash_balance + expanses, 'cash')
+        self.cash_flow(cash_balance + expanses - by_weight, 'cash')
         self.cash_flow(form.cashless.data, 'cashless')
-        report.consumption_coffee_arabika = self.storage.coffee_arabika - form.coffee_arabika.data
-        report.consumption_coffee_blend = self.storage.coffee_blend - form.coffee_blend.data
-        report.consumption_milk = self.storage.milk - form.milk.data
-        report.consumption_panini = self.storage.panini - form.panini.data
-        report.consumption_sausages = self.storage.sausages - form.sausages.data
-        report.consumption_buns = self.storage.buns - form.buns.data
+        def wight_amount(product_name):
+            weight = [w.amount for w in day_by_weight if w.product_name==product_name]
+            return sum(weight)
+        
+        
+        report.consumption_coffee_arabika = self.storage.coffee_arabika - form.coffee_arabika.data + wight_amount('coffee_arabika')
+        report.consumption_coffee_blend = self.storage.coffee_blend - form.coffee_blend.data + wight_amount('coffee_blend')
+        report.consumption_milk = self.storage.milk - form.milk.data + wight_amount('milk')
+        report.consumption_panini = self.storage.panini - form.panini.data + wight_amount('panini')
+        report.consumption_sausages = self.storage.sausages - form.sausages.data + wight_amount('sausages')
+        report.consumption_buns = self.storage.buns - form.buns.data + wight_amount('buns')
 
         self.storage.coffee_arabika -= report.consumption_coffee_arabika
         self.storage.coffee_blend -= report.consumption_coffee_blend
