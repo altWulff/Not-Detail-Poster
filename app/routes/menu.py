@@ -95,16 +95,6 @@ def transfer():
     return render_template_modal('index.html', modal='modal-form')
 
 
-# @menu.route('/add_staff', methods=('POST', ))
-# @login_required
-# def add_staff_to_shop():
-#     form = AddStaffForm(request.form)
-#     if form.validate_on_submit():
-#         flash('')
-#         return redirect(url_for("home"))
-#     return render_template_modal('index.html', modal='modal-form')
-
-
 @menu.route('/create_coffee_shop', methods=('GET', 'POST'))
 @login_required
 @roles_accepted('admin', 'moderator')

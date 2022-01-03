@@ -1,10 +1,10 @@
 from flask import render_template, redirect, url_for, flash, Blueprint, request
 from flask_security import login_required, current_user
 from flask_babelex import _
-from app import db, app
+from app import db, app, date_today
 from app.forms import ReportForm
 from app.models import Shop, Report, Storage, Expense, Supply, ByWeight, DepositFund, CollectionFund, TransferProduct, Category
-from app.business_logic import TransactionHandler, date_today
+from app.business_logic import TransactionHandler
 
 
 report = Blueprint('reports', __name__, url_prefix='/report')

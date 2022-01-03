@@ -29,7 +29,20 @@ class MyFloatField(DecimalField):
 
 class NonValidatingSelectMultipleField(SelectMultipleField):
     def pre_validate(self, form):
-        pass 
+        pass
+
+
+class ActualBalanceValidator(object):
+    def __init__(self):
+        self.message = _l('Фактический остаток не может быть меньше вчерашнего остатка налички')
+
+    def __call__(self, form, field):
+        form_cash = field.data
+        shop_id = form.shop.data
+        shop = Shop.query.filter_by(id=shop_id).first()
+        cash = form_cash - shop.cash
+        if cash < 0:
+            raise ValidationError(self.message)
 
 
 class LoginForm(FlaskForm):
@@ -300,7 +313,8 @@ class ReportForm(FlaskForm):
             NumberRange(
                 min=0,
                 message=_l('Сумма не может быть нулевой, либо ниже нуля')
-            )
+            ),
+            ActualBalanceValidator()
         ]
     )
     coffee_arabika = MyFloatField(
