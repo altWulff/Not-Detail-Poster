@@ -20,7 +20,8 @@ class ReportAdmin(ModeratorView):
             [
                 e.money
                 for e in m.expenses
-                if e.type_cost == 'cash']
+                if e.type_cost == 'cash'
+            ]
         )
     )
     column_searchable_list = (Report.timestamp, )
@@ -376,6 +377,8 @@ class ReportAdmin(ModeratorView):
             'placeholder': gettext('Количество булок, остаток на следующий день')
         }
     }
+
+    products = ('coffee_arabika', 'coffee_blend', 'milk', 'panini', 'sausages', 'buns')
     
     @property 
     def shop_id(self):
@@ -411,42 +414,16 @@ class ReportAdmin(ModeratorView):
             return 0
 
     def render(self, template, **kwargs):
-        if template == 'admin/model/report_list.html':
-            _current_page = kwargs['page']
-            kwargs['column_labels'] = self.column_labels
-            kwargs['summary_data'] = {
-                'on_page': {
-                    'cashbox': self.sum_page('cashbox'),
-                    'cash_balance': self.sum_page('cash_balance'),
-                    'remainder_of_day': self.sum_page('remainder_of_day'),
-                    'cashless': self.sum_page('cashless'),
-                    'actual_balance': self.sum_page('actual_balance'),
-                },
-                'total': {
-                    'cashbox': self.sum_total('cashbox'),
-                    'cash_balance': self.sum_total('cash_balance'),
-                    'remainder_of_day': self.sum_total('remainder_of_day'),
-                    'cashless': self.sum_total('cashless'),
-                    'actual_balance': self.sum_total('actual_balance'),
-                }
-            }
-            kwargs['median_data'] = {
-                'on_page': {
-                    'cashbox': self.median_page('cashbox'),
-                    'cash_balance': self.median_page('cash_balance'),
-                    'remainder_of_day': self.median_page('remainder_of_day'),
-                    'cashless': self.median_page('cashless'),
-                    'actual_balance': self.median_page('actual_balance'),
-                },
-                'total': {
-                    'cashbox': self.median_total('cashbox'),
-                    'cash_balance': self.median_total('cash_balance'),
-                    'remainder_of_day': self.median_total('remainder_of_day'),
-                    'cashless': self.median_total('cashless'),
-                    'actual_balance': self.median_total('actual_balance'),
-                }
-            }
-
+        _current_page = kwargs['page']
+        kwargs['column_labels'] = self.column_labels
+        kwargs['summary_data'] = {'on_page': {}, 'total': {}}
+        kwargs['median_data'] = {'on_page': {}, 'total': {}}
+        render_fields = ('cashbox', 'cash_balance', 'remainder_of_day', 'cashless', 'actual_balance')
+        for field in render_fields:
+            kwargs['summary_data']['on_page'][field] = self.sum_page(field)
+            kwargs['summary_data']['total'][field] = self.sum_total(field)
+            kwargs['median_data']['on_page'][field] = self.median_page(field)
+            kwargs['median_data']['total'][field] = self.median_total(field)
         return super(ReportAdmin, self).render(template, **kwargs)
 
     def create_form(self, obj=None):
@@ -569,16 +546,17 @@ class ReportAdmin(ModeratorView):
             self.after_model_change(form, model, False)
         return True
 
-    def weight_count(self, model, get_sum=False):
+    @staticmethod
+    def weight_count(model, get_sum=False):
         day_by_weight = ByWeight.get_local_by_shop(model.shop.id)
         by_weight = sum([e.money for e in day_by_weight if e.type_cost == 'cash'])
         if get_sum:
             return by_weight
             
         def weight_amount(product_name):
-            weight = [w.amount for w in day_by_weight if w.product_name==product_name]
+            weight = [w.amount for w in day_by_weight if w.product_name == product_name]
             return sum(weight)
-        if get_sum == False:
+        if not get_sum:
             return weight_amount
 
     def on_model_change(self, form, model, is_created):
@@ -596,19 +574,14 @@ class ReportAdmin(ModeratorView):
         model.shop.cash += model.cash_balance + expanses - by_weight
         model.shop.cashless += model.cashless
         weight_amount = self.weight_count(model)
-        model.consumption_coffee_arabika = model.shop.storage.coffee_arabika - float(form.coffee_arabika.data) + weight_amount('coffee_arabika')
-        model.consumption_coffee_blend = model.shop.storage.coffee_blend - float(form.coffee_blend.data) + weight_amount('coffee_blend')
-        model.consumption_milk = model.shop.storage.milk - float(form.milk.data) + weight_amount('milk')
-        model.consumption_panini = model.shop.storage.panini - int(form.panini.data) + weight_amount('panini')
-        model.consumption_sausages = model.shop.storage.sausages - int(form.sausages.data) + weight_amount('sausages')
-        model.consumption_buns = model.shop.storage.buns - int(form.buns.data) + weight_amount('buns')
-
-        model.shop.storage.coffee_arabika -= model.consumption_coffee_arabika
-        model.shop.storage.coffee_blend -= model.consumption_coffee_blend
-        model.shop.storage.milk -= model.consumption_milk
-        model.shop.storage.panini -= model.consumption_panini
-        model.shop.storage.sausages -= model.consumption_sausages
-        model.shop.storage.buns -= model.consumption_buns
+        for p in ReportAdmin.products:
+            if p in ['panini', 'sausages', 'buns']:
+                consumption_value = getattr(model.shop.storage, p) - int(getattr(form, p).data) + weight_amount(p)
+            else:
+                consumption_value = getattr(model.shop.storage, p) - float(getattr(form, p).data) + weight_amount(p)
+            setattr(model, 'consumption_%s' % p, consumption_value)
+            consumption_to_storage = getattr(model.shop.storage, p) - getattr(model, 'consumption_%s' % p)
+            setattr(model.shop.storage, p, consumption_to_storage)
 
     def after_model_change(self, form, model, is_created):
         if form.backdating.data:
@@ -618,7 +591,7 @@ class ReportAdmin(ModeratorView):
             expanses = model.expenses
             expanses = sum([e.money for e in expanses if e.type_cost == 'cash'])
             diff_actual_balance = model.actual_balance - form.actual_balance.data
-            model.cash_balance = diff_actual_balance + form.actual_balance.data
+            model.cash_balance = form.cash_balance.data + diff_actual_balance
             model.remainder_of_day = model.cash_balance + model.cashless
             model.cashbox = model.remainder_of_day + expanses
             model.shop.cashless -= form.cashless.data
@@ -644,9 +617,8 @@ class ReportAdmin(ModeratorView):
             by_weight = self.weight_count(model, get_sum=True)
             model.shop.cash -= model.cash_balance - by_weight
             model.shop.cashless -= model.cashless
-            model.shop.storage.coffee_arabika += model.consumption_coffee_arabika
-            model.shop.storage.coffee_blend += model.consumption_coffee_blend
-            model.shop.storage.milk += model.consumption_milk
-            model.shop.storage.panini += model.consumption_panini
-            model.shop.storage.sausages += model.consumption_sausages
-            model.shop.storage.buns += model.consumption_buns
+
+            for p in ReportAdmin.products:
+                consumption_to_storage = getattr(model.shop.storage, p) + getattr(model, 'consumption_%s' % p)
+                setattr(model.shop.storage, p, consumption_to_storage)
+
