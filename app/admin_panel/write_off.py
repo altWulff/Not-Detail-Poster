@@ -128,27 +128,16 @@ class WriteOffAdmin(StorageModeratorView):
             return 0
 
     def render(self, template, **kwargs):
-        if template == 'admin/model/write_off_list.html':
-            _current_page = kwargs['page']
-            kwargs['column_labels'] = self.column_labels
-            kwargs['summary_data'] = {
-                'on_page': {
-                    'amount': self.sum_page('amount')
-                },
-                'total': {
-                    'amount': self.sum_total('amount')
-
-                }
-            }
-            kwargs['median_data'] = {
-                'on_page': {
-                    'amount': self.median_page('amount')
-                },
-                'total': {
-                    'amount': self.median_total('amount')
-                }
-            }
-
+        _current_page = kwargs['page']
+        kwargs['column_labels'] = self.column_labels
+        kwargs['summary_data'] = {'on_page': {}, 'total': {}}
+        kwargs['median_data'] = {'on_page': {}, 'total': {}}
+        render_fields = ('amount', )
+        for field in render_fields:
+            kwargs['summary_data']['on_page'][field] = self.sum_page(field)
+            kwargs['summary_data']['total'][field] = self.sum_total(field)
+            kwargs['median_data']['on_page'][field] = self.median_page(field)
+            kwargs['median_data']['total'][field] = self.median_total(field)
         return super(WriteOffAdmin, self).render(template, **kwargs)
 
     def create_form(self, obj=None):

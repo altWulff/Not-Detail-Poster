@@ -4,8 +4,6 @@ from flask_security import current_user
 from app.models import Shop, ShopEquipment, Report, Expense, Storage, Category, WriteOff, Supply, ByWeight
 from app import app, db
 
-date_today = datetime(datetime.today().year, datetime.today().month, datetime.today().day)
-
 
 def transaction_count(shop_id: int) -> int:
     reports = Report.query.filter_by(shop_id=shop_id)
@@ -143,7 +141,7 @@ class TransactionHandler:
         if form.cleaning_coffee_machine.data:
             self.equipment.last_cleaning_coffee_machine = datetime.utcnow()
         if form.cleaning_grinder.data:
-           self.equipment.last_cleaning_grinder = datetime.utcnow()
+            self.equipment.last_cleaning_grinder = datetime.utcnow()
         report = Report(
             cashbox=cashbox,
             cash_balance=cash_balance,
@@ -162,22 +160,16 @@ class TransactionHandler:
         report.expenses = day_expanses.all()
         self.cash_flow(cash_balance + expanses - by_weight, 'cash')
         self.cash_flow(form.cashless.data, 'cashless')
-        def wight_amount(product_name):
-            weight = [w.amount for w in day_by_weight if w.product_name==product_name]
-            return sum(weight)
-        
-        
-        report.consumption_coffee_arabika = self.storage.coffee_arabika - form.coffee_arabika.data + wight_amount('coffee_arabika')
-        report.consumption_coffee_blend = self.storage.coffee_blend - form.coffee_blend.data + wight_amount('coffee_blend')
-        report.consumption_milk = self.storage.milk - form.milk.data + wight_amount('milk')
-        report.consumption_panini = self.storage.panini - form.panini.data + wight_amount('panini')
-        report.consumption_sausages = self.storage.sausages - form.sausages.data + wight_amount('sausages')
-        report.consumption_buns = self.storage.buns - form.buns.data + wight_amount('buns')
 
-        self.storage.coffee_arabika -= report.consumption_coffee_arabika
-        self.storage.coffee_blend -= report.consumption_coffee_blend
-        self.storage.milk -= report.consumption_milk
-        self.storage.panini -= report.consumption_panini
-        self.storage.sausages -= report.consumption_sausages
-        self.storage.buns -= report.consumption_buns
+        def weight_amount(product_name):
+            weight = [w.amount for w in day_by_weight if w.product_name == product_name]
+            return sum(weight)
+
+        products = ('coffee_arabika', 'coffee_blend', 'milk', 'panini', 'sausages', 'buns')
+        for p in products:
+            consumption_value = getattr(self.storage, p) - getattr(form, p).data + weight_amount(p)
+            setattr(report, 'consumption_%s' % p, consumption_value)
+            consumption_to_storage = getattr(self.storage, p) - getattr(report, 'consumption_%s' % p)
+            setattr(self.storage, p, consumption_to_storage)
+
         self.write_to_db(report)

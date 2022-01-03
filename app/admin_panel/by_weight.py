@@ -177,31 +177,16 @@ class ByWeightAdmin(StorageModeratorView):
             return 0
 
     def render(self, template, **kwargs):
-        if template == 'admin/model/by_weight_list.html':
-            _current_page = kwargs['page']
-            kwargs['column_labels'] = self.column_labels
-            kwargs['summary_data'] = {
-                'on_page': {
-                    'amount': self.sum_page('amount'),
-                    'money': self.sum_page('money'),
-                },
-                'total': {
-                    'amount': self.sum_total('amount'),
-                    'money': self.sum_total('money')
-
-                }
-            }
-            kwargs['median_data'] = {
-                'on_page': {
-                    'amount': self.median_page('amount'),
-                    'money': self.median_page('money')
-                },
-                'total': {
-                    'amount': self.median_total('amount'),
-                    'money': self.median_total('money')
-                }
-            }
-
+        _current_page = kwargs['page']
+        kwargs['column_labels'] = self.column_labels
+        kwargs['summary_data'] = {'on_page': {}, 'total': {}}
+        kwargs['median_data'] = {'on_page': {}, 'total': {}}
+        render_fields = ('amount', 'money')
+        for field in render_fields:
+            kwargs['summary_data']['on_page'][field] = self.sum_page(field)
+            kwargs['summary_data']['total'][field] = self.sum_total(field)
+            kwargs['median_data']['on_page'][field] = self.median_page(field)
+            kwargs['median_data']['total'][field] = self.median_total(field)
         return super(ByWeightAdmin, self).render(template, **kwargs)
 
     def create_form(self, obj=None):

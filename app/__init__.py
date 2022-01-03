@@ -1,6 +1,7 @@
 import os
 import logging
 from logging.handlers import SMTPHandler, RotatingFileHandler
+from datetime import datetime
 from flask import Flask, request, url_for
 from flask_babelex import Babel
 from flask_sqlalchemy import SQLAlchemy
@@ -26,6 +27,8 @@ toolbar = DebugToolbarExtension(app)
 moment = Moment(app)
 modal = Modal(app)
 babel = Babel(app)
+
+date_today = datetime(datetime.today().year, datetime.today().month, datetime.today().day)
 
 from app import routes, models, forms, routes
 from app.routes import auth
