@@ -1,13 +1,10 @@
-from datetime import datetime, date
+from datetime import date
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import func
 from sqlalchemy.ext.hybrid import hybrid_property
 from flask_security import UserMixin, RoleMixin
 from flask_admin.babel import gettext
-from app import db, login
-
-
-date_today = datetime(datetime.today().year, datetime.today().month, datetime.today().day)
+from app import db, login, date_today
 
 
 @login.user_loader
@@ -20,6 +17,21 @@ baristas = db.Table(
     db.Column('barista_id', db.Integer, db.ForeignKey('barista.id'), primary_key=True),
     db.Column('shop_id', db.Integer, db.ForeignKey('shop.id'), primary_key=True)
 )
+
+
+class TimeMixin:
+    timestamp = db.Column(db.DateTime(timezone=True), server_default=func.now(), index=True)
+    last_edit = db.Column(db.DateTime(timezone=True), server_default=func.now(), index=True)
+
+
+class MoneyMixin:
+    type_cost = db.Column(db.String(64), index=True)
+    money = db.Column(db.Integer, index=True)
+
+
+class ProductMixin:
+    product_name = db.Column(db.String(80), index=True)
+    amount = db.Column(db.Float(50), index=True)
 
 
 class Shop(db.Model):
@@ -44,15 +56,15 @@ class Shop(db.Model):
         cascade="all, delete-orphan",
         single_parent=True
     )
-    reports = db.relationship('Report', backref='shop', lazy=True)
+    reports = db.relationship('Report', backref='shop', lazy=True, cascade="all, delete-orphan")
     baristas = db.relationship(
         'Barista',
         secondary=baristas, lazy='subquery',
         backref=db.backref('shop', lazy=True)
     )
-    expenses = db.relationship('Expense', backref='shop', lazy=True)
-    collection_funds = db.relationship('CollectionFund', backref='shop', lazy=True)
-    deposit_funds = db.relationship('DepositFund', backref='shop', lazy=True)
+    expenses = db.relationship('Expense', backref='shop', lazy=True, cascade="all, delete-orphan",)
+    collection_funds = db.relationship('CollectionFund', backref='shop', lazy=True, cascade="all, delete-orphan")
+    deposit_funds = db.relationship('DepositFund', backref='shop', lazy=True, cascade="all, delete-orphan")
 
     def __repr__(self):
         return f'<Shop: {self.place_name}>'
@@ -76,7 +88,12 @@ class ShopEquipment(db.Model):
     __tablename__ = 'shop_equipment'
     id = db.Column(db.Integer, primary_key=True)
     shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'))
-    shop = db.relationship("Shop", back_populates="shop_equipment")
+    shop = db.relationship(
+        "Shop",
+        back_populates="shop_equipment",
+        cascade="all, delete-orphan",
+        single_parent=True
+    )
     coffee_machine = db.Column(db.String(64), index=True)
     last_cleaning_coffee_machine = db.Column(db.DateTime(timezone=True), server_default=func.now())
     grinder_1 = db.Column(db.String(64), index=True)
@@ -98,16 +115,21 @@ class Storage(db.Model):
     __tablename__ = 'storage'
     id = db.Column(db.Integer, primary_key=True)
     shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'))
-    shop = db.relationship("Shop", back_populates="storage")
+    shop = db.relationship(
+        "Shop",
+        back_populates="storage",
+        cascade="all, delete-orphan",
+        single_parent=True
+    )
     coffee_arabika = db.Column(db.Float(50))
     coffee_blend = db.Column(db.Float(50))
     milk = db.Column(db.Float(50))
     panini = db.Column(db.Integer)
     sausages = db.Column(db.Integer)
     buns = db.Column(db.Integer)
-    supplies = db.relationship('Supply', backref='storage', lazy=True)
-    by_weights = db.relationship('ByWeight', backref='storage', lazy=True)
-    write_offs = db.relationship('WriteOff', backref='storage', lazy=True)
+    supplies = db.relationship('Supply', backref='storage', lazy=True, cascade="all, delete-orphan")
+    by_weights = db.relationship('ByWeight', backref='storage', lazy=True, cascade="all, delete-orphan")
+    write_offs = db.relationship('WriteOff', backref='storage', lazy=True, cascade="all, delete-orphan")
 
     def __repr__(self):
         if self.shop_id:
@@ -217,15 +239,12 @@ deposit_funds = db.Table(
 )
 
 
-class Report(db.Model):
+class Report(TimeMixin, db.Model):
     __tablename__ = 'report'
     id = db.Column(db.Integer, primary_key=True)
     shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'))
     barista_id = db.Column(db.Integer, db.ForeignKey('barista.id'))
     backdating = db.Column(db.Boolean, default=False)
-    # Дата
-    timestamp = db.Column(db.DateTime(timezone=True), server_default=func.now())
-    last_edit = db.Column(db.DateTime(timezone=True), server_default=func.now())
     # Касса - остаток дня в сумме с расходами
     cashbox = db.Column(db.Integer)
     # Расходы
@@ -270,7 +289,6 @@ class Report(db.Model):
             return f'{self.timestamp.strftime("%d.%m.%y")}г.'
             
 
-
 categories = db.Table(
     'categories',
     db.Column('category_id', db.Integer, db.ForeignKey('category.id'), primary_key=True),
@@ -290,18 +308,13 @@ class Category(db.Model):
         return gettext(self.name.title())
 
 
-class Expense(db.Model):
+class Expense(TimeMixin, MoneyMixin, db.Model):
     __tablename__ = 'expense'
     id = db.Column(db.Integer, primary_key=True)
     barista_id = db.Column(db.Integer, db.ForeignKey('barista.id'))
     shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'))
     backdating = db.Column(db.Boolean, default=False)
-    timestamp = db.Column(db.DateTime(timezone=True), server_default=func.now())
-    last_edit = db.Column(db.DateTime(timezone=True), server_default=func.now())
-    is_global = db.Column(db.Boolean, default=False)
-    # налл, безнал
-    type_cost = db.Column(db.String(64), index=True)
-    money = db.Column(db.Integer)
+    is_global = db.Column(db.Boolean, default=False, index=True)
     categories = db.relationship(
         'Category',
         secondary=categories,
@@ -337,33 +350,44 @@ class Expense(db.Model):
         _query = cls.query.filter_by(shop_id=shop_id).filter(cls.is_global==False)
         _query = _query.filter(func.date(cls.timestamp) == date.today()).all()
         return _query
-    
 
-class Supply(db.Model):
+
+class DepositFund(TimeMixin, MoneyMixin, db.Model):
+    __tablename__ = 'deposit_fund'
+    id = db.Column(db.Integer, primary_key=True)
+    barista_id = db.Column(db.Integer, db.ForeignKey('barista.id'))
+    shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'))
+    backdating = db.Column(db.Boolean, default=False)
+
+    @classmethod
+    def get_local_by_shop(cls, shop_id, today=True):
+        _query = cls.query.filter_by(shop_id=shop_id)
+        if today:
+            _query = _query.filter(cls.timestamp >= date_today)
+        return _query
+
+
+class CollectionFund(TimeMixin, MoneyMixin, db.Model):
+    __tablename__ = 'collection_fund'
+    id = db.Column(db.Integer, primary_key=True)
+    barista_id = db.Column(db.Integer, db.ForeignKey('barista.id'))
+    shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'))
+    backdating = db.Column(db.Boolean, default=False)
+
+    @classmethod
+    def get_local_by_shop(cls, shop_id, today=True):
+        _query = cls.query.filter_by(shop_id=shop_id)
+        if today:
+            _query = _query.filter(cls.timestamp >= date_today)
+        return _query
+
+
+class Supply(TimeMixin, MoneyMixin, ProductMixin, db.Model):
     __tablename__ = 'supply'
     id = db.Column(db.Integer, primary_key=True)
     barista_id = db.Column(db.Integer, db.ForeignKey('barista.id'))
     storage_id = db.Column(db.Integer, db.ForeignKey('storage.id'))
     backdating = db.Column(db.Boolean, default=False)
-    timestamp = db.Column(db.DateTime(timezone=True), server_default=func.now())
-    last_edit = db.Column(db.DateTime(timezone=True), server_default=func.now())
-    product_name = db.Column(db.String(80))
-    amount = db.Column(db.Float(50))
-    type_cost = db.Column(db.String(64), index=True)
-    money = db.Column(db.Integer)
-    
-    @classmethod
-    def get_local(cls, storage_id, today=True):
-        _query = cls.query.filter_by(storage_id=storage_id)
-        if today:
-            _query = _query.filter(cls.timestamp >= date_today)
-        return _query
-        
-    @classmethod
-    def get_local_by_shop(cls, shop_id):
-        storage = Storage.query.filter_by(shop_id=shop_id).first_or_404()
-        _query = cls.query.filter_by(storage_id=storage.id).filter(cls.timestamp >= date_today)
-        return _query
 
     def __repr__(self):
         return f'<Supply: {self.id} / {self.timestamp.strftime("%d.%m.%y")}'
@@ -374,32 +398,26 @@ class Supply(db.Model):
         else:
             return f'{self.money} грн.(Безнал) / {self.storage.shop.address} / {self.timestamp.strftime("%d.%m.%y")}г.'
 
-
-class ByWeight(db.Model):
-    __tablename__ = 'by_weight'
-    id = db.Column(db.Integer, primary_key=True)
-    barista_id = db.Column(db.Integer, db.ForeignKey('barista.id'))
-    storage_id = db.Column(db.Integer, db.ForeignKey('storage.id'))
-    backdating = db.Column(db.Boolean, default=False)
-    timestamp = db.Column(db.DateTime(timezone=True), server_default=func.now())
-    last_edit = db.Column(db.DateTime(timezone=True), server_default=func.now())
-    product_name = db.Column(db.String(80))
-    amount = db.Column(db.Float(50))
-    type_cost = db.Column(db.String(64), index=True)
-    money = db.Column(db.Integer)
-    
     @classmethod
     def get_local(cls, storage_id, today=True):
         _query = cls.query.filter_by(storage_id=storage_id)
         if today:
             _query = _query.filter(cls.timestamp >= date_today)
         return _query
-    
+
     @classmethod
     def get_local_by_shop(cls, shop_id):
         storage = Storage.query.filter_by(shop_id=shop_id).first_or_404()
         _query = cls.query.filter_by(storage_id=storage.id).filter(cls.timestamp >= date_today)
         return _query
+
+
+class ByWeight(TimeMixin, MoneyMixin, ProductMixin, db.Model):
+    __tablename__ = 'by_weight'
+    id = db.Column(db.Integer, primary_key=True)
+    barista_id = db.Column(db.Integer, db.ForeignKey('barista.id'))
+    storage_id = db.Column(db.Integer, db.ForeignKey('storage.id'))
+    backdating = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
         return f'{self.money} / {self.timestamp.strftime("%d.%m.%y")}г.'
@@ -410,17 +428,26 @@ class ByWeight(db.Model):
         else:
             return f'{self.money} грн.(Безнал) / {self.storage.shop.address} / {self.timestamp.strftime("%d.%m.%y")}г.'
 
+    @classmethod
+    def get_local(cls, storage_id, today=True):
+        _query = cls.query.filter_by(storage_id=storage_id)
+        if today:
+            _query = _query.filter(cls.timestamp >= date_today)
+        return _query
 
-class WriteOff(db.Model):
+    @classmethod
+    def get_local_by_shop(cls, shop_id):
+        storage = Storage.query.filter_by(shop_id=shop_id).first_or_404()
+        _query = cls.query.filter_by(storage_id=storage.id).filter(cls.timestamp >= date_today)
+        return _query
+
+
+class WriteOff(TimeMixin, ProductMixin, db.Model):
     __tablename__ = 'write_off'
     id = db.Column(db.Integer, primary_key=True)
     barista_id = db.Column(db.Integer, db.ForeignKey('barista.id'))
     storage_id = db.Column(db.Integer, db.ForeignKey('storage.id'))
     backdating = db.Column(db.Boolean, default=False)
-    timestamp = db.Column(db.DateTime(timezone=True), server_default=func.now())
-    last_edit = db.Column(db.DateTime(timezone=True), server_default=func.now())
-    amount = db.Column(db.Float(50))
-    product_name = db.Column(db.String(80))
 
     def __repr__(self):
         return f'{self.product_name} / {self.timestamp.strftime("%d.%m.%y")}г.'
@@ -435,55 +462,13 @@ class WriteOff(db.Model):
         return _query
 
 
-class DepositFund(db.Model):
-    __tablename__ = 'deposit_fund'
-    id = db.Column(db.Integer, primary_key=True)
-    barista_id = db.Column(db.Integer, db.ForeignKey('barista.id'))
-    shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'))
-    backdating = db.Column(db.Boolean, default=False)
-    timestamp = db.Column(db.DateTime(timezone=True), server_default=func.now())
-    last_edit = db.Column(db.DateTime(timezone=True), server_default=func.now())
-    type_cost = db.Column(db.String(64), index=True)
-    money = db.Column(db.Integer)
-
-    @classmethod
-    def get_local_by_shop(cls, shop_id, today=True):
-        _query = cls.query.filter_by(shop_id=shop_id)
-        if today:
-            _query = _query.filter(cls.timestamp >= date_today)
-        return _query
-
-
-class CollectionFund(db.Model):
-    __tablename__ = 'collection_fund'
-    id = db.Column(db.Integer, primary_key=True)
-    barista_id = db.Column(db.Integer, db.ForeignKey('barista.id'))
-    shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'))
-    backdating = db.Column(db.Boolean, default=False)
-    timestamp = db.Column(db.DateTime(timezone=True), server_default=func.now())
-    last_edit = db.Column(db.DateTime(timezone=True), server_default=func.now())
-    type_cost = db.Column(db.String(64), index=True)
-    money = db.Column(db.Integer)
-
-    @classmethod
-    def get_local_by_shop(cls, shop_id, today=True):
-        _query = cls.query.filter_by(shop_id=shop_id)
-        if today:
-            _query = _query.filter(cls.timestamp >= date_today)
-        return _query
-
-
-class TransferProduct(db.Model):
+class TransferProduct(TimeMixin, ProductMixin, db.Model):
     __tablename__ = 'transfer_product'
     id = db.Column(db.Integer, primary_key=True)
     barista_id = db.Column(db.Integer, db.ForeignKey('barista.id'))
     where_shop = db.Column(db.String(64), index=True)
     to_shop = db.Column(db.String(64), index=True)
     backdating = db.Column(db.Boolean, default=False)
-    timestamp = db.Column(db.DateTime(timezone=True), server_default=func.now())
-    last_edit = db.Column(db.DateTime(timezone=True), server_default=func.now())
-    product_name = db.Column(db.String(80))
-    amount = db.Column(db.Float(50))
 
     @classmethod
     def get_shop(cls, shop_id, today=True):
