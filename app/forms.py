@@ -33,12 +33,13 @@ class NonValidatingSelectMultipleField(SelectMultipleField):
 
 
 class ActualBalanceValidator(object):
-    def __init__(self):
+    def __init__(self, target_shop):
+        self.target_shop = target_shop
         self.message = _l('Фактический остаток не может быть меньше вчерашнего остатка налички')
 
     def __call__(self, form, field):
         form_cash = field.data
-        shop_id = form.shop.data
+        shop_id = getattr(form, self.target_shop).data
         shop = Shop.query.filter_by(id=shop_id).first()
         cash = form_cash - shop.cash
         if cash < 0:
@@ -314,7 +315,7 @@ class ReportForm(FlaskForm):
                 min=0,
                 message=_l('Сумма не может быть нулевой, либо ниже нуля')
             ),
-            ActualBalanceValidator()
+            ActualBalanceValidator(target_shop='shop')
         ]
     )
     coffee_arabika = MyFloatField(

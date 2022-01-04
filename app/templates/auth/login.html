@@ -21,16 +21,12 @@
 {% endwith %}
 <form method="post" novalidate>
     {{ form.csrf_token }}
+    <h1>Not Detail Poster</h1>
     <h1 class="h3 mb-3 fw-normal">{{ _('Войдти в аккаунт') }}</h1>
     {{ render_field(form.name) }}
     {{ render_password_field(form.password) }}
-    <div class="checkbox mb-3">
-        <label>
-            <input type="checkbox" value="remember_me"> {{_('Запомнить меня')}}
-        </label>
-    </div>
     {{ form.submit(class="w-100 btn btn-lg btn-primary") }}
-    <p class="mt-5 mb-3 text-muted">&copy; 2021</p>
+    <p class="mt-5 mb-3 text-muted">&copy; 2022</p>
   </form>
 </main>
 </body>

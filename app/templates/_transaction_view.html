@@ -1,43 +1,59 @@
 <ul class="nav nav-pills mb-3" id="pills-tab-{{coffee_shop.id}}" role="tablist">
+    {% if expense.get_local(coffee_shop.id, True).first() %}
     <li class="nav-item" role="presentation">
         <button class="nav-link active" id="pills-expansion-tab-{{coffee_shop.id}}" data-bs-toggle="pill" data-bs-target="#pills-expansion-{{coffee_shop.id}}" type="button" role="tab" aria-controls="pills-expansion-{{coffee_shop.id}}" aria-selected="true">
             {{ _('Расходы') }}</button>
     </li>
+    {% endif %}
+    {% if expense.get_global(coffee_shop.id, True).first() %}
     <li class="nav-item" role="presentation">
         <button class="nav-link" id="pills-g-expansion-tab-{{coffee_shop.id}}" data-bs-toggle="pill" data-bs-target="#pills-g-expansion-{{coffee_shop.id}}" type="button" role="tab" aria-controls="pills-g-expansion-{{coffee_shop.id}}" aria-selected="false">
             {{ _('Глобальные расходы') }}
         </button>
     </li>
+    {% endif %}
+    {% if supply.get_local_by_shop(coffee_shop.id).first() %}
     <li class="nav-item" role="presentation">
         <button class="nav-link" id="pills-supply-tab-{{coffee_shop.id}}" data-bs-toggle="pill" data-bs-target="#pills-supply-{{coffee_shop.id}}" type="button" role="tab" aria-controls="pills-supply-{{coffee_shop.id}}" aria-selected="false">
             {{ _('Поступления') }}
         </button>
     </li>
+    {% endif %}
+    {% if by_weight.get_local_by_shop(coffee_shop.id).first() %}
     <li class="nav-item" role="presentation">
         <button class="nav-link" id="pills-by-wright-tab-{{coffee_shop.id}}" data-bs-toggle="pill" data-bs-target="#pills-by-weight-{{coffee_shop.id}}" type="button" role="tab" aria-controls="pills-by-weight-{{coffee_shop.id}}" aria-selected="false">
             {{ _('Развес') }}
         </button>
     </li>
+    {% endif %}
+    {% if deposit_fund.get_local_by_shop(coffee_shop.id).first() %}
     <li class="nav-item" role="presentation">
         <button class="nav-link" id="pills-deposit-fund-tab-{{coffee_shop.id}}" data-bs-toggle="pill" data-bs-target="#pills-deposit-fund-{{coffee_shop.id}}" type="button" role="tab" aria-controls="pills-deposit-fund-{{coffee_shop.id}}" aria-selected="false">
             {{ _('Внесение средств') }}
         </button>
     </li>
+    {% endif %}
+    {% if collection_fund.get_local_by_shop(coffee_shop.id).first() %}
     <li class="nav-item" role="presentation">
         <button class="nav-link" id="pills-collection-fund-tab-{{coffee_shop.id}}" data-bs-toggle="pill" data-bs-target="#pills-collection-fund-{{coffee_shop.id}}" type="button" role="tab" aria-controls="pills-collection-fund-{{coffee_shop.id}}" aria-selected="false">
             {{ _('Инкасация') }}
         </button>
     </li>
+    {% endif %}
+    {% if write_off.get_local_by_shop(coffee_shop.id).first() %}
     <li class="nav-item" role="presentation">
         <button class="nav-link" id="pills-write_off-tab-{{coffee_shop.id}}" data-bs-toggle="pill" data-bs-target="#pills-write_off-{{coffee_shop.id}}" type="button" role="tab" aria-controls="pills-write_off-{{coffee_shop.id}}" aria-selected="false">
             {{ _('Списания') }}
         </button>
     </li>
+    {% endif %}
+    {% if transfer.query.first() %}
     <li class="nav-item" role="presentation">
         <button class="nav-link" id="pills-transfer-tab-{{coffee_shop.id}}" data-bs-toggle="pill" data-bs-target="#pills-transfer-{{coffee_shop.id}}" type="button" role="tab" aria-controls="pills-transfer-{{coffee_shop.id}}" aria-selected="false">
             {{ _('Перемещения') }}
         </button>
     </li>
+    {% endif %}
 </ul>
 <div class="tab-content" id="pills-tabContent">
     <div class="tab-pane fade show active" id="pills-expansion-{{coffee_shop.id}}" role="tabpanel" aria-labelledby="pills-expansion-tab-{{coffee_shop.id}}">
