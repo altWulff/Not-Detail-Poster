@@ -1,13 +1,13 @@
 <div class="col-sm-15">
     <div class="card">
         <div class="card-body">
-            <h3 class="card-title">{{coffee_shop.place_name}} / {{coffee_shop.address}}</h3>
+            <h3 class="card-title">{{coffee_shop.place_name}} |  <i class="bi bi-geo-alt"></i> {{coffee_shop.address}}</h3>
             {% if current_user.has_role('admin') or current_user.has_role('moderator') %}
-            <h5 class="card-subtitle mb-2 text-muted">{{ _('Наличка') }}: {{coffee_shop.cash}} грн.</h5>
-            <h5 class="card-subtitle mb-2 text-muted">{{ _('Безнал') }}: {{coffee_shop.cashless}} грн.</h5>
+            <h5 class="card-subtitle mb-2 text-muted"> <i class="bi bi-wallet"></i> {{ _('Наличка') }}: {{coffee_shop.cash}} грн.</h5>
+            <h5 class="card-subtitle mb-2 text-muted"> <i class="bi bi-credit-card"></i> {{ _('Безнал') }}: {{coffee_shop.cashless}} грн.</h5>
             {% endif %}
-            <p class="card-subtitle mb-2 text-muted">{{_('Последняя чистка КМ: ')}} {{ moment(coffee_shop.shop_equipment.last_cleaning_coffee_machine).fromNow() }}</p>
-            <p class="card-subtitle mb-2 text-muted">{{_('Последняя чистка кофемолок: ')}} {{ moment(coffee_shop.shop_equipment.last_cleaning_grinder).fromNow() }}</p>
+            <p class="card-subtitle mb-2 text-muted"><i class="bi bi-calendar4-event"></i> {{_('Последняя чистка КМ: ')}} {{ moment(coffee_shop.shop_equipment.last_cleaning_coffee_machine).fromNow() }}</p>
+            <p class="card-subtitle mb-2 text-muted"><i class="bi bi-calendar4-event"></i> {{_('Последняя чистка кофемолок: ')}} {{ moment(coffee_shop.shop_equipment.last_cleaning_grinder).fromNow() }}</p>
             <p class="card-text">{{ _('Сотрудники') }}:</p>
             <ul>
                 {% for barista in coffee_shop.baristas %}
