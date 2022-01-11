@@ -6,7 +6,7 @@ from flask_admin.babel import gettext
 from flask_security import current_user
 from wtforms import SelectField, BooleanField, RadioField
 from wtforms.validators import DataRequired, Required, NumberRange, InputRequired
-from app.models import Barista, Supply, Storage
+from app.models import Barista, Supply
 from . import StorageModeratorView, log
 
 
@@ -185,7 +185,7 @@ class SupplyAdmin(StorageModeratorView):
             return 0
 
     def render(self, template, **kwargs):
-        _current_page = kwargs['page']
+        _current_page = kwargs
         kwargs['column_labels'] = self.column_labels
         kwargs['summary_data'] = {'on_page': {}, 'total': {}}
         kwargs['median_data'] = {'on_page': {}, 'total': {}}
@@ -299,3 +299,4 @@ class SupplyAdmin(StorageModeratorView):
             model.storage.shop.cash += model.money
         else:
             model.storage.shop.cashless += model.money
+

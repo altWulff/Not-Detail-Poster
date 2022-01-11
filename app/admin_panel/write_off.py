@@ -128,7 +128,7 @@ class WriteOffAdmin(StorageModeratorView):
             return 0
 
     def render(self, template, **kwargs):
-        _current_page = kwargs['page']
+        _current_page = kwargs
         kwargs['column_labels'] = self.column_labels
         kwargs['summary_data'] = {'on_page': {}, 'total': {}}
         kwargs['median_data'] = {'on_page': {}, 'total': {}}
