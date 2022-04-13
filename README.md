@@ -86,7 +86,7 @@
 Создание и редактирование категорий, а также список ролей и раздача прав доступа пользователям.
 
 ## Зависимости
-`Pythno3`, `PosgreSQL`
+`Python 3`, `PosgreSQL`
 
 ### Установка
 `$ git clone git@github.com:altWulff/Not-Detail-Poster.git`
