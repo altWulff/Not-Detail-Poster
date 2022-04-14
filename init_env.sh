@@ -7,4 +7,3 @@ flask db upgrade
 flask translate compile
 flask create roles
 flask create superuser admin admin
-flask run

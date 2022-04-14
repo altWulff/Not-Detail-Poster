@@ -1,8 +1,27 @@
 # Not-Detail-Poster MVP
+## Зависимости
+`Pythno3`, `PosgreSQL`
 
+## Установка
+`$ git clone git@github.com:altWulff/Not-Detail-Poster.git && cd Not-Detail-Poster`
+
+`$ virtualenv venv`
+
+`$ source venv/bin/activate`
+
+`$ pip install -r requirements.txt`
+
+`$ ./init_env.sh`
+
+`$ flask run`
+
+Базовый пользователь и пароль `admin`
+Адрес `http://127.0.0.1:5000/`
+
+# Описание проекта
 Упрощённая система автоматизации, аналитики, и отчётов для кофейни.
 
-# Возможности
+## Возможности
 - ограничение на вход
 - ведение отчетов за день
 - различные транзакции: расход денежных сумм, поступление товара, перемещение товара, и его списание
@@ -84,29 +103,3 @@
 
 #### Разное
 Создание и редактирование категорий, а также список ролей и раздача прав доступа пользователям.
-
-## Зависимости
-`Pythno3`, `PosgreSQL`
-
-### Установка
-`$ git clone git@github.com:altWulff/Not-Detail-Poster.git`
-
-`$ cd Not-Detail-Poster`
-
-`$ virtualenv venv`
-
-`$ source venv/bin/activate`
-
-`$ pip install -r requirements.txt`
-
-`$ export FLASK_APP=not_detail_poster.py`
-
-`$ export FLASK_ENV=development`
-
-`$ export SECRET_KEY='super_strong_key'`
-
-`$ export DATABASE_URL="postgresql:///dev_db"`
-
-`$ ./start.sh`
-
-Базовый пользователь и пароль `admin`
