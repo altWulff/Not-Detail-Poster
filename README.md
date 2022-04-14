@@ -1,6 +1,6 @@
 # Not-Detail-Poster MVP
 ## Зависимости
-`Pythno3`, `PosgreSQL`
+`Python 3.X`, `PosgreSQL`
 
 ## Установка
 `$ git clone git@github.com:altWulff/Not-Detail-Poster.git && cd Not-Detail-Poster`
