@@ -1,6 +1,6 @@
 # Not-Detail-Poster MVP
 ## Зависимости
-`Pythno3`, `PosgreSQL`
+`Python 3.X`, `PosgreSQL`
 
 ## Установка
 `$ git clone git@github.com:altWulff/Not-Detail-Poster.git && cd Not-Detail-Poster`
@@ -17,6 +17,8 @@
 
 Базовый пользователь и пароль `admin`
 Адрес `http://127.0.0.1:5000/`
+
+Demo проекта https://not-detail-poster.herokuapp.com
 
 # Описание проекта
 Упрощённая система автоматизации, аналитики, и отчётов для кофейни.
