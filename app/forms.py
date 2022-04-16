@@ -50,7 +50,7 @@ class LoginForm(FlaskForm):
     name = StringField(_l('Имя'), validators=[DataRequired()])
     password = PasswordField(_l('Пароль'), validators=[DataRequired()])
     remember_me = BooleanField(_l('Запомнить меня'))
-    submit = SubmitField(_l('Войдти'))
+    submit = SubmitField(_l('Войти'))
 
 
 class RegistrationForm(FlaskForm):
