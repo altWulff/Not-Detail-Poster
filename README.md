@@ -1,8 +1,8 @@
 # Not-Detail-Poster MVP
-## Зависимости
+## Dependencies
 `Python 3.X`, `PosgreSQL`
 
-## Установка
+## Installation
 `$ git clone git@github.com:altWulff/Not-Detail-Poster.git && cd Not-Detail-Poster`
 
 `$ virtualenv venv`
@@ -15,93 +15,92 @@
 
 `$ flask run`
 
-Базовый пользователь и пароль `admin`
-Адрес `http://127.0.0.1:5000/`
+Base user and password `admin`
+Local address `http://127.0.0.1:5000/`
 
-Demo проекта https://not-detail-poster.herokuapp.com
+Project demo  https://not-detail-poster.herokuapp.com
 
-# Описание проекта
-Упрощённая система автоматизации, аналитики, и отчётов для кофейни.
+# Description of the project
+Simplified system of automation, analytics, and reports for a coffee shop.
 
-## Возможности
-- ограничение на вход
-- ведение отчетов за день
-- различные транзакции: расход денежных сумм, поступление товара, перемещение товара, и его списание
-- различные роли пользователей: администратор, модератор, пользователь (сотрудник/бариста).
-- админ-панель сайта: администратора (создание, редактирование, удаление), для модератора только редактирование
-- базовый перевод, в зависимости от настроек броузера
+## Features
+- entry restriction
+- daily reporting
+- various transactions: expenditure of money, receipt of goods, movement of goods, and its write-off
+- different user roles: administrator, moderator, user (employee/barista)
+- site admin panel: administrator (create, edit, delete), for moderator only edit
+- basic translation, depending on browser settings
 
 ## Вход и выход из в системы
-При входе пользователь видит окно аутентификации, с полями
-`Имя` и `Пароль`, у пользователя без имени и пароль нет возможности войди на сайт.
-После входа пользователь направляется на главную страницу с отображением карточек кофейных точек.
-Для выхода клик на `Выход` во всплывающем меню.
+`Name` and `Password`, a user without a name and password cannot enter the site.
+After logging in, the user is redirected to the main page with the display of cards for coffee outlets.
+To exit click on `Exit` in the popup menu.
 
-## Отображение кофеен
-Отображаются в списке.
-В карточке отображается название, адрес, сумма налички и безнал.
-Отображаются сотрудники работающие в кофейне. При клике на имя перенаправление на описание профиля сотрудника.
-В разворачивающимися полях
-- описание оборудования на точке
-- остатки на складе
-- текущие транзакции кофейни
+## Display coffee shops
+Are displayed in the list.
+The card displays the name, address, amount of cash and cashless.
+Displays employees working in a coffee shop. Clicking on the name redirects to the employee's profile description.
+In unfolding fields
+- description of equipment at the point
+- stock balances
+- current transactions of the coffee shop
 
-## Отчеты
-По клику на ссылку `Отчеты` пользователь перенаправляется на список отчетов по дням с постраничной пагинацией.
-Разное отобрание в зависимости от роли пользователя, для бариста три последних, для модератора, и админа все отчеты.
+## Reports
+By clicking on the `Reports` link, the user is redirected to the list of daily reports with pagination.
+Different selection depending on the role of the user, for the barista the last three, for the moderator, and the admin all reports.
 
-В отчете отображается название кофейни, кто отправил отчет, дата в формате dd.mm.YYYY
-Отчет разделен на три колонки
-- в первой: касса, расход за день, остаток дня, безнал, остаток наличности, фактический остаток дня (наличка)
-- во второй: глобальные расходы за день, поступления от поставщиков, перемещения товаров
-- в третьей: расход товаров за день, и их остаток на конец смены
+The report displays the name of the coffee shop, who sent the report, the date in the dd.mm.YYYY format
+The report is divided into three columns
+- in the first: cash desk, expense for the day, balance of the day, cashless, cash balance, actual balance of the day (cash)
+- in the second: global expenses per day, receipts from suppliers, movement of goods
+- in the third: consumption of goods for the day, and their balance at the end of the shift
 
 
-## Транзакции
-При создании транзакции пользователь может выбрать кофейню из списка на которых он работает, для админа ограничений нет.
-Все транзакции реализованы через модальное окно. Про успешную валидации, сигнализирует флеш сообщение.
+## Transactions
+When creating a transaction, the user can select a coffee shop from the list on which he works, there are no restrictions for the administrator.
+All transactions are realized through a modal window. About successful validation, flash message signals.
 
-#### Расход
-Есть чек бокс глобального расхода, вариант оплаты, категорию(ии) расхода, и его сумма
+#### Expenses
+There is a global expense checkbox, payment option, expense category(s), and its amount
 
-#### Поступление
-При поступлении выбор пришедшего товара, количество, вариант оплаты, сумма.
+#### Supply
+Upon receipt, the choice of the incoming goods, quantity, payment option, amount.
 
-### Продажа развеса и списание товара
-Продажа и списание реализованы аналогично, списание без суммы расхода.
+### Selling by weight and writing off goods
+Sale and write-off are implemented in the same way, write-off without the amount of the expense.
 
-### Закрытие смены
-По окончании смены бариста создает отчет кликом на `Создание отчета`, переправляется в форму,
-если бариста не взял зарплату, информационное сообщение сообщит об этом.
-В форму вводятся данные про полученные
-- Безнал за день (Z-отчет)
-- Фактический остаток
-- остаток арабики, бленда, молока, панини, булочек, и колбасок.
-- присутствуют чек-боксы проведенной чистки кофе машины и кофемолок.
+### Closing the shift
+At the end of the shift, the barista creates a report by clicking on `Create report`, redirected to the form,
+if the barista has not taken a salary, an information message will inform you about it.
+The form contains information about the received
+- Cashless per day (Z-report)
+- Actual balance
+- the rest of Arabica, blend, milk, panini, buns, and sausages.
+- there are check-boxes of the cleaning of the coffee machine and coffee grinders
 
-### Всплывающее Меню для Администратора
-Может через меню создать кофейню,
-и добавить сотрудника,
+### Popup Menu for Administrator
+Can create a coffee shop through the menu,
+and add employee
 
-## Панель Администратора
-Вход через всплывающее меню на клик `Администрирование` (доступно для админа и модератора), выход при клике на `Выход` в верхней панели.
-Здесь нас встречает обзор на созданные кофейни.
-Для админа видны все расходы и поступления, модератор может видеть информацию только из кофеен где он работает/модерирует.
+## Admin Panel
+Login via pop-up menu by clicking `Administration` (available for admin and moderator), exit by clicking on `Exit` in the top bar.
+Here we are met by an overview of the created coffee houses.
+For the admin, all expenses and receipts are visible, the moderator can see information only from the coffee houses where he works / moderates.
 
-#### Кофейни
-Выпадающий список кофеен, оборудования, складов и их создание, редактирование, удаление.
+#### Coffee shops
+Drop-down list of coffee shops, equipment, warehouses and their creation, editing, deletion.
 
-#### Статистика
-Список отчетов, фильтры для выборки, сортировка по дате и их создание, редактирование, удаление.
+#### Statistics
+List of reports, filters for selection, sorting by date and their creation, editing, deletion.
 
-#### Двидения товаров
-Создание, редактирование, удаление записей про - поступления, развес, списания, перемещения товаров.
+#### Movement of goods
+Creation, editing, removal of records about - receipts, weight, write-offs, movement of goods.
 
-#### Кассовые средства
-Создание, редактирование, удаление записей про - расходы, внесение денежных средств, и инкассации.
+#### Cash
+Creating, editing, deleting records about - expenses, depositing funds, and collection.
 
-#### Сотрудники
-Список сотрудников, создание и редактирование их данных.
+#### Employees
+List of employees, creation and editing of their data.
 
-#### Разное
-Создание и редактирование категорий, а также список ролей и раздача прав доступа пользователям.
+#### Miscellaneous
+Creation and editing of categories, as well as a list of roles and distribution of access rights to users.
