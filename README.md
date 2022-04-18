@@ -16,9 +16,10 @@
 `$ flask run`
 
 Base user and password `admin`
+
 Local address `http://127.0.0.1:5000/`
 
-Project demo  https://not-detail-poster.herokuapp.com
+Project demo https://not-detail-poster.herokuapp.com
 
 # Description of the project
 Simplified system of automation, analytics, and reports for a coffee shop.
@@ -31,7 +32,7 @@ Simplified system of automation, analytics, and reports for a coffee shop.
 - site admin panel: administrator (create, edit, delete), for moderator only edit
 - basic translation, depending on browser settings
 
-## Вход и выход из в системы
+## Login and Logout
 `Name` and `Password`, a user without a name and password cannot enter the site.
 After logging in, the user is redirected to the main page with the display of cards for coffee outlets.
 To exit click on `Exit` in the popup menu.
