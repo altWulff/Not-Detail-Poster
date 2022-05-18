@@ -1,0 +1,6 @@
+[TYPECHECK]
+generated-members=app.logger
+
+ignored-classes=scoped_session
+disable=too-few-public-methods,no-member, duplicate-code
+

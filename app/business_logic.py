@@ -1,63 +1,91 @@
-from datetime import datetime, date
-from sqlalchemy import func
+"""
+Module define Transaction logic
+"""
+
+
+from datetime import date, datetime
+
 from flask_security import current_user
-from app.models import Shop, ShopEquipment, Report, Expense, Storage, Category, WriteOff, Supply, ByWeight
+from sqlalchemy import func
+
 from app import app, db
+from app.models import (ByWeight, Category, Expense, Report, Shop,
+                        ShopEquipment, Storage, Supply, WriteOff)
 
 
 def transaction_count(shop_id: int) -> int:
+    """Lengths list reports by today"""
     reports = Report.query.filter_by(shop_id=shop_id)
     reports_today = reports.filter(func.date(Report.timestamp) == date.today()).all()
     return len(reports_today)
 
 
 def is_report_send(shop_id: int) -> bool:
-    return transaction_count(shop_id) >= app.config['REPORTS_PER_DAY']
+    """Check if report send and compare with config variable"""
+    return transaction_count(shop_id) >= app.config["REPORTS_PER_DAY"]
 
 
 class TransactionHandler:
+    """
+    Transaction handler
+    Get shop, storage, equipment from shop_id
+    """
+
     def __init__(self, shop_id=None):
         self.shop = self.get_shop_from_id(shop_id)
         self.storage = self.get_storage_from_id(shop_id)
         self.equipment = self.get_equipment_from_id(shop_id)
 
-    def get_shop_from_id(self, shop_id):
+    @staticmethod
+    def get_shop_from_id(shop_id):
+        """Query shop by shop id"""
         query = Shop.query.filter_by(id=shop_id).first_or_404()
         return query
-    
-    def get_storage_from_id(self, shop_id):
+
+    @staticmethod
+    def get_storage_from_id(shop_id):
+        """Query storage by shop id"""
         query = Storage.query.filter_by(shop_id=shop_id).first_or_404()
         return query
 
-    def get_equipment_from_id(self, shop_id):
+    @staticmethod
+    def get_equipment_from_id(shop_id):
+        """Query shop equipment by shop id"""
         query = ShopEquipment.query.filter_by(shop_id=shop_id).first_or_404()
         return query
 
-    def is_report_send(self, shop_id: int) -> bool:
-        return transaction_count(shop_id) >= app.config['REPORTS_PER_DAY']
-            
+    @staticmethod
+    def is_report_send(shop_id: int) -> bool:
+        """Check if report send and compare with config variable"""
+        return transaction_count(shop_id) >= app.config["REPORTS_PER_DAY"]
+
     def funds_expenditure(self, money, type_cost):
-        if type_cost == 'cash':
+        """Funds expenditure by type cost"""
+        if type_cost == "cash":
             self.shop.cash -= money
         else:
             self.shop.cashless -= money
 
     def cash_flow(self, money, type_cost):
-        if type_cost == 'cash':
+        """Cash flow by type cost"""
+        if type_cost == "cash":
             self.shop.cash += money
         else:
             self.shop.cashless += money
-        
-    def write_to_db(self, record):
+
+    @staticmethod
+    def write_to_db(record):
+        """Write record to database"""
         db.session.add(record)
         db.session.commit()
-        
+
     def create_expense(self, form):
+        """Create expense transaction"""
         expense = Expense(
             type_cost=form.type_cost.data,
             money=form.money.data,
             is_global=form.is_global.data,
-            barista=current_user
+            barista=current_user,
         )
         self.funds_expenditure(form.money.data, form.type_cost.data)
         for c_id in form.categories.data:
@@ -65,9 +93,10 @@ class TransactionHandler:
             expense.categories.append(category)
         self.shop.expenses.append(expense)
         self.write_to_db(expense)
-    
+
     def crete_by_weight(self, form):
-        if form.by_weight_choice.data == 'coffee_blend':
+        """Create by weight transaction"""
+        if form.by_weight_choice.data == "coffee_blend":
             self.storage.coffee_blend -= form.amount.data
         else:
             self.storage.coffee_arabika -= form.amount.data
@@ -77,47 +106,49 @@ class TransactionHandler:
             storage=self.storage,
             amount=form.amount.data,
             product_name=form.by_weight_choice.data,
-            type_cost=form.type_cost.data, 
+            type_cost=form.type_cost.data,
             money=form.money.data,
-            barista=current_user
+            barista=current_user,
         )
         self.write_to_db(by_weight)
-        
+
     def create_write_off(self, form):
-        if form.write_off_choice.data == 'coffee_blend':
+        """Create write off transaction"""
+        if form.write_off_choice.data == "coffee_blend":
             self.storage.coffee_blend -= form.amount.data
-        elif form.write_off_choice.data == 'coffee_arabika':
+        elif form.write_off_choice.data == "coffee_arabika":
             self.storage.coffee_arabika -= form.amount.data
-        elif form.write_off_choice.data == 'milk':
+        elif form.write_off_choice.data == "milk":
             self.storage.milk -= form.amount.data
-        elif form.write_off_choice.data == 'panini':
+        elif form.write_off_choice.data == "panini":
             self.storage.panini -= int(form.amount.data)
-        elif form.write_off_choice.data == 'sausages':
+        elif form.write_off_choice.data == "sausages":
             self.storage.sausages -= int(form.amount.data)
         else:
             self.storage.buns -= int(form.amount.data)
         write_off = WriteOff(
-            storage=self.storage, 
-            amount=form.amount.data, 
+            storage=self.storage,
+            amount=form.amount.data,
             product_name=form.write_off_choice.data,
-            barista=current_user
+            barista=current_user,
         )
         self.write_to_db(write_off)
-    
+
     def create_supply(self, form):
-        if form.supply_choice.data == 'coffee_blend':
+        """Create supply transaction"""
+        if form.supply_choice.data == "coffee_blend":
             self.storage.coffee_blend += form.amount.data
-        elif form.supply_choice.data == 'coffee_arabika':
+        elif form.supply_choice.data == "coffee_arabika":
             self.storage.coffee_arabika += form.amount.data
-        elif form.supply_choice.data == 'milk':
+        elif form.supply_choice.data == "milk":
             self.storage.milk += form.amount.data
-        elif form.supply_choice.data == 'panini':
+        elif form.supply_choice.data == "panini":
             self.storage.panini += int(form.amount.data)
-        elif form.supply_choice.data == 'sausages':
+        elif form.supply_choice.data == "sausages":
             self.storage.sausages += int(form.amount.data)
         else:
             self.storage.buns += int(form.amount.data)
-            
+
         self.funds_expenditure(form.money.data, form.type_cost.data)
         supply = Supply(
             storage=self.storage,
@@ -125,25 +156,25 @@ class TransactionHandler:
             amount=form.amount.data,
             type_cost=form.type_cost.data,
             money=form.money.data,
-            barista=current_user
+            barista=current_user,
         )
         self.write_to_db(supply)
-        
+
     def create_report(self, form):
+        """Create day report transaction"""
         day_expanses = Expense.get_local(self.shop.id, True)
         day_by_weight = ByWeight.get_local_by_shop(self.shop.id)
-        expanses = sum([e.money for e in day_expanses if e.type_cost == 'cash'])
-        by_weight = sum([e.money for e in day_by_weight if e.type_cost == 'cash'])
-        last_actual_balance = self.shop.cash + expanses - by_weight 
+        expanses = sum([e.money for e in day_expanses if e.type_cost == "cash"])
+        by_weight = sum([e.money for e in day_by_weight if e.type_cost == "cash"])
+        last_actual_balance = self.shop.cash + expanses - by_weight
         cash_balance = form.actual_balance.data - last_actual_balance
         remainder_of_day = cash_balance + form.cashless.data
-        cashbox = remainder_of_day + expanses
         if form.cleaning_coffee_machine.data:
             self.equipment.last_cleaning_coffee_machine = datetime.utcnow()
         if form.cleaning_grinder.data:
             self.equipment.last_cleaning_grinder = datetime.utcnow()
         report = Report(
-            cashbox=cashbox,
+            cashbox=remainder_of_day + expanses,
             cash_balance=cash_balance,
             cashless=form.cashless.data,
             actual_balance=form.actual_balance.data,
@@ -155,21 +186,32 @@ class TransactionHandler:
             milk=form.milk.data,
             panini=form.panini.data,
             sausages=form.sausages.data,
-            buns=form.buns.data
+            buns=form.buns.data,
         )
         report.expenses = day_expanses.all()
-        self.cash_flow(cash_balance + expanses - by_weight, 'cash')
-        self.cash_flow(form.cashless.data, 'cashless')
+        self.cash_flow(cash_balance + expanses - by_weight, "cash")
+        self.cash_flow(form.cashless.data, "cashless")
 
         def weight_amount(product_name):
             weight = [w.amount for w in day_by_weight if w.product_name == product_name]
             return sum(weight)
 
-        products = ('coffee_arabika', 'coffee_blend', 'milk', 'panini', 'sausages', 'buns')
-        for p in products:
-            consumption_value = getattr(self.storage, p) - getattr(form, p).data + weight_amount(p)
-            setattr(report, 'consumption_%s' % p, consumption_value)
-            consumption_to_storage = getattr(self.storage, p) - getattr(report, 'consumption_%s' % p)
-            setattr(self.storage, p, consumption_to_storage)
+        products = (
+            "coffee_arabika",
+            "coffee_blend",
+            "milk",
+            "panini",
+            "sausages",
+            "buns",
+        )
+        for i in products:
+            consumption_value = (
+                getattr(self.storage, i) - getattr(form, i).data + weight_amount(i)
+            )
+            setattr(report, f"consumption_{i}", consumption_value)
+            consumption_to_storage = getattr(self.storage, i) - getattr(
+                report, f"consumption_{i}"
+            )
+            setattr(self.storage, i, consumption_to_storage)
 
         self.write_to_db(report)
